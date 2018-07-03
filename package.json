@@ -1,0 +1,26 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "Recipe API, serving recipe data to the Funky Radish online recipe system.",
+  "main": "server.js",
+  "scripts": {
+    "start": "SET NODE_ENV=dev && node server.js",
+    "test": "mocha --timeout 10000"
+  },
+  "author": "scolobey",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^2.0.1",
+    "body-parser": "^1.18.3",
+    "config": "^1.30.0",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.1.7",
+    "mongoose-unique-validator": "^2.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "mocha": "^5.2.0"
+  }
+}
