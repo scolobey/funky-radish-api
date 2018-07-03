@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const config = require('config');
 const authConfig = require('./config/authentication.config.js');
 const mongoose = require('mongoose');
+const PORT = process.env.PORT || 8080
 
 // create express app
 const app = express();
@@ -35,6 +36,6 @@ require('./app/routes/user.routes.js')(app);
 require('./app/routes/recipe.routes.js')(app);
 
 // listen for requests
-app.listen(8080, () => {
-    console.log("Server is listening on port 8080");
-});
+app.listen(PORT, () =>
+  console.log(`Listening on ${ PORT }`)
+);
