@@ -4,7 +4,7 @@
   "description": "Recipe API, serving recipe data to the Funky Radish online recipe system.",
   "main": "server.js",
   "scripts": {
-    "start": "NODE_ENV=dev && node server.js",
+    "start": "node server.js",
     "test": "mocha --timeout 10000"
   },
   "author": "scolobey",
