@@ -43,6 +43,19 @@ exports.findAll = (req, res) => {
     });
 };
 
+// Retrieve and return all recipes corresponding to a specific user from the database.
+exports.findAllByUser = (req, res) => {
+  Recipe.find({author: {_id: req.params.userId}})
+    .populate('author')
+    .then(recipes => {
+      res.send(recipes);
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Error occurred while retrieving Recipes for user " + req.params.userId
+      });
+    });
+};
+
 // Find a single recipe with a recipeId
 exports.findOne = (req, res) => {
   Recipe.findById(req.params.recipeId)

@@ -10,12 +10,14 @@ module.exports = function (app) {
     // Create a new Recipe
     app.post('/recipes', recipes.create);
 
+    app.get('/recipes/:userId', Auth.verifyUserOwner, recipes.findAllByUser);
+
     // Retrieve a single Recipe with recipeId
-    app.get('/recipes/:recipeId', recipes.findOne);
+    app.get('/recipe/:recipeId', recipes.findOne);
 
     // Update a Recipe with recipeId
-    app.put('/recipes/:recipeId', Auth.verifyRecipeOwner, recipes.update);
+    app.put('/recipe/:recipeId', Auth.verifyRecipeOwner, recipes.update);
 
     // Delete a Recipe with recipeId
-    app.delete('/recipes/:recipeId', Auth.verifyRecipeOwner, recipes.delete);
+    app.delete('/recipe/:recipeId', Auth.verifyRecipeOwner, recipes.delete);
 }
