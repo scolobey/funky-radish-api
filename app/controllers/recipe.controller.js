@@ -1,4 +1,6 @@
 const Recipe = require('../models/recipe.model.js');
+const Seed = require('../../config/authentication.config.js').secret;
+const jwt    = require('jsonwebtoken');
 
 // Create and Save a new Recipe
 exports.create = (req, res) => {
@@ -30,17 +32,53 @@ exports.create = (req, res) => {
   });
 };
 
-// Retrieve and return all recipes from the database.
+// Retrieve and return all recipes from the database belonging to the user specified in the token.
 exports.findAll = (req, res) => {
-  Recipe.find()
-    .populate('author')
-    .then(recipes => {
-      res.send(recipes);
-    }).catch(err => {
-      res.status(500).send({
-        message: err.message || "Error occurred while retrieving Recipes."
+
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+    // decode the token
+    if (token) {
+
+      // verify secret and check expiration
+      jwt.verify(token, Seed, function(err, decoded) {
+        if (err) {
+          return res.status(403).send({
+              success: false,
+              message: 'This action requires authentication.'
+          });
+        }
+        else {
+          if (decoded) {
+            // if everything is good, save to request for use in other routes
+            Recipe.find({author: {_id: decoded.user}})
+              .populate('author')
+              .then(recipes => {
+                res.send(recipes);
+              }).catch(err => {
+                res.status(500).send({
+                  message: err.message || "Error occurred while retrieving Recipes."
+                });
+              });
+            }
+          else {
+            return res.status(403).send({
+                success: false,
+                message: 'This action requires authentication.'
+            });
+          }
+        }
       });
-    });
+
+    } else {
+      // if there is no token
+      // return an error
+      return res.status(403).send({
+          success: false,
+          message: 'This action requires an authentication token.'
+      });
+    }
 };
 
 // Retrieve and return all recipes corresponding to a specific user from the database.
