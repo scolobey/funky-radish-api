@@ -4,32 +4,71 @@ const jwt    = require('jsonwebtoken');
 
 // Create and Save a new Recipe
 exports.create = (req, res) => {
-  // Validate
-  if(req.body.directions.length == 0 && !req.body.title && req.body.ingredients.length == 0 ) {
-      return res.status(400).send({
-          message: "Recipe cannot be empty."
+
+  if(Array.isArray(req.body)) {
+
+    var recipeList = []
+
+    for(var i=0 ; i<req.body.length ; i++){
+      // Validate
+      if(req.body[i].directions.length == 0 && !req.body[i].title && req.body[i].ingredients.length == 0 ) {
+          return res.status(400).send({
+              message: "Detected an empty recipe."
+          });
+      }
+
+      // Create
+      const recipe = new Recipe({
+          title: req.body[i].title,
+          ingredients: req.body[i].ingredients,
+          directions: req.body[i].directions,
+          author: req.body[i].author
       });
+
+      recipeList.push(recipe)
+    }
+
+    // Save
+    Recipe.insertMany(recipeList)
+    .then(function(data) {
+        res.send(data);
+    })
+    .catch(function(err) {
+        res.status(500).send({
+            message: err.message || "Error occurred while creating Recipes."
+        });
+    });
+
+  }
+  else {
+    // Validate
+    if(req.body.directions.length == 0 && !req.body.title && req.body.ingredients.length == 0 ) {
+        return res.status(400).send({
+            message: "Recipe cannot be empty."
+        });
+    }
+
+    // Create
+    const recipe = new Recipe({
+        title: req.body.title,
+        ingredients: req.body.ingredients,
+        directions: req.body.directions,
+        author: req.body.author
+    });
+
+    // Save
+    recipe
+    .populate('author')
+    .save()
+    .then(data => {
+        res.send(data);
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Error occurred while creating Recipe."
+        });
+    });
   }
 
-  // Create
-  const recipe = new Recipe({
-      title: req.body.title,
-      ingredients: req.body.ingredients,
-      directions: req.body.directions,
-      author: req.body.author
-  });
-
-  // Save
-  recipe
-  .populate('author')
-  .save()
-  .then(data => {
-      res.send(data);
-  }).catch(err => {
-      res.status(500).send({
-          message: err.message || "Error occurred while creating Recipe."
-      });
-  });
 };
 
 // Retrieve and return all recipes from the database belonging to the user specified in the token.
