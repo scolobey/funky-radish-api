@@ -189,8 +189,18 @@ exports.verifyRecipeOwner = (req, res, next) => {
         });
       }
       else {
+        let recipeId = ""
+
+        // When updating a list of recipes, you must include recipe._id with each recipe in body of request.
+        if(Array.isArray(req.body)) {
+          recipeId = req.body[0]._id
+        }
+        else {
+          recipeId = req.params.recipeId
+        }
+
         Recipe.findOne({
-            _id: req.params.recipeId
+            _id: recipeId
           },
           function(err, recipe) {
             if (err) throw err;
@@ -210,6 +220,8 @@ exports.verifyRecipeOwner = (req, res, next) => {
               });
             }
         });
+
+
       }
     });
 

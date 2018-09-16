@@ -7,7 +7,7 @@ module.exports = function (app) {
     app.get('/recipes', recipes.findAll);
     app.get('/', recipes.findAll);
 
-    // Create a new Recipe
+    // Create new Recipe or Recipes
     app.post('/recipes', recipes.create);
 
     // Find any user's recipes, if you're admin.
@@ -18,6 +18,9 @@ module.exports = function (app) {
 
     // Update a Recipe with recipeId
     app.put('/recipe/:recipeId', Auth.verifyRecipeOwner, recipes.update);
+
+    // Update a list of Recipes
+    app.put('/updateRecipes', Auth.verifyRecipeOwner, recipes.updateMany);
 
     // Delete a Recipe with recipeId
     app.delete('/recipe/:recipeId', Auth.verifyRecipeOwner, recipes.delete);

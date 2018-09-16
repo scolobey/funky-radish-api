@@ -4,7 +4,6 @@ const jwt    = require('jsonwebtoken');
 
 // Create and Save a new Recipe
 exports.create = (req, res) => {
-
   // check header, url parameters or post parameters for an authorization token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
@@ -194,37 +193,118 @@ exports.findOne = (req, res) => {
 // Update the recipe identified by the recipeId in the request
 exports.update = (req, res) => {
   // Validate
-     if(!req.body.directions && !req.body.title && !req.body.ingredients) {
-         return res.status(400).send({
-             message: "Recipe cannot be empty."
-         });
-     }
+  if(!req.body.directions && !req.body.title && !req.body.ingredients && !req.body.updatedAt) {
+    return res.status(400).send({
+      message: "One of your recipes appears to be missing some information."
+    });
+  }
 
-     // Find and update recipe from request body
-     Recipe.findByIdAndUpdate(req.params.recipeId, {
-         title: req.body.title || "Untitled",
-         ingredients: req.body.ingredients,
-         directions: req.body.directions,
-         author: req.body.author
-     }, {new: true})
-     .populate('author')
-     .then(recipe => {
-         if(!recipe) {
-             return res.status(404).send({
-                 message: "Recipe not found. recipeId = " + req.params.recipeId
-             });
-         }
-         res.send(recipe);
-     }).catch(err => {
-         if(err.kind === 'ObjectId') {
-             return res.status(404).send({
-                 message: "No recipe found with id: " + req.params.recipeId
-             });
-         }
-         return res.status(500).send({
-             message: "Error updating recipe with id: " + req.params.recipeId
-         });
-     });
+  // Find and update recipe from request body
+  Recipe.findByIdAndUpdate(req.params.recipeId, {
+    $set: {
+      title: req.body.title || "Untitled",
+      ingredients: req.body.ingredients,
+      directions: req.body.directions,
+      updatedAt: req.body.updatedAt
+    }
+  }, {new: true})
+  .populate('author')
+  .then(recipe => {
+    if(!recipe) {
+      return res.status(404).send({
+        message: "Recipe not found. recipeId = " + req.params.recipeId
+      });
+    }
+    res.send(recipe);
+  }).catch(err => {
+    if(err.kind === 'ObjectId') {
+      return res.status(404).send({
+        message: "No recipe found with id: " + req.params.recipeId
+      });
+    }
+    return res.status(500).send({
+      message: "Error updating recipe with id: " + req.params.recipeId
+    });
+  });
+};
+
+// Update the list of recipes identified by recipeId's in the request
+exports.updateMany = (req, res) => {
+
+  var bulkOps = []
+
+  for(var i=0 ; i<req.body.length ; i++){
+
+    console.log(req.body[i]._id)
+
+    // Validate
+    if(req.body[i].directions.length == 0 && !req.body[i].title && req.body[i].ingredients.length == 0 && req.body[i]._id.length == 0 ) {
+      return res.status(400).send({
+        message: "Detected an incomplete recipe."
+      });
+    }
+
+    bulkOps.push({
+      updateOne :
+        {
+          "filter" : { "_id" : req.body[i]._id },
+          "update" : {
+            $set : {
+              title: req.body[i].title || "Untitled",
+              ingredients: req.body[i].ingredients,
+              directions: req.body[i].directions,
+              updatedAt: req.body[i].updatedAt
+            }
+          }
+        }
+    })
+
+    // // Find and update recipe from request body
+    // Recipe.findByIdAndUpdate(req.body[i]._id, {
+      // $set: {
+      //   title: req.body[i].title || "Untitled",
+      //   ingredients: req.body[i].ingredients,
+      //   directions: req.body[i].directions,
+      //   updatedAt: req.body[i].updatedAt
+      // }
+    // }, {new: true})
+    // .then(recipe => {
+    //   if (i == req.body.length-1) {
+    //     return res.status(404).send({
+    //         message: "Update complete."
+    //     });
+    //   }
+    // }).catch(err => {
+    //   if(err.kind === 'ObjectId') {
+    //     return res.status(404).send({
+    //       message: "No recipe found with id: " + req.params.recipeId
+    //     });
+    //   }
+    //   return res.status(500).send({
+    //     message: "Error updating recipe with id: " + req.params.recipeId
+    //   });
+    // });
+
+  }
+
+
+
+  Recipe.bulkWrite(bulkOps)
+  .then(recipe => {
+    return res.status(404).send({
+      message: "Update complete."
+    });
+  }).catch(err => {
+    if(err.kind === 'ObjectId') {
+      return res.status(404).send({
+        message: "No recipe found with id: " + req.params.recipeId
+      });
+    }
+    return res.status(500).send({
+      message: "Error updating recipe with id: " + req.params.recipeId
+    });
+  });
+
 };
 
 // Delete the recipe specified by the recipeId in the request
