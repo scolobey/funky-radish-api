@@ -31,6 +31,7 @@ exports.create = (req, res) => {
               }
               // Create and add to queue for saving.
               const recipe = new Recipe({
+                realmID: req.body[i].realmID || "",
                 title: req.body[i].title,
                 ingredients: req.body[i].ingredients,
                 directions: req.body[i].directions,
@@ -63,6 +64,7 @@ exports.create = (req, res) => {
             // Create
             const recipe = new Recipe({
               title: req.body.title,
+              realmId: req.body.realmID,
               ingredients: req.body.ingredients,
               directions: req.body.directions,
               author: req.body.author
@@ -203,6 +205,7 @@ exports.update = (req, res) => {
   Recipe.findByIdAndUpdate(req.params.recipeId, {
     $set: {
       title: req.body.title || "Untitled",
+      realmID: req.body.realmID || "",
       ingredients: req.body.ingredients,
       directions: req.body.directions,
       updatedAt: req.body.updatedAt
@@ -234,9 +237,6 @@ exports.updateMany = (req, res) => {
   var bulkOps = []
 
   for(var i=0 ; i<req.body.length ; i++){
-
-    console.log(req.body[i]._id)
-
     // Validate
     if(req.body[i].directions.length == 0 && !req.body[i].title && req.body[i].ingredients.length == 0 && req.body[i]._id.length == 0 ) {
       return res.status(400).send({
@@ -251,6 +251,7 @@ exports.updateMany = (req, res) => {
           "update" : {
             $set : {
               title: req.body[i].title || "Untitled",
+              realmID: req.body[i].realmID || "",
               ingredients: req.body[i].ingredients,
               directions: req.body[i].directions,
               updatedAt: req.body[i].updatedAt
@@ -258,36 +259,7 @@ exports.updateMany = (req, res) => {
           }
         }
     })
-
-    // // Find and update recipe from request body
-    // Recipe.findByIdAndUpdate(req.body[i]._id, {
-      // $set: {
-      //   title: req.body[i].title || "Untitled",
-      //   ingredients: req.body[i].ingredients,
-      //   directions: req.body[i].directions,
-      //   updatedAt: req.body[i].updatedAt
-      // }
-    // }, {new: true})
-    // .then(recipe => {
-    //   if (i == req.body.length-1) {
-    //     return res.status(404).send({
-    //         message: "Update complete."
-    //     });
-    //   }
-    // }).catch(err => {
-    //   if(err.kind === 'ObjectId') {
-    //     return res.status(404).send({
-    //       message: "No recipe found with id: " + req.params.recipeId
-    //     });
-    //   }
-    //   return res.status(500).send({
-    //     message: "Error updating recipe with id: " + req.params.recipeId
-    //   });
-    // });
-
   }
-
-
 
   Recipe.bulkWrite(bulkOps)
   .then(recipe => {
