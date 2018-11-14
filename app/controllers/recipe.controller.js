@@ -35,6 +35,8 @@ exports.create = (req, res) => {
                 title: req.body[i].title,
                 ingredients: req.body[i].ingredients,
                 directions: req.body[i].directions,
+                _id: req.body[i]._id,
+                updatedAt: req.body[i].updatedAt,
                 author: {_id: decoded.user}
               });
               recipeList.push(recipe)
@@ -67,6 +69,8 @@ exports.create = (req, res) => {
               realmId: req.body.realmID,
               ingredients: req.body.ingredients,
               directions: req.body.directions,
+              _id: req.body._id,
+              updatedAt: req.body.updatedAt,
               author: req.body.author
             });
 
@@ -107,7 +111,7 @@ exports.create = (req, res) => {
 
 // Retrieve and return all recipes from the database belonging to the user specified in the token.
 exports.findAll = (req, res) => {
-
+  console.log(req.headers)
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
@@ -119,7 +123,7 @@ exports.findAll = (req, res) => {
         if (err) {
           return res.status(403).send({
               success: false,
-              message: 'This action requires authentication.'
+              message: 'Token verification error.'
           });
         }
         else {
@@ -131,14 +135,14 @@ exports.findAll = (req, res) => {
                 res.send(recipes);
               }).catch(err => {
                 res.status(500).send({
-                  message: err.message || "Error occurred while retrieving Recipes."
+                  message: err.message || "Error retrieving Recipes."
                 });
               });
             }
           else {
             return res.status(403).send({
                 success: false,
-                message: 'This action requires authentication.'
+                message: 'Token did not decode properly.'
             });
           }
         }
@@ -149,7 +153,7 @@ exports.findAll = (req, res) => {
       // return an error
       return res.status(403).send({
           success: false,
-          message: 'This action requires an authentication token.'
+          message: 'No token provided.'
       });
     }
 };

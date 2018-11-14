@@ -6,7 +6,6 @@ const jwt    = require('jsonwebtoken');
 
 // Create a token
 exports.getToken = (req, res) => {
-
   // find the user
   User.findOne({
       email: req.body.email

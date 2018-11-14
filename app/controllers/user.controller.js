@@ -2,6 +2,8 @@ const User = require('../models/user.model.js');
 
 // Create and Save a new User
 exports.create = (req, res) => {
+  console.log(req.body)
+  
   // Validate
   if(!req.body.email || !req.body.name || !req.body.password) {
       return res.status(400).send({
