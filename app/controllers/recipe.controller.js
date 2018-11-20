@@ -267,7 +267,7 @@ exports.updateMany = (req, res) => {
 
   Recipe.bulkWrite(bulkOps)
   .then(recipe => {
-    return res.status(404).send({
+    return res.status(200).send({
       message: "Update complete."
     });
   }).catch(err => {
