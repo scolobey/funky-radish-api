@@ -266,8 +266,8 @@ exports.updateMany = (req, res) => {
   }
 
   Recipe.bulkWrite(bulkOps)
-  .then(function(data) {
-    res.send(data.upserted);
+  .then(recipe => {
+    res.send("[]");
   })
   .catch(err => {
     if(err.kind === 'ObjectId') {
