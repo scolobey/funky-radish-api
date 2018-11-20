@@ -266,7 +266,7 @@ exports.updateMany = (req, res) => {
   }
 
   Recipe.bulkWrite(bulkOps)
-  .then(data => {
+  .then(function(data) {
     res.send(data);
   })
   .catch(err => {
