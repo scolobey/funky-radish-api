@@ -266,11 +266,10 @@ exports.updateMany = (req, res) => {
   }
 
   Recipe.bulkWrite(bulkOps)
-  .then(recipe => {
-    return res.status(200).send({
-      message: "Update complete."
-    });
-  }).catch(err => {
+  .then(data => {
+    res.send(data);
+  })
+  .catch(err => {
     if(err.kind === 'ObjectId') {
       return res.status(404).send({
         message: "No recipe found with id: " + req.params.recipeId
