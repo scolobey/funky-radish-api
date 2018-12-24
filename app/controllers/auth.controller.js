@@ -219,8 +219,6 @@ exports.verifyRecipeOwner = (req, res, next) => {
               });
             }
         });
-
-
       }
     });
 
@@ -233,5 +231,73 @@ exports.verifyRecipeOwner = (req, res, next) => {
       message: 'This action requires authentication.'
     });
   }
+};
 
+// Check for admin or owner.
+exports.verifyBulkDelete = (req, res, next) => {
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+  // decode the token
+  if (token) {
+    // verify secret and check expiration
+    jwt.verify(token, Seed, function(err, decoded) {
+      if (err) {
+        return res.status(403).send({
+          success: false,
+          message: 'This action requires authentication.'
+        });
+      }
+      else {
+
+        Recipe.find({
+            _id: req.body
+          },
+          function(err, recipes) {
+            if (err) throw err;
+
+            if (recipes.length < 1) {
+              res.json({ success: false, message: 'Authentication failed. Recipes not found.' });
+            }
+            else {
+              var author = recipes[0]["author"]["_id"]
+              //check if all of the recipes have the same _id
+              function checkIds(recipe) {
+                return JSON.stringify(recipe.author._id) == JSON.stringify(author)
+              }
+
+              var sameIds = recipes.every(checkIds)
+
+              if (sameIds) {
+                if (decoded.user == author) {
+                  // Save to request for use in other routes
+                  req.decoded = decoded;
+                  next();
+                }
+                else {
+                  return res.status(403).send({
+                    success: false,
+                    message: 'You can only delete your own recipes.'
+                  });
+                }
+              }
+              else {
+                return res.status(403).send({
+                  success: false,
+                  message: 'Recipe authors are not all the same.'
+                });
+              }
+            }
+        });
+      }
+    });
+  }
+  else {
+    // if there is no token
+    // return an error
+    return res.status(403).send({
+      success: false,
+      message: 'This action requires authentication.'
+    });
+  }
 };

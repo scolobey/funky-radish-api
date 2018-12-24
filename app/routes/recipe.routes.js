@@ -22,6 +22,9 @@ module.exports = function (app) {
     // Update a list of Recipes
     app.put('/updateRecipes', Auth.verifyRecipeOwner, recipes.updateMany);
 
+    // Delete a list of Recipes
+    app.delete('/deleteRecipes', Auth.verifyBulkDelete, recipes.deleteMany);
+
     // Delete a Recipe with recipeId
     app.delete('/recipe/:recipeId', Auth.verifyRecipeOwner, recipes.delete);
 }

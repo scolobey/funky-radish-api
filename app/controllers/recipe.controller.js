@@ -303,3 +303,16 @@ exports.delete = (req, res) => {
           });
       });
 };
+
+// Delete the recipes specified by the array of Id's in the request body
+exports.deleteMany = (req, res) => {
+  Recipe.deleteMany({_id: {$in: req.body}})
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      return res.status(500).send({
+          message: "Error deleting recipes"
+      });
+    })
+};
