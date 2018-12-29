@@ -24,7 +24,7 @@ app.use(cors());
 // }
 
 // Then pass them to cors:
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 
 // set the secret key for authentication
