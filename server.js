@@ -10,6 +10,23 @@ const PORT = process.env.PORT || 8080
 const app = express();
 app.use(cors());
 
+//  Todo: set this up once gone live.
+// var whitelist = ['https://funkyradish.com']
+//
+// var corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   }
+// }
+
+// Then pass them to cors:
+app.use(cors(corsOptions));
+
+
 // set the secret key for authentication
 app.set('secret', authConfig.secret);
 
