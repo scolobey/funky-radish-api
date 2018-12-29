@@ -7,7 +7,7 @@ npm
 
 # installation
 clone
-npm install 
+npm install
 npm start
 
 but you need to change the secret key located here:
