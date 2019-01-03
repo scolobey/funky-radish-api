@@ -1,5 +1,5 @@
 const Recipe = require('../models/recipe.model.js');
-const Seed = require('../../config/authentication.config.js').secret;
+const Seed = process.env.SEED;
 const jwt    = require('jsonwebtoken');
 
 // Create and Save a new Recipe
