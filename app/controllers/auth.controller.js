@@ -1,6 +1,6 @@
 const User = require('../models/user.model.js');
 const Recipe = require('../models/recipe.model.js');
-const Seed = require('../../config/authentication.config.js').secret;
+const Seed = process.env.SEED;
 const bcrypt = require('bcrypt');
 const jwt    = require('jsonwebtoken');
 
