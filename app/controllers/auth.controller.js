@@ -21,6 +21,9 @@ exports.getToken = (req, res) => {
         // check if password hashes correctly
         bcrypt.compare(req.body.password, user.password, function (err, result) {
           if (result === true) {
+
+            console.log(Seed);
+
             // if user is found and password is correct
             // create a token with the given payload
             const payload = {

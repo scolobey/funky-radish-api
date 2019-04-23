@@ -1,9 +1,12 @@
 const User = require('../models/user.model.js');
+const Recipe = require('../models/recipe.model.js');
+const Seed = process.env.SEED;
+const jwt    = require('jsonwebtoken');
 
 // Create and Save a new User
 exports.create = (req, res) => {
   console.log(req.body)
-  
+
   // Validate
   if(!req.body.email || !req.body.name || !req.body.password) {
       return res.status(400).send({
@@ -21,8 +24,46 @@ exports.create = (req, res) => {
 
   // Save
   user.save()
-  .then(data => {
-      res.json({message: "User created successfully.", data});
+  .then(userData => {
+
+    // Generate a token
+    const payload = {
+      admin: userData.admin,
+      user: userData._id
+    };
+    var token = jwt.sign(payload, Seed, {
+      expiresIn: 86400 // expires in 24 hours
+    });
+
+    // Compile recipes
+    var recipeList = []
+
+    for(var i=0 ; i<req.body.recipes.length ; i++){
+      // Create and add to queue for saving.
+      const recipe = new Recipe({
+        realmID: req.body.recipes[i].realmID || "",
+        title: req.body.recipes[i].title,
+        ingredients: req.body.recipes[i].ingredients,
+        directions: req.body.recipes[i].directions,
+        _id: req.body.recipes[i]._id,
+        updatedAt: req.body.recipes[i].updatedAt,
+        author: {_id: userData._id}
+      });
+      recipeList.push(recipe)
+    }
+
+    Recipe.insertMany(recipeList)
+      .then(function(recipeData) {
+        userData.recipes = recipeData
+        res.json({message: "User created successfully.", token: token, userData});
+      })
+      .catch(function(err) {
+        // res.status(500).send({
+        //   message: err.message || "Error occurred while creating Recipes."
+        // });
+        res.json({message: "User created, but recipe creation was incomplete.", token: token, userData});
+      });
+
   }).catch(err => {
       res.status(500).send({
           message: err.message || "Error occurred while creating User."
