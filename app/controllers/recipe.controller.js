@@ -211,7 +211,7 @@ exports.update = (req, res) => {
     $set: {
       title: req.body.title || "Untitled",
       realmID: req.body.realmID || "",
-      clientID: req.body[i].clientID || "",
+      clientID: req.body.clientID || "",
       ingredients: req.body.ingredients,
       directions: req.body.directions,
       updatedAt: req.body.updatedAt
