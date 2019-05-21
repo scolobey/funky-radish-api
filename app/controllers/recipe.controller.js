@@ -17,7 +17,6 @@ exports.create = (req, res) => {
       }
       else {
         if (decoded) {
-
           // Is it a list of recipes?
           if(Array.isArray(req.body)) {
             var recipeList = []
@@ -32,6 +31,7 @@ exports.create = (req, res) => {
               // Create and add to queue for saving.
               const recipe = new Recipe({
                 realmID: req.body[i].realmID || "",
+                clientID: req.body[i].clientID || "",
                 title: req.body[i].title,
                 ingredients: req.body[i].ingredients,
                 directions: req.body[i].directions,
@@ -66,7 +66,8 @@ exports.create = (req, res) => {
             // Create
             const recipe = new Recipe({
               title: req.body.title,
-              realmId: req.body.realmID,
+              realmId: req.body.realmID || "",
+              clientID: req.body[i].clientID || "",
               ingredients: req.body.ingredients,
               directions: req.body.directions,
               _id: req.body._id,
@@ -210,6 +211,7 @@ exports.update = (req, res) => {
     $set: {
       title: req.body.title || "Untitled",
       realmID: req.body.realmID || "",
+      clientID: req.body[i].clientID || "",
       ingredients: req.body.ingredients,
       directions: req.body.directions,
       updatedAt: req.body.updatedAt
@@ -256,6 +258,7 @@ exports.updateMany = (req, res) => {
             $set : {
               title: req.body[i].title || "Untitled",
               realmID: req.body[i].realmID || "",
+              clientID: req.body[i].clientID || "",
               ingredients: req.body[i].ingredients,
               directions: req.body[i].directions,
               updatedAt: req.body[i].updatedAt

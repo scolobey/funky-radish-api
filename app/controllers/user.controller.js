@@ -58,9 +58,6 @@ exports.create = (req, res) => {
         res.json({message: "User created successfully.", token: token, userData});
       })
       .catch(function(err) {
-        // res.status(500).send({
-        //   message: err.message || "Error occurred while creating Recipes."
-        // });
         res.json({message: "User created, but recipe creation was incomplete.", token: token, userData});
       });
 
