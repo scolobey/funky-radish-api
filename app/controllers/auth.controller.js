@@ -198,6 +198,8 @@ exports.verifyRecipeOwner = (req, res, next) => {
           recipeId = req.params.recipeId
         }
 
+        console.log(recipeId);
+
         Recipe.findOne({
             _id: recipeId
           },

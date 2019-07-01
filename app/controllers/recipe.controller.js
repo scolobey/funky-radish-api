@@ -197,6 +197,29 @@ exports.findOne = (req, res) => {
     });
 };
 
+// Find a single recipe with a recipeId
+exports.findByTitle = (req, res) => {
+
+  let title = req.params.recipeTitle.replace(/-/g, " ");
+
+  Recipe.findOne({ 'title': title })
+    .populate('author')
+    .then(recipe => {
+      if(!recipe) {
+        return res.status(404).send({
+          message: "No recipe found with the title: " + title
+        });
+      }
+      res.send(recipe);
+    })
+    .catch(err => {
+      return res.status(404).send({
+        message: "No recipe found with the title: " + title
+      });
+    });
+
+};
+
 // Update the recipe identified by the recipeId in the request
 exports.update = (req, res) => {
   // Validate
@@ -205,6 +228,8 @@ exports.update = (req, res) => {
       message: "One of your recipes appears to be missing some information."
     });
   }
+
+  console.log(req.body.updatedAt);
 
   // Find and update recipe from request body
   Recipe.findByIdAndUpdate(req.params.recipeId, {

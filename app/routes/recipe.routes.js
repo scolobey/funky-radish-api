@@ -10,8 +10,11 @@ module.exports = function (app) {
     // Create new Recipe or Recipes
     app.post('/recipes', recipes.create);
 
+    // app.get('/recipes/:recipeTitle', recipes.findByTitle);
+    app.get('/recipes/:recipeTitle', recipes.findByTitle);
+
     // Find any user's recipes, if you're admin.
-    app.get('/recipes/:userId', Auth.verifyAdmin, recipes.findAllByUser);
+    app.get('/recipesByUser/:userId', Auth.verifyAdmin, recipes.findAllByUser);
 
     // Retrieve a single Recipe with recipeId
     app.get('/recipe/:recipeId', recipes.findOne);

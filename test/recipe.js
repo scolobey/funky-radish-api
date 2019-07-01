@@ -285,6 +285,30 @@ describe('Recipes', () => {
     });
   });
 
+  // GET
+  describe('/GET recipes with recipeTitle', () => {
+    it('it should not GET a non existent recipe', (done) => {
+      chai.request('http://localhost:8080')
+        .get('/recipes/Non-Existent-Recipe')
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+    it('it should GET recipe we just created.', (done) => {
+      chai.request('http://localhost:8080')
+        .get('/recipes/Nuclear-Hot-Dog')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.title.should.be.eql('Nuclear Bacon Dog');
+          res.body.ingredients.should.be.eql(['Nuclear Bacon Dog', 'Ham', 'Nuclear Bacon Dog']);
+          res.body.directions.should.be.eql(['Nuclear Bacon Dog', 'Is', 'A mans best', 'Friend!']);
+          res.body.should.not.have.property('author');
+          done();
+        });
+    });
+  });
+
   // DELETE
   describe('/DELETE recipes without auth', () => {
     it('it should not DELETE a recipe with a given Id and invalid auth', (done) => {
