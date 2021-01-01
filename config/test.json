@@ -1,3 +1,3 @@
 {
-    "DBHost": "mongodb://admin:funkyradish123@ds121341.mlab.com:21341/funky-radish-test"
+    "DBHost": "mongodb+srv://chef:mise@funkyradish.eurby.mongodb.net/funky-radish?retryWrites=true&w=majority"
 }

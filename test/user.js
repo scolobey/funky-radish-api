@@ -44,7 +44,6 @@ describe('Users', () => {
   })
 
   // Add a user
-
   describe('/POST user without name', () => {
     it('it should not POST a user if no name is specified', (done) => {
       var brokenUser = {
@@ -74,10 +73,10 @@ describe('Users', () => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('message').eql('User created successfully.');
-          res.body.data.should.have.property('name').eql('manpearpig');
-          res.body.data.should.have.property('email').eql('manpearpig@email.com');
-          res.body.data.should.have.property('password');
-          res.body.data.should.have.property('admin').eql(false);
+          res.body.userData.should.have.property('name').eql('manpearpig');
+          res.body.userData.should.have.property('email').eql('manpearpig@email.com');
+          res.body.userData.should.have.property('password');
+          res.body.userData.should.have.property('admin').eql(false);
           done();
         });
     });
@@ -107,10 +106,10 @@ describe('Users', () => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('message').eql('User created successfully.');
-          res.body.data.should.have.property('name').eql('username');
-          res.body.data.should.have.property('email').eql('email@email.com');
-          res.body.data.should.have.property('password');
-          res.body.data.should.have.property('admin').eql(true);
+          res.body.userData.should.have.property('name').eql('username');
+          res.body.userData.should.have.property('email').eql('email@email.com');
+          res.body.userData.should.have.property('password');
+          res.body.userData.should.have.property('admin').eql(true);
           done();
         });
     });
@@ -137,8 +136,8 @@ describe('Users', () => {
         .get('/users')
         .set('x-access-token', standardToken)
         .end((err, res) => {
-          res.should.have.status(403);
-          res.body.message.should.be.eql('This action requires authentication.');
+          res.should.have.status(404);
+          res.body.message.should.be.eql('That which you seek does not exist.');
           done();
         });
 

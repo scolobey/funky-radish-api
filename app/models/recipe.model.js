@@ -6,8 +6,7 @@ const RecipeSchema = mongoose.Schema({
     clientID: String,
     ingredients: [String],
     directions: [String],
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    updatedAt: String
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, {
     timestamps: true
 });

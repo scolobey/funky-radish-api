@@ -11,8 +11,8 @@ const app = express();
 
 app.use(cors());
 
-//  Todo: set this up once gone live.
-// var whitelist = ['https://funkyradish.com']
+ // Todo: set this up once gone live.
+// var whitelist = ['https://funkyradish.com', 'http://localhost:3000']
 //
 // var corsOptions = {
 //   origin: function (origin, callback) {
@@ -23,9 +23,15 @@ app.use(cors());
 //     }
 //   }
 // }
-
-// Then pass them to cors:
+//
+// // Then pass them to cors:
 // app.use(cors(corsOptions));
+
+// app.use(function(req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   next();
+// });
 
 
 // set the secret key for authentication
@@ -39,9 +45,13 @@ app.use(bodyParser.json())
 
 // Connect to the database
 mongoose.Promise = global.Promise;
+mongoose.set('useFindAndModify', false);
 
 // Connect to production or test db, depending on environment variables.
+console.log(config.DBHost)
 mongoose.connect(config.DBHost)
+
+// Connect to Realm
 
 .then(() => {
     console.log("Database connection successful");
@@ -54,6 +64,7 @@ mongoose.connect(config.DBHost)
 require('./app/routes/authenticate.routes.js')(app);
 require('./app/routes/user.routes.js')(app);
 require('./app/routes/recipe.routes.js')(app);
+require('./app/routes/collector.routes.js')(app);
 
 // listen for requests
 app.listen(PORT, () =>

@@ -21,15 +21,17 @@ let adminToken = '';
 let standardUser = {
     name: 'manpearpig',
     email: 'manpearpig@email.com',
-    password: '321123',
-    admin: false
+    password: 'manpearpig123',
+    admin: false,
+    _id: ''
 }
 
 let adminUser = {
-  name: 'username',
-  email: 'email@email.com',
-  password: '123321',
-  admin: true
+  name: 'adminpearpig',
+  email: 'adminpearpig@email.com',
+  password: 'adminpearpig123',
+  admin: true,
+  _id: ''
 }
 
 describe('Recipes', () => {
@@ -61,14 +63,15 @@ describe('Recipes', () => {
         .post('/users')
         .send(standardUser)
         .end((err, res) => {
+          standardUser._id = res.body.userData._id;
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('message').eql('User created successfully.');
-          res.body.data.should.have.property('name').eql('manpearpig');
-          res.body.data.should.have.property('email').eql('manpearpig@email.com');
-          res.body.data.should.have.property('password');
-          res.body.data.should.have.property('admin').eql(false);
-          standardUser._id = res.body.data._id;
+          res.body.userData.should.have.property('name').eql(standardUser.name);
+          res.body.userData.should.have.property('email').eql(standardUser.email);
+          res.body.userData.should.have.property('password');
+          res.body.userData.should.have.property('_id');
+          res.body.userData.should.have.property('admin').eql(false);
           done();
         });
     });
@@ -82,13 +85,15 @@ describe('Recipes', () => {
         .post('/users')
         .send(adminUser)
         .end((err, res) => {
+          adminUser._id = res.body.userData._id;
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('message').eql('User created successfully.');
-          res.body.data.should.have.property('name').eql('username');
-          res.body.data.should.have.property('email').eql('email@email.com');
-          res.body.data.should.have.property('password');
-          res.body.data.should.have.property('admin').eql(true);
+          res.body.userData.should.have.property('name').eql(adminUser.name);
+          res.body.userData.should.have.property('email').eql(adminUser.email);
+          res.body.userData.should.have.property('password');
+          res.body.userData.should.have.property('_id');
+          res.body.userData.should.have.property('admin').eql(true);
           done();
         });
     });
@@ -115,8 +120,8 @@ describe('Recipes', () => {
         .get('/users')
         .set('x-access-token', standardToken)
         .end((err, res) => {
-          res.should.have.status(403);
-          res.body.message.should.be.eql('This action requires authentication.');
+          res.should.have.status(404);
+          res.body.message.should.be.eql('That which you seek does not exist.');
           done();
         });
 
@@ -166,12 +171,12 @@ describe('Recipes', () => {
       let recipe = {
         title: 'Nuclear Bacon Dog',
         ingredients: ['Nuclear Bacon Dog', 'Ham', 'Nuclear Bacon Dog'],
-        directions: ['Nuclear Bacon Dog', 'Is', 'A mans best', 'Friend!'],
-        author: standardUser._id
+        directions: ['Nuclear Bacon Dog', 'Is', 'A mans best', 'Friend!']
       };
 
       chai.request('http://localhost:8080')
         .post('/recipes')
+        .set('x-access-token', standardToken)
         .send(recipe)
         .end((err, res) => {
           res.should.have.status(200);
@@ -179,28 +184,6 @@ describe('Recipes', () => {
           res.body.ingredients.should.be.eql(['Nuclear Bacon Dog', 'Ham', 'Nuclear Bacon Dog']);
           res.body.directions.should.be.eql(['Nuclear Bacon Dog', 'Is', 'A mans best', 'Friend!']);
           recipeId = res.body._id;
-          done();
-        });
-    });
-  });
-
-  describe('/POST recipe without an author', () => {
-    it('it should POST a new recipe without an author', (done) => {
-      let recipe = {
-        title: 'Nuclear Bacon Dog',
-        ingredients: ['Nuclear Bacon Dog', 'Ham', 'Nuclear Bacon Dog'],
-        directions: ['Nuclear Bacon Dog', 'Is', 'A mans best', 'Friend!']
-      };
-
-      chai.request('http://localhost:8080')
-        .post('/recipes')
-        .send(recipe)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.title.should.be.eql('Nuclear Bacon Dog');
-          res.body.ingredients.should.be.eql(['Nuclear Bacon Dog', 'Ham', 'Nuclear Bacon Dog']);
-          res.body.directions.should.be.eql(['Nuclear Bacon Dog', 'Is', 'A mans best', 'Friend!']);
-          res.body.should.not.have.property('author');
           done();
         });
     });
@@ -216,6 +199,7 @@ describe('Recipes', () => {
 
       chai.request('http://localhost:8080')
         .post('/recipes')
+        .set('x-access-token', standardToken)
         .send(recipe)
         .end((err, res) => {
           res.should.have.status(400);
@@ -235,7 +219,7 @@ describe('Recipes', () => {
       };
 
       chai.request('http://localhost:8080')
-        .put('/recipes/' + recipeId)
+        .put('/recipe/' + recipeId)
         .send(recipe)
         .end((err, res) => {
           res.should.have.status(403);
@@ -250,12 +234,11 @@ describe('Recipes', () => {
       recipe = {
         title: 'Bacon Nuclear Dog',
         ingredients: ['Bacon Bacon Dog', 'Ham', 'Bacon Nuclear Dog'],
-        directions: ['Bacon Dog Nuclear', 'Is a blast', 'my', 'Friend!'],
-        author: standardUser._id
+        directions: ['Bacon Dog Nuclear', 'Is a blast', 'my', 'Friend!']
       };
 
       chai.request('http://localhost:8080')
-        .put('/recipes/' + recipeId)
+        .put('/recipe/' + recipeId)
         .set('x-access-token', standardToken)
         .send(recipe)
         .end((err, res) => {
@@ -272,14 +255,15 @@ describe('Recipes', () => {
 
 
   // GET
-  describe('/GET recipes', () => {
-    it('it should GET all existing recipes', (done) => {
+  describe('/GET recipes belonging to a user', () => {
+    it('it should GET recipes published by user in standardUser token', (done) => {
       chai.request('http://localhost:8080')
         .get('/recipes')
+        .set('x-access-token', standardToken)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(2);
+          res.body.length.should.be.eql(1);
           done();
         });
     });
@@ -287,23 +271,23 @@ describe('Recipes', () => {
 
   // GET
   describe('/GET recipes with recipeTitle', () => {
-    it('it should not GET a non existent recipe', (done) => {
+    it('it should not GET a non-existent recipe', (done) => {
       chai.request('http://localhost:8080')
         .get('/recipes/Non-Existent-Recipe')
         .end((err, res) => {
-          res.should.have.status(400);
+          res.should.have.status(404);
           done();
         });
     });
-    it('it should GET recipe we just created.', (done) => {
+
+    it('it should GET the recipe we created.', (done) => {
       chai.request('http://localhost:8080')
-        .get('/recipes/Nuclear-Hot-Dog')
+        .get('/recipes/Bacon-Nuclear-Dog')
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.title.should.be.eql('Nuclear Bacon Dog');
-          res.body.ingredients.should.be.eql(['Nuclear Bacon Dog', 'Ham', 'Nuclear Bacon Dog']);
-          res.body.directions.should.be.eql(['Nuclear Bacon Dog', 'Is', 'A mans best', 'Friend!']);
-          res.body.should.not.have.property('author');
+          res.body.title.should.be.eql('Bacon Nuclear Dog');
+          res.body.ingredients.should.be.eql(['Bacon Bacon Dog', 'Ham', 'Bacon Nuclear Dog']);
+          res.body.directions.should.be.eql(['Bacon Dog Nuclear', 'Is a blast', 'my', 'Friend!']);
           done();
         });
     });
@@ -313,7 +297,7 @@ describe('Recipes', () => {
   describe('/DELETE recipes without auth', () => {
     it('it should not DELETE a recipe with a given Id and invalid auth', (done) => {
       chai.request('http://localhost:8080')
-        .delete('/recipes/' + recipeId)
+        .delete('/recipe/' + recipeId)
         .end((err, res) => {
           res.should.have.status(403);
           res.body.message.should.be.eql('This action requires authentication.');
@@ -325,7 +309,7 @@ describe('Recipes', () => {
   describe('/DELETE recipe with auth', () => {
     it('it should DELETE a recipe with a given Id', (done) => {
       chai.request('http://localhost:8080')
-        .delete('/recipes/' + recipeId)
+        .delete('/recipe/' + recipeId)
         .set('x-access-token', standardToken)
         .end((err, res) => {
           res.should.have.status(200);

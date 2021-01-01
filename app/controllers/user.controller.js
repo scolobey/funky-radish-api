@@ -1,72 +1,56 @@
+const { v4: uuidv4 } = require('uuid');
+
 const User = require('../models/user.model.js');
 const Recipe = require('../models/recipe.model.js');
-const Seed = process.env.SEED;
-const jwt    = require('jsonwebtoken');
+const TokenService = require('../services/token_service.js');
+const RealmService = require('../services/realm_service.js');
 
 // Create and Save a new User
 exports.create = (req, res) => {
-  console.log(req.body)
 
   // Validate
-  if(!req.body.email || !req.body.name || !req.body.password) {
-      return res.status(400).send({
-          message: "User must have a name, email and password."
-      });
+  if(!req.body.email || !req.body.password) {
+    return res.status(400).send({
+      message: "User must have a name, email and password.", token: ""
+    });
   }
 
-  // Create
+  if(!req.body.name) {
+    req.body.name = req.body.email
+  }
+
+  const payload = {
+    admin: false,
+    user: req.body.name,
+    id: uuidv4()
+  };
+
+  // // Create
   const user = new User({
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      admin: req.body.admin || false
+      admin: req.body.admin || false,
+      verified: false
   });
 
-  // Save
   user.save()
-  .then(userData => {
+    .then(userData => {
+      const payload = {
+        admin: userData.admin,
+        user: userData._id
+      };
 
-    // Generate a token
-    const payload = {
-      admin: userData.admin,
-      user: userData._id
-    };
-    var token = jwt.sign(payload, Seed, {
-      expiresIn: 86400 // expires in 24 hours
+      const token = TokenService.generateToken(payload)
+      res.json({ message: "User created successfully.", token: token, error: "" });
+    }).catch(err => {
+      res.json({ message: "User creation failed.", token: "", error: err });
     });
-
-    // Compile recipes
-    var recipeList = []
-
-    for(var i=0 ; i<req.body.recipes.length ; i++){
-      // Create and add to queue for saving.
-      const recipe = new Recipe({
-        realmID: req.body.recipes[i].realmID || "",
-        title: req.body.recipes[i].title,
-        ingredients: req.body.recipes[i].ingredients,
-        directions: req.body.recipes[i].directions,
-        _id: req.body.recipes[i]._id,
-        updatedAt: req.body.recipes[i].updatedAt,
-        author: {_id: userData._id}
-      });
-      recipeList.push(recipe)
-    }
-
-    Recipe.insertMany(recipeList)
-      .then(function(recipeData) {
-        userData.recipes = recipeData
-        res.json({message: "User created successfully.", token: token, userData});
-      })
-      .catch(function(err) {
-        res.json({message: "User created, but recipe creation was incomplete.", token: token, userData});
-      });
-
-  }).catch(err => {
-      res.status(500).send({
-          message: err.message || "Error occurred while creating User."
-      });
-  });
 };
+
+exports.verify = (req, res) => {
+  console.log("verification.")
+}
 
 // Retrieve and return all users from the database.
 exports.findAll = (req, res) => {

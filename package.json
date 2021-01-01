@@ -10,14 +10,16 @@
   "author": "scolobey",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^2.0.1",
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.18.3",
     "config": "^1.30.0",
     "cors": "^2.8.5",
     "express": "^4.16.3",
     "jsonwebtoken": "^8.3.0",
-    "mongoose": "^5.1.7",
-    "mongoose-unique-validator": "^2.0.1"
+    "mongoose": "^5.7.3",
+    "mongoose-unique-validator": "^2.0.1",
+    "realm": "^2.3.0",
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
     "chai": "^4.1.2",

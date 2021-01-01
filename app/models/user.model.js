@@ -10,12 +10,13 @@ const UserSchema = mongoose.Schema({
     email: {
       type: String,
       lowercase: true,
-      unique: true, 
+      unique: true,
       match: [/\S+@\S+\.\S+/, 'is invalid']
     },
     password: String,
     recipes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }],
-    admin: Boolean
+    admin: Boolean,
+    verified: Boolean
 }, {
     timestamps: true
 });
@@ -32,6 +33,12 @@ UserSchema.pre('save', function (next) {
     user.password = hash;
     next();
   })
+});
+
+const tokenSchema = mongoose.Schema({
+    _userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+    token: { type: String, required: true },
+    createdAt: { type: Date, required: true, default: Date.now, expires: 43200 }
 });
 
 module.exports = mongoose.model('User', UserSchema);

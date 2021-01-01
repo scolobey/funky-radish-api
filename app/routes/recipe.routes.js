@@ -4,11 +4,11 @@ module.exports = function (app) {
     const recipes = require('../controllers/recipe.controller.js');
 
     // Retrieve all Recipes belonging to you
-    app.get('/recipes', recipes.findAll);
-    app.get('/', recipes.findAll);
+    app.get('/recipes', Auth.verifyToken, recipes.findAll);
+    app.get('/', Auth.verifyToken, recipes.findAll);
 
     // Create new Recipe or Recipes
-    app.post('/recipes', recipes.create);
+    app.post('/recipes', Auth.verifyToken, recipes.create);
 
     // app.get('/recipes/:recipeTitle', recipes.findByTitle);
     app.get('/recipes/:recipeTitle', recipes.findByTitle);
