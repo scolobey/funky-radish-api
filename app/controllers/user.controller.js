@@ -3,7 +3,6 @@ const { v4: uuidv4 } = require('uuid');
 const User = require('../models/user.model.js');
 const Recipe = require('../models/recipe.model.js');
 const TokenService = require('../services/token_service.js');
-const RealmService = require('../services/realm_service.js');
 const EmailService = require('../services/email_service.js');
 
 // Create and Save a new User

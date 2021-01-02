@@ -1,10 +1,7 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
-const privateKey = fs.readFileSync('./privatekey.pem');
-const publicKey = fs.readFileSync('./publickey.pem');
-
-const privateKey = fs.readFileSync('./privatekey.pem');
-const publicKey = fs.readFileSync('./publickey.pem');
+const privKey = fs.readFileSync('./privatekey.pem');
+const pubKey = fs.readFileSync('./publickey.pem');
 
 exports.generateToken = (payload) => {
   let currentTime = Date.now();
@@ -13,7 +10,7 @@ exports.generateToken = (payload) => {
   payload.sub = payload.user
   payload.aud = 'funky-radish-twdxv'
 
-  const token = jwt.sign(payload, privateKey, {
+  const token = jwt.sign(payload, privKey, {
     algorithm: 'RS256',
     expiresIn: 86400
   });
@@ -24,7 +21,7 @@ exports.generateToken = (payload) => {
 }
 
 exports.verifyToken = (token, callback) => {
-  jwt.verify(token, publicKey, function(err, decoded) {
+  jwt.verify(token, pubKey, function(err, decoded) {
     if (err) {
       return res.json({
         success: false,
