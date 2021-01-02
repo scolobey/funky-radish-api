@@ -15,14 +15,14 @@ generateKeyPair('rsa', {
     cipher: 'aes-256-cbc',
     passphrase: process.env.SECRET
   }
-}, (err, publicKey, privateKey) => {
+}, (err, public, private) => {
   // Handle errors and use the generated key pair.
-  fs.writeFile('publickey.pem', publicKey, function (err) {
+  fs.writeFile('publickey.pem', public, function (err) {
     if (err) throw err;
     console.log('Saved!');
   });
 
-  fs.writeFile('privatekey.pem', privateKey, function (err) {
+  fs.writeFile('privatekey.pem', private, function (err) {
     if (err) throw err;
     console.log('Saved!');
   });
