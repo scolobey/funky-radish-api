@@ -4,10 +4,10 @@ const User = require('../models/user.model.js');
 const Recipe = require('../models/recipe.model.js');
 const TokenService = require('../services/token_service.js');
 const RealmService = require('../services/realm_service.js');
+const EmailService = require('../services/email_service.js');
 
 // Create and Save a new User
 exports.create = (req, res) => {
-
   // Validate
   if(!req.body.email || !req.body.password) {
     return res.status(400).send({
@@ -24,6 +24,8 @@ exports.create = (req, res) => {
     user: req.body.name,
     id: uuidv4()
   };
+
+  console.log("create", req.body.email)
 
   // // Create
   const user = new User({
@@ -42,15 +44,21 @@ exports.create = (req, res) => {
       };
 
       const token = TokenService.generateToken(payload)
-      res.json({ message: "User created successfully.", token: token, error: "" });
+
+      EmailService.sendVerificationEmail(userData.email, token)
+        .then(() => {
+          res.json({ message: "Verification email sent.", token: "", error: "" });
+        })
+        .catch((error) => {
+          res.status(500).send({
+              message: error.message || "Error occurred while sending verification email."
+          });
+        })
+
     }).catch(err => {
       res.json({ message: "User creation failed.", token: "", error: err });
     });
 };
-
-exports.verify = (req, res) => {
-  console.log("verification.")
-}
 
 // Retrieve and return all users from the database.
 exports.findAll = (req, res) => {

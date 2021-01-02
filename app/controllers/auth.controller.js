@@ -4,11 +4,15 @@ const bcrypt = require('bcrypt');
 const TokenService = require('../services/token_service.js');
 
 exports.getToken = (req, res) => {
+
   User.findOne({
     email: req.body.email
   },
   function(err, user) {
-    if (err) throw err;
+    if (err) {
+      console.log('user find rejected')
+      throw err;
+    }
 
     if (!user) {
       res.json({
@@ -20,6 +24,14 @@ exports.getToken = (req, res) => {
       bcrypt.compare(req.body.password, user.password, function (err, result) {
         // if password hashes to user.password
         if (result === true) {
+          if (user.verified != true) {
+            res.json({
+              token: false,
+              message: 'User not verified.',
+              error: 'Unverified user.'
+            });
+          }
+
           const payload = {
             admin: user.admin,
             user: user.id
@@ -219,3 +231,52 @@ exports.verifyBulkDelete = (req, res, next) => {
     });
   }
 };
+
+// Verify a new user with the token they got in their email.
+exports.verify = (req, res) => {
+
+  var token = req.params.secret
+
+  if (token) {
+    TokenService.verifyToken(token, function(decoded) {
+      if (decoded) {
+        User.findByIdAndUpdate(decoded.user, {
+            verified: true
+        })
+        .then(user => {
+          if(!user) {
+            return res.status(404).send({
+              message: "User not found. userId = " + req.params.userId
+            });
+          }
+          res.send(user);
+        }).catch(err => {
+          if(err.kind === 'ObjectId') {
+            return res.status(404).send({
+              message: "No user found with id: " + req.params.userId
+            });
+          }
+          return res.status(500).send({
+            message: "Error updating user with id: " + req.params.userId
+          });
+        });
+      }
+      else {
+        return res.status(403).send({
+          success: false,
+          message: 'secret key failed.'
+        });
+      }
+    });
+  }
+  else {
+    return res.status(403).send({
+      success: false,
+      message: 'This action requires a secret key.'
+    });
+  }
+};
+
+exports.resendSecret = (req, res) => {
+  console.log("resend confirmation")
+}

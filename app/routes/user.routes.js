@@ -6,11 +6,11 @@ module.exports = function (app) {
     // Create a new User
     app.post('/users', users.create);
 
-    // // Verify a new User
-    // app.post('/verify/:secret', users.verify);
+    // // // Verify a new User
+    // app.put('/verify/:secret', users.verify);
     //
-    // // Resend verification
-    // app.post('/resend', users.resendSecret);
+    // // // Resend verification
+    // // app.post('/resend', users.resendSecret);
 
     // Retrieve all Users
     app.get('/users', Auth.verifyAdmin, users.findAll);

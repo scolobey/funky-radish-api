@@ -9,8 +9,8 @@ const UserSchema = mongoose.Schema({
     },
     email: {
       type: String,
-      lowercase: true,
       unique: true,
+      uniqueCaseInsensitive: true,
       match: [/\S+@\S+\.\S+/, 'is invalid']
     },
     password: String,
