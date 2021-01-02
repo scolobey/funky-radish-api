@@ -33,7 +33,6 @@ app.use(cors());
 //   next();
 // });
 
-
 // set the secret key for authentication
 app.set('secret', authConfig.secret);
 

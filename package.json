@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "mocha --timeout 10000"
+    "test": "mocha --timeout 10000",
+    "build": "node config/keys.config.js"
   },
   "author": "scolobey",
   "license": "ISC",

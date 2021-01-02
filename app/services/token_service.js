@@ -3,6 +3,9 @@ const fs = require('fs');
 const privateKey = fs.readFileSync('./privatekey.pem');
 const publicKey = fs.readFileSync('./publickey.pem');
 
+const privateKey = fs.readFileSync('./privatekey.pem');
+const publicKey = fs.readFileSync('./publickey.pem');
+
 exports.generateToken = (payload) => {
   let currentTime = Date.now();
   let expTime = currentTime + 86400
