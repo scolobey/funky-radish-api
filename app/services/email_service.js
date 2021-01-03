@@ -7,9 +7,11 @@ exports.sendVerificationEmail = (email, secret) => {
   const msg = {
     to: 'minedied@gmail.com', // Change to your recipient
     from: 'no-reply@funkyradish.com', // Change to your verified sender
-    subject: 'Confirm your FunkyRadish registration',
-    text: 'Click here to confirm your account registration.',
-    html: '<a href="http://localhost:8080/verify/${secret}">Click to confirm</a>',
+    templateId: 'd-041eb47115154e338d21854457cc1750',
+    dynamicTemplateData: {
+      "sender_secret": secret
+    },
+    subject: 'Confirm your FunkyRadish registration'
   }
 
   return sgMail.send(msg)

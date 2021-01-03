@@ -1,10 +1,8 @@
 const { generateKeyPair } = require('crypto');
 const fs = require('fs');
 
-console.log("it maybe will work then", process.env.SECRET)
-
 generateKeyPair('rsa', {
-  modulusLength: 4096,
+  modulusLength: 2048,
   publicKeyEncoding: {
     type: 'spki',
     format: 'pem'
@@ -13,7 +11,7 @@ generateKeyPair('rsa', {
     type: 'pkcs8',
     format: 'pem',
     cipher: 'aes-256-cbc',
-    passphrase: process.env.SECRET
+    passphrase: ''
   }
 }, (err, public, private) => {
   // Handle errors and use the generated key pair.

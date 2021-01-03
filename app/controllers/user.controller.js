@@ -31,7 +31,7 @@ exports.create = (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      admin: req.body.admin || false,
+      admin: false,
       verified: false
   });
 
@@ -42,7 +42,16 @@ exports.create = (req, res) => {
         user: userData._id
       };
 
-      const token = TokenService.generateToken(payload)
+      var token = ""
+
+      try {
+        token = TokenService.generateToken(payload)
+      } catch(err) {
+        console.log("token error: ", err)
+        res.status(500).send({
+            message: "Error creating a token."
+        });
+      }
 
       EmailService.sendVerificationEmail(userData.email, token)
         .then(() => {

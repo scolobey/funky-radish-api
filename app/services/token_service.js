@@ -8,14 +8,13 @@ exports.generateToken = (payload) => {
   let expTime = currentTime + 86400
 
   payload.sub = payload.user
+  //todo: extract constants
   payload.aud = 'funky-radish-twdxv'
 
   const token = jwt.sign(payload, privKey, {
     algorithm: 'RS256',
     expiresIn: 86400
-  });
-
-  console.log(token)
+  })
 
   return token
 }

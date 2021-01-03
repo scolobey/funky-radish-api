@@ -2,6 +2,7 @@ const User = require('../models/user.model.js');
 const Recipe = require('../models/recipe.model.js');
 const bcrypt = require('bcrypt');
 const TokenService = require('../services/token_service.js');
+const EmailService = require('../services/email_service.js');
 
 exports.getToken = (req, res) => {
 
@@ -10,8 +11,17 @@ exports.getToken = (req, res) => {
   },
   function(err, user) {
     if (err) {
-      console.log('user find rejected')
-      throw err;
+      res.json({
+        success: false,
+        message: 'Authentication error.'
+      });
+    }
+
+    if (user.verified != true) {
+      res.json({
+        success: false,
+        message: 'Email not verified.'
+      });
     }
 
     if (!user) {
@@ -24,14 +34,6 @@ exports.getToken = (req, res) => {
       bcrypt.compare(req.body.password, user.password, function (err, result) {
         // if password hashes to user.password
         if (result === true) {
-          if (user.verified != true) {
-            res.json({
-              token: false,
-              message: 'User not verified.',
-              error: 'Unverified user.'
-            });
-          }
-
           const payload = {
             admin: user.admin,
             user: user.id
@@ -234,7 +236,6 @@ exports.verifyBulkDelete = (req, res, next) => {
 
 // Verify a new user with the token they got in their email.
 exports.verify = (req, res) => {
-
   var token = req.params.secret
 
   if (token) {
@@ -278,5 +279,90 @@ exports.verify = (req, res) => {
 };
 
 exports.resendSecret = (req, res) => {
-  console.log("resend confirmation")
-}
+  var userId = req.params.userId
+
+  if (userId) {
+    User.findById(userId, { password: 0 })
+      .then(user => {
+        if(!user) {
+          return res.status(404).send({
+            message: "User not found. userId = " + userId
+          });
+        }
+
+        const payload = {
+          admin: user.admin,
+          user: user._id
+        };
+
+        const token = TokenService.generateToken(payload)
+
+        EmailService.sendVerificationEmail(user.email, token)
+          .then(() => {
+            res.json({ message: "Verification email sent.", token: "", error: "" });
+          })
+          .catch((error) => {
+            res.status(500).send({
+                message: error.message || "Error occurred while sending verification email."
+            });
+          })
+      })
+      .catch(err => {
+            if(err.kind === 'ObjectId') {
+                return res.status(404).send({
+                    message: "No user found with id: " + userId
+                });
+            }
+            return res.status(500).send({
+                message: "Error retrieving user with id: " + userId
+            });
+      });
+  }
+  else {
+    return res.status(403).send({
+      success: false,
+      message: 'Parameter missing: userId.'
+    });
+  }
+};
+
+exports.deleteUnverifiedUser = (req, res) => {
+  var userId = req.params.userId
+
+  if (userId) {
+    User.findById(userId, { password: 0 })
+      .then(user => {
+        if(!user) {
+          return res.status(404).send({
+            message: "User not found. userId = " + userId
+          });
+        }
+
+        if(user.verified != true) {
+          user.deleteOne()
+          res.json({ message: "User succesfully removed." });
+        }
+        else {
+          return res.status(404).send({
+            message: "User has already been verified. Contact help@funkyradish.com for assistance."
+          });
+        }
+      })
+      .catch(err => {
+            if(err.kind === 'ObjectId') {
+                return res.status(404).send({
+                    message: "No user found with id: " + userId
+                });
+            }
+            return res.status(500).send({
+                message: "Error retrieving user with id: " + userId
+            });
+      });
+  }
+  else {
+    return res.status(403).send({
+      success: false,
+      message: 'Parameter missing: userId.'
+    });
+  }
+};

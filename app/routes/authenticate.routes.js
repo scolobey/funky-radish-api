@@ -6,8 +6,11 @@ module.exports = function (app) {
     app.post('/authenticate', auth.getToken);
 
     // // Verify a new User
-    app.put('/verify/:secret', auth.verify);
+    app.get('/verify/:secret', auth.verify);
 
     // // Resend verification
-    // app.post('/resend', users.resendSecret);
+    app.get('/resendVerification/:userId', auth.resendSecret);
+
+    // Delete an unverified user
+    app.get('/deleteRecord/:userId', auth.deleteUnverifiedUser);
 }
