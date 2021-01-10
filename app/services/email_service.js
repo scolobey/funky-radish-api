@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-exports.sendVerificationEmail = (email, secret) => {
+exports.sendVerificationEmail = (email, user, secret) => {
   console.log("emailing", email, secret)
 
   const msg = {
@@ -9,7 +9,8 @@ exports.sendVerificationEmail = (email, secret) => {
     from: 'no-reply@funkyradish.com', // Change to your verified sender
     templateId: 'd-041eb47115154e338d21854457cc1750',
     dynamicTemplateData: {
-      "sender_secret": secret
+      "sender_secret": secret,
+      "user": user
     },
     subject: 'Confirm your FunkyRadish registration'
   }

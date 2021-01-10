@@ -17,20 +17,13 @@ exports.getToken = (req, res) => {
       });
     }
 
-    if (user.verified != true) {
-      res.json({
-        success: false,
-        message: 'Email not verified.'
-      });
-    }
-
     if (!user) {
       res.json({
         success: false,
         message: 'Authentication failed. User not found.'
       });
     }
-    else if (user) {
+    else if (user && user.verified) {
       bcrypt.compare(req.body.password, user.password, function (err, result) {
         // if password hashes to user.password
         if (result === true) {
@@ -55,6 +48,12 @@ exports.getToken = (req, res) => {
           });
         }
       })
+    }
+    else {
+      res.json({
+        success: false,
+        message: 'Email not verified.'
+      });
     }
   });
 };
@@ -297,7 +296,7 @@ exports.resendSecret = (req, res) => {
 
         const token = TokenService.generateToken(payload)
 
-        EmailService.sendVerificationEmail(user.email, token)
+        EmailService.sendVerificationEmail(user.email, user._id, token)
           .then(() => {
             res.json({ message: "Verification email sent.", token: "", error: "" });
           })
