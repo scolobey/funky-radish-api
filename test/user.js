@@ -1,5 +1,4 @@
-// Set environment to test
-process.env.NODE_ENV = 'test';
+const config = require('config');
 
 // Fire up the server
 const server = require('../server');
@@ -19,13 +18,15 @@ let adminToken = '';
 
 let standardUser = {
     email: 'manpearpig@email.com',
-    password: '321123',
-
+    password: '321123'
 }
+
+const host = config.get('AppRoot');
 
 describe('Users', () => {
 
   before(function(done){
+    console.log("Preparing data.")
     // Clear data
     User.remove({}, (err) => {
       if(err) {
@@ -33,12 +34,15 @@ describe('Users', () => {
       }
       else done();
     });
-  })
+  });
 
   describe('/POST standard user', () => {
-    it('it should POST a standard user', (done) => {
 
-      chai.request('http://localhost:8080')
+    it('it should POST a standard user', (done) => {
+      console.log('ENV: ', process.env.NODE_ENV)
+      console.log('ROOT: ', host)
+
+      chai.request(host)
         .post('/users')
         .send(standardUser)
         .end((err, res) => {
@@ -48,11 +52,13 @@ describe('Users', () => {
           done();
         });
     });
+
   });
 
   describe('/POST user with pre-existing email', () => {
+
     it('it should not POST a user if the email has already been used', (done) => {
-      chai.request('http://localhost:8080')
+      chai.request(host)
         .post('/users')
         .send(standardUser)
         .end((err, res) => {
@@ -61,13 +67,14 @@ describe('Users', () => {
           done();
         });
     });
+
   });
 
   // GET token for standard authentication
   describe('/POST standard authentication', () => {
 
     it('it should not return a token if user is unverified', (done) => {
-      chai.request('http://localhost:8080')
+      chai.request(host)
         .post('/authenticate')
         .send({email: standardUser.email, password: standardUser.password})
         .end((err, res) => {
@@ -75,6 +82,9 @@ describe('Users', () => {
           done();
         });
     });
+
+  });
+});
 
     // I dunno how to verify without email access?
     // it('it should return a token if user is verified', (done) => {
@@ -87,7 +97,7 @@ describe('Users', () => {
     //       done();
     //     });
     // });
-  });
+
     // it('it should return a standard token', (done) => {
     //
     //   chai.request('http://localhost:8080')
@@ -112,7 +122,7 @@ describe('Users', () => {
     //     });
     //
     // });
-  });
+
 
   // GET token for admin authentication
   // describe('/POST admin authentication', () => {

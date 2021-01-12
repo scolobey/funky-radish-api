@@ -33,9 +33,6 @@ app.use(cors());
 //   next();
 // });
 
-// set the secret key for authentication
-app.set('secret', authConfig.secret);
-
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -49,8 +46,6 @@ mongoose.set('useFindAndModify', false);
 // Connect to production or test db, depending on environment variables.
 console.log(config.DBHost)
 mongoose.connect(config.DBHost)
-
-// Connect to Realm
 
 .then(() => {
     console.log("Database connection successful");
