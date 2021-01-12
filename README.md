@@ -59,5 +59,6 @@ refer to documentation for details on how to use the project.
 -[mocha](https://www.npmjs.com/package/mocha)
 
 ## Tests
-API testing using Chai
-run `npm test` to run tests
+API testing using Chai.
+Run `npm run test-local` to run tests locally. This triggers the local_test config, setting the root to localhost.
+Standard test config sets root to the active heroku instance.

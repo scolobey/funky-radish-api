@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "test": "mocha --timeout 10000",
+    "test-local": "NODE_ENV=local_test mocha --timeout 10000",
     "build": "node config/keys.config.js"
   },
   "author": "scolobey",
