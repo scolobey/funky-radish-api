@@ -28,7 +28,7 @@ describe('Users', () => {
   before(function(done){
     console.log("Preparing data.")
     // Clear data
-    User.remove({}, (err) => {
+    User.deleteOne({}, (err) => {
       if(err) {
         console.log(err);
       }
