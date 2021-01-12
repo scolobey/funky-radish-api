@@ -42,10 +42,10 @@ app.use(bodyParser.json())
 // Connect to the database
 mongoose.Promise = global.Promise;
 mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
 
-// Connect to production or test db, depending on environment variables.
-console.log(config.DBHost)
-mongoose.connect(config.DBHost)
+// Connect to db.
+mongoose.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true })
 
 .then(() => {
     console.log("Database connection successful");
