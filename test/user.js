@@ -25,16 +25,6 @@ const host = config.get('AppRoot');
 
 describe('Users', () => {
 
-  before(function(done){
-    // Clear data
-    User.deleteOne({}, (err) => {
-      if(err) {
-        console.log(err);
-      }
-      else done();
-    });
-  });
-
   describe('/POST standard user', () => {
 
     it('it should POST a standard user', (done) => {
