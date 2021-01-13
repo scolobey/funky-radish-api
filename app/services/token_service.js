@@ -6,7 +6,7 @@ const config = require('config');
 const realmKey = config.get('RealmKey');
 
 exports.asynchToken = (payload) => {
-  console.log("token call asynch")
+  console.log("token call asynch ", process.env.SECRET)
   let currentTime = Date.now();
   let expTime = currentTime + 86400
 
@@ -14,7 +14,7 @@ exports.asynchToken = (payload) => {
   payload.aud = realmKey
 
   let tokenPromise = new Promise(function(resolve, reject) {
-    const token = jwt.sign(payload, { key: privateKey, passphrase: 'passphrase' }, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
+    const token = jwt.sign(payload, { key: privateKey, passphrase: process.env.SECRET }, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
       if (err) {
         console.log("rejected")
         reject(err);

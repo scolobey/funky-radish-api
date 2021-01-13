@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "test": "mocha --timeout 10000",
-    "test-local": "NODE_ENV=local_test mocha --timeout 10000 --exit",
-    "build": "node config/keys.config.js"
+    "build": "node config/keys.config.js",
+    "start-local": "SECRET=secretkey node server.js",
+    "test-local": "SECRET=secretkey NODE_ENV=local_test mocha --timeout 10000 --exit",
+    "build-local": "SECRET=secretkey node config/keys.config.js"
   },
   "author": "scolobey",
   "license": "ISC",

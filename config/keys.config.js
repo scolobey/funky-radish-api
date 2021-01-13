@@ -12,7 +12,7 @@ generateKeyPair('rsa', {
     type: 'pkcs8',
     format: 'pem',
     cipher: 'aes-256-cbc',
-    passphrase: 'passphrase'
+    passphrase: process.env.SECRET
   }
 }, (err, public, private) => {
   // Handle errors and use the generated key pair.
