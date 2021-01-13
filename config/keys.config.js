@@ -1,5 +1,7 @@
 const { generateKeyPair } = require('crypto');
 const fs = require('fs');
+const config = require('config');
+const pass = config.get('Passphrase');
 
 generateKeyPair('rsa', {
   modulusLength: 2048,

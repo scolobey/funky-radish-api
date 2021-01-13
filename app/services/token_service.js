@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
-const privKey = fs.readFileSync('./privatekey.pem');
+const privateKey = fs.readFileSync('./privatekey.pem');
 const pubKey = fs.readFileSync('./publickey.pem');
 const config = require('config');
 const realmKey = config.get('RealmKey');
@@ -14,7 +14,7 @@ exports.asynchToken = (payload) => {
   payload.aud = realmKey
 
   let tokenPromise = new Promise(function(resolve, reject) {
-    const token = jwt.sign(payload, privKey, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
+    const token = jwt.sign(payload, privateKey, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
       if (err) {
         console.log("rejected")
         reject(err);
@@ -36,7 +36,7 @@ exports.generateToken = (payload) => {
   payload.sub = payload.user
   payload.aud = realmKey
 
-  const token = jwt.sign(payload, privKey, {
+  const token = jwt.sign(payload, privateKey, {
     algorithm: 'RS256',
     expiresIn: 86400
   })
