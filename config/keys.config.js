@@ -10,7 +10,8 @@ generateKeyPair('rsa', {
   privateKeyEncoding: {
     type: 'pkcs8',
     format: 'pem',
-    cipher: 'aes-256-cbc'
+    cipher: 'aes-256-cbc',
+    passphrase: ''
   }
 }, (err, public, private) => {
   // Handle errors and use the generated key pair.
