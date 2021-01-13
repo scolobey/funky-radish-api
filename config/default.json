@@ -1,3 +1,4 @@
 {
-    "DBHost": "mongodb+srv://chef:mise@funkyradish.eurby.mongodb.net/funky_radish_db?retryWrites=true&w=majority"
+    "DBHost": "mongodb+srv://chef:mise@funkyradish.eurby.mongodb.net/funky_radish_db?retryWrites=true&w=majority",
+    "RealmKey": "funky-radish-twdxv"
 }

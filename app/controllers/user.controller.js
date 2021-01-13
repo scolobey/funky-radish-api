@@ -42,21 +42,22 @@ exports.create = (req, res) => {
         user: userData._id
       };
 
-      var token = ""
+      console.log("trying that asynch call")
 
-      try {
-        //todo: I think I need to an asynchronous token
-        token = TokenService.generateToken(payload)
-      } catch(err) {
-        res.status(500).send({
-            message: "Error creating a token.", error: err
-        });
-      }
-
-      EmailService.sendVerificationEmail(userData.email, userData._id, token)
-        .then(() => {
-          res.json({ message: "Verification email sent.", token: "", error: "" });
-        })
+      TokenService.asynchToken(payload)
+        .then((token) => {
+          EmailService.sendVerificationEmail(userData.email, userData._id, token)
+            .then(() => {
+              res.json({ message: "Verification email sent.", token: "", error: "" });
+            })
+            .catch((error) => {
+                console.log("Error", error);
+                res.json({ message: "Verification email sending failure.", token: "", error: error });
+            })
+      }).catch((error) => {
+          console.log("Error", error);
+          res.json({ message: "Token creation failed.", token: "", error: error });
+      })
 
     }).catch(err => {
       res.json({ message: "User creation failed.", token: "", error: err });

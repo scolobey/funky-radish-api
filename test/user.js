@@ -26,7 +26,6 @@ const host = config.get('AppRoot');
 describe('Users', () => {
 
   before(function(done){
-    console.log("Preparing data.")
     // Clear data
     User.deleteOne({}, (err) => {
       if(err) {
@@ -84,6 +83,20 @@ describe('Users', () => {
     });
 
   });
+
+  // Delete User
+  // describe('/DELETE user', () => {
+  //
+  //   it('it should delete an unverified user.', (done) => {
+  //     chai.request(host)
+  //       .post('/users/')
+  //       .end((err, res) => {
+  //         res.body.message.should.be.eql('Email not verified.');
+  //         done();
+  //       });
+  //   });
+  //
+  // });
 
 });
 
