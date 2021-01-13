@@ -85,18 +85,29 @@ describe('Users', () => {
   });
 
   // Delete User
-  // describe('/DELETE user', () => {
-  //
-  //   it('it should delete an unverified user.', (done) => {
-  //     chai.request(host)
-  //       .post('/users/')
-  //       .end((err, res) => {
-  //         res.body.message.should.be.eql('Email not verified.');
-  //         done();
-  //       });
-  //   });
-  //
-  // });
+  describe('/DELETE user', () => {
+
+    it('it should delete an unverified user.', (done) => {
+
+      User.findOne({
+        email: standardUser.email
+      },
+      function(err, user) {
+        if (err) {
+          assert.fail("actual", "expected", "Error message");
+        }
+
+        chai.request(host)
+          .get('/deleteRecord/' + user._id)
+          .end((err, res) => {
+            res.body.message.should.be.eql('User succesfully removed.');
+            done();
+          });
+      });
+
+    });
+
+  });
 
 });
 
