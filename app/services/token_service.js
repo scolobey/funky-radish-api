@@ -14,7 +14,7 @@ exports.asynchToken = (payload) => {
   payload.aud = realmKey
 
   let tokenPromise = new Promise(function(resolve, reject) {
-    const token = jwt.sign(payload, privateKey, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
+    const token = jwt.sign(payload, { key: privateKey, passphrase: 'passphrase' }, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
       if (err) {
         console.log("rejected")
         reject(err);
