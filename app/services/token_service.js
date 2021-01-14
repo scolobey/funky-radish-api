@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const config = require('config');
 const realmKey = config.get('RealmKey');
-const secret = config.get('SECRET')
-const publicKey = config.get('PUBLIC')
-const privateKey = config.get('PRIVATE')
+const secret = config.get('SECRET');
+const publicKey = config.get('PUBLIC');
+const privateKey = config.get('PRIVATE');
 
 exports.asynchToken = (payload) => {
   console.log("token call asynch ", secret)
