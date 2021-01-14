@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
-const privateKey = fs.readFileSync('./privatekey.pem');
-const pubKey = fs.readFileSync('./publickey.pem');
 const config = require('config');
 const realmKey = config.get('RealmKey');
+const secret = config.get('SECRET')
+const publicKey = config.get('PUBLIC')
+const privateKey = config.get('PRIVATE')
 
 exports.asynchToken = (payload) => {
-  console.log("token call asynch ", process.env.SECRET)
+  console.log("token call asynch ", secret)
   let currentTime = Date.now();
   let expTime = currentTime + 86400
 
@@ -14,7 +15,7 @@ exports.asynchToken = (payload) => {
   payload.aud = realmKey
 
   let tokenPromise = new Promise(function(resolve, reject) {
-    const token = jwt.sign(payload, { key: privateKey, passphrase: process.env.SECRET }, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
+    const token = jwt.sign(payload, { key: privateKey, passphrase: secret }, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
       if (err) {
         console.log("rejected")
         reject(err);
@@ -45,7 +46,7 @@ exports.generateToken = (payload) => {
 }
 
 exports.verifyToken = (token, callback) => {
-  jwt.verify(token, pubKey, function(err, decoded) {
+  jwt.verify(token, publicKey, function(err, decoded) {
     if (err) {
       return res.json({
         success: false,

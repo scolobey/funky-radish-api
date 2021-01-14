@@ -5,11 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "SECRET=secretkey mocha --timeout 10000 --exit",
+    "test": "mocha --timeout 10000 --exit",
     "build": "",
     "start-local": "SECRET=secretkey node server.js",
-    "test-local": "SECRET=secretkey NODE_ENV=local_test mocha --timeout 10000 --exit",
-    "build-local": "SECRET=secretkey node config/keys.config.js",
+    "test-local": "NODE_ENV=local_test mocha --timeout 10000 --exit",
     "generate-keys": "node config/keys.config.js"
   },
   "author": "scolobey",
