@@ -32,13 +32,17 @@ exports.getToken = (req, res) => {
             user: user.id
           }
 
-          const token = TokenService.generateToken(payload)
-
-          res.json({
-            message: 'Enjoy your token, ya filthy animal!',
-            token: token,
-            error: ""
-          });
+          TokenService.asynchToken(payload)
+            .then((token) => {
+              res.json({
+                message: 'Enjoy your token, ya filthy animal!',
+                token: token,
+                error: ""
+              });
+          }).catch((error) => {
+              console.log("Error", error);
+              res.json({ message: "Token creation failed.", token: "", error: error });
+          })
         }
         else {
           res.json({
@@ -294,17 +298,20 @@ exports.resendSecret = (req, res) => {
           user: user._id
         };
 
-        const token = TokenService.generateToken(payload)
-
-        EmailService.sendVerificationEmail(user.email, user._id, token)
-          .then(() => {
-            res.json({ message: "Verification email sent.", token: "", error: "" });
-          })
-          .catch((error) => {
-            res.status(500).send({
-                message: error.message || "Error occurred while sending verification email."
-            });
-          })
+        TokenService.asynchToken(payload)
+          .then((token) => {
+            EmailService.sendVerificationEmail(user.email, user._id, token)
+              .then(() => {
+                res.json({ message: "Verification email sent.", token: "", error: "" });
+              })
+              .catch((error) => {
+                  console.log("Error", error);
+                  res.json({ message: "Verification email sending failure.", token: "", error: error });
+              })
+        }).catch((error) => {
+            console.log("Error", error);
+            res.json({ message: "Token creation failed.", token: "", error: error });
+        })
       })
       .catch(err => {
             if(err.kind === 'ObjectId') {
@@ -312,6 +319,7 @@ exports.resendSecret = (req, res) => {
                     message: "No user found with id: " + userId
                 });
             }
+            console.log(err)
             return res.status(500).send({
                 message: "Error retrieving user with id: " + userId
             });
