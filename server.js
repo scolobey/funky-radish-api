@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const config = require('config');
-const authConfig = require('./config/authentication.config.js');
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 8080
 
