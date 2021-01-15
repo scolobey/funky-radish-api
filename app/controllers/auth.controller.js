@@ -5,7 +5,6 @@ const TokenService = require('../services/token_service.js');
 const EmailService = require('../services/email_service.js');
 
 exports.getToken = (req, res) => {
-
   User.findOne({
     email: req.body.email
   },
@@ -29,7 +28,7 @@ exports.getToken = (req, res) => {
         if (result === true) {
           const payload = {
             admin: user.admin,
-            user: user.id
+            user: user.email
           }
 
           TokenService.asynchToken(payload)
