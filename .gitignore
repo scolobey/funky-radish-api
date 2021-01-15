@@ -1,4 +1,7 @@
-# Compiled source #
+# Sensitive data #
+############
+**/config/local_test.json
+
 ###################
 *.class
 *.com
