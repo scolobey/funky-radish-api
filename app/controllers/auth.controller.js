@@ -252,7 +252,11 @@ exports.verify = (req, res) => {
               message: "User not found. userId = " + req.params.userId
             });
           }
-          res.send(user);
+          return res.send({
+            message: "Email verified.",
+            token: token,
+            user: user
+          });
         }).catch(err => {
           if(err.kind === 'ObjectId') {
             return res.status(404).send({
