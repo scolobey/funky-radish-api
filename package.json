@@ -7,7 +7,7 @@
     "start": "node server.js",
     "test": "mocha --timeout 10000 --exit",
     "build": "",
-    "start-local": "SECRET=secretkey node server.js",
+    "start-local": "NODE_ENV=local_start node server.js",
     "test-local": "NODE_ENV=local_test mocha --timeout 10000 --exit",
     "generate-keys": "node config/keys.config.js"
   },

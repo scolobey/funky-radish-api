@@ -21,17 +21,3 @@ exports.sendVerificationEmail = (email, user, secret) => {
 
   return sgMail.send(msg)
 }
-
-
-exports.forwardPublicKey = (email, key) => {
-  console.log("Emailing public key: " + email)
-
-  const msg = {
-    to: email, // Change to your recipient
-    from: 'no-reply@funkyradish.com', // Change to your verified sender
-    subject: 'New Public Key!',
-    text: key
-  }
-
-  return sgMail.send(msg)
-}
