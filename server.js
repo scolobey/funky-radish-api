@@ -8,23 +8,23 @@ const PORT = process.env.PORT || 8080
 // create express app
 const app = express();
 
-app.use(cors());
-
- // Todo: Set up dev and prod here so we can do localhost.
-var whitelist = ['https://funkyradish.com','funky-radish-api.herokuapp.com']
-
-var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
-
+// app.use(cors());
+//
+//  // Todo: Set up dev and prod here so we can do localhost.
+// var whitelist = ['https://funkyradish.com','funky-radish-api.herokuapp.com']
+//
+// var corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   }
+// }
+//
 // // Then pass them to cors:
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 // app.use(function(req, res, next) {
 //   res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
