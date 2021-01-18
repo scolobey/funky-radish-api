@@ -1,25 +1,10 @@
 const Auth = require('../controllers/auth.controller.js');
 
-const cors = require('cors');
-
-
-var whitelist = ['http://www.funkyradish.com/','https://funky-radish-api.herokuapp.com/', 'funky-radish-api.herokuapp.com']
-
-var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
-
 module.exports = function (app) {
     const users = require('../controllers/user.controller.js');
 
     // Create a new User
-    app.post('/users', cors(corsOptions), users.create);
+    app.post('/users', users.create);
 
     // // // Verify a new User
     // app.put('/verify/:secret', users.verify);
