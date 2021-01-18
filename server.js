@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors');
+// const cors = require('cors');
 const bodyParser = require('body-parser');
 const config = require('config');
 const mongoose = require('mongoose');
@@ -10,21 +10,21 @@ const app = express();
 
 // app.use(cors());
 
-
-var whitelist = ['http://www.funkyradish.com/','https://funky-radish-api.herokuapp.com']
-
-var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
+//
+// var whitelist = ['http://www.funkyradish.com/','https://funky-radish-api.herokuapp.com']
+//
+// var corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('Not allowed by CORS'))
+//     }
+//   }
+// }
 
 // Then pass them to cors:
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 // app.use(function(req, res, next) {
 //   res.header("Access-Control-Allow-Origin", "http://www.funkyradish.com/"); // update to match the domain you will make the request from
