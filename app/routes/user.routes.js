@@ -3,7 +3,7 @@ const Auth = require('../controllers/auth.controller.js');
 const cors = require('cors');
 
 
-var whitelist = ['http://www.funkyradish.com/','https://funky-radish-api.herokuapp.com']
+var whitelist = ['http://www.funkyradish.com/','https://funky-radish-api.herokuapp.com/', 'funky-radish-api.herokuapp.com']
 
 var corsOptions = {
   origin: function (origin, callback) {
