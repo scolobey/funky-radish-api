@@ -1,6 +1,9 @@
 {
   "name": "api",
   "version": "1.0.0",
+  "engines": {
+    "node": "15.6.0"
+  },
   "description": "Recipe API, serving recipe data to the Funky Radish online recipe system.",
   "main": "server.js",
   "scripts": {

@@ -8,27 +8,10 @@ const PORT = process.env.PORT || 8080
 // create express app
 const app = express();
 
-// app.use(cors());
-
-
-// var whitelist = ['http://www.funkyradish.com/','https://funky-radish-api.herokuapp.com']
-//
-// var corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1) {
-//       callback(null, true)
-//     } else {
-//       callback(new Error('Not allowed by CORS'))
-//     }
-//   }
-// }
-
 var corsOptions = {
     origin: 'http://www.funkyradish.com',
     optionsSuccessStatus: 200 // For legacy browser support
 }
-
-app.use(cors(corsOptions));
 
 // Then pass them to cors:
 app.use(cors(corsOptions));
