@@ -243,6 +243,7 @@ exports.verify = (req, res) => {
   if (token) {
     TokenService.verifyToken(token, function(decoded) {
       if (decoded) {
+        console.log(decoded)
         User.findByIdAndUpdate(decoded.user, {
             verified: true
         })

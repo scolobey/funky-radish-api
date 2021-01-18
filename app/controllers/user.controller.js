@@ -18,12 +18,6 @@ exports.create = (req, res) => {
     req.body.name = req.body.email
   }
 
-  const payload = {
-    admin: false,
-    user: req.body.name,
-    id: uuidv4()
-  };
-
   console.log("create", req.body.email)
 
   // // Create
@@ -42,7 +36,7 @@ exports.create = (req, res) => {
         user: userData._id
       };
 
-      console.log("trying that asynch call")
+      console.log("trying that asynch call: ", payload.user)
 
       TokenService.asynchToken(payload)
         .then((token) => {
