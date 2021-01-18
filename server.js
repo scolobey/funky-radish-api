@@ -26,11 +26,11 @@ const app = express();
 // Then pass them to cors:
 // app.use(cors(corsOptions));
 
-// app.use(function(req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "http://www.funkyradish.com/"); // update to match the domain you will make the request from
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//   next();
-// });
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://www.funkyradish.com/"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
