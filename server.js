@@ -11,7 +11,7 @@ const app = express();
 // app.use(cors());
 
 
-var whitelist = ['http://www.funkyradish.com/','http://funky-radish-api.herokuapp.com/']
+var whitelist = ['http://www.funkyradish.com/','https://funky-radish-api.herokuapp.com']
 
 var corsOptions = {
   origin: function (origin, callback) {
