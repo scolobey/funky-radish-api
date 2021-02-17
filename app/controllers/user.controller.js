@@ -46,15 +46,15 @@ exports.create = (req, res) => {
             })
             .catch((error) => {
                 console.log("Error", error);
-                res.json({ message: "Verification email sending failure.", token: "", error: error });
+                res.json({ message: "Verification email sending failure.", token: "", error: error.message || "error without message" });
             })
       }).catch((error) => {
           console.log("Error", error);
-          res.json({ message: "Token creation failed.", token: "", error: error });
+          res.json({ message: "Token creation failed.", token: "", error: error.message || "error without message" });
       })
 
     }).catch(err => {
-      res.json({ message: "User creation failed.", token: "", error: err });
+      res.json({ message: "User creation failed.", token: "", error: err.message || "error without message" });
     });
 };
 
