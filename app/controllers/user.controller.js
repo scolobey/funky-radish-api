@@ -54,7 +54,7 @@ exports.create = (req, res) => {
       })
 
     }).catch(err => {
-      res.json({ message: "User creation failed.", token: "", error: err.message || "error without message" });
+      res.json({ message: err.message || "error without message", token: "", error: err.message || "error without message" });
     });
 };
 
