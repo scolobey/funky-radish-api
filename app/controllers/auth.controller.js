@@ -11,15 +11,17 @@ exports.getToken = (req, res) => {
   function(err, user) {
     if (err) {
       res.json({
-        success: false,
-        message: 'Authentication error.'
+        message: "Token creation failed.",
+        token: "",
+        error: "Authentication error."
       });
     }
 
     if (!user) {
       res.json({
-        success: false,
-        message: 'Authentication failed. User not found.'
+        message: "Token creation failed.",
+        token: "",
+        error: "User not found"
       });
     }
     else if (user && user.verified) {
@@ -40,7 +42,11 @@ exports.getToken = (req, res) => {
               });
           }).catch((error) => {
               console.log("Error", error);
-              res.json({ message: "Token creation failed.", token: "", error: error });
+              res.json({
+                message: "Token creation failed.",
+                token: "",
+                error: error
+              });
           })
         }
         else {
