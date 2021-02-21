@@ -45,13 +45,13 @@ exports.getToken = (req, res) => {
               res.json({
                 message: "Token creation failed.",
                 token: "",
-                error: error
+                error: error.message || "no message"
               });
           })
         }
         else {
           res.json({
-            token: false,
+            token: '',
             message: 'Authentication failed. Wrong password.',
             error: 'Incorrect password.'
           });
