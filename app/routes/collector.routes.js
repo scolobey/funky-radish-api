@@ -4,4 +4,6 @@ module.exports = function (app) {
     // Get the recipe
     app.post('/collector', collector.collect);
 
+    app.get('/collector/import/:id', collector.importRecipe);
+
 }
