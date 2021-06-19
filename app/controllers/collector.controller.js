@@ -2,6 +2,21 @@ const SpoonacularService = require('../services/spoonacular_service.js');
 const Recipe = require('../models/recipe.model.js');
 
 
+exports.autocomplete = (req, res) => {
+  //TODO: handle overloaded api code.
+  SpoonacularService.autocomplete(req.query.query)
+    .then(res=> {
+      return res.clone().json()
+    })
+    .then(data => {
+      res.json({
+        message: 'Here ya go, punk!',
+        suggestions: data,
+        error: ""
+      });
+    })
+};
+
 exports.collect = (req, res) => {
   //TODO: handle overloaded api code.
   SpoonacularService.search(req.query.query)
