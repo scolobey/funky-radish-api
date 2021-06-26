@@ -32,7 +32,11 @@ exports.collect = (req, res) => {
       });
     })
     .catch(err => {
-      res.status(500).send({ message: err.message || "Error occurred while importing Recipe." });
+      res.json({
+        message: 'Here ya go, punk!',
+        recipes: [],
+        error: err.message
+      });
     });
 };
 
