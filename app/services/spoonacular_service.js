@@ -11,8 +11,10 @@ exports.autocomplete = (query) => {
 }
 
 // https://api.spoonacular.com/recipes/complexSearch?fillIngredients=true&query=cookies&apiKey=baf6ca65c5e6461cbdb8f3cc87e1a730
-exports.search = (query) => {
+exports.recipeSearch = (query) => {
   const endpoint = "https://api.spoonacular.com/recipes/complexSearch?fillIngredients=true&query=" + query + "&apiKey=" + spoonacular_key
+
+  console.log("calling: ", endpoint)
   return fetch(endpoint, { method: 'get' })
 }
 
