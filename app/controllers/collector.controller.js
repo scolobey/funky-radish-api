@@ -31,6 +31,9 @@ exports.collect = (req, res) => {
         error: ""
       });
     })
+    .catch(err => {
+      res.status(500).send({ message: err.message || "Error occurred while importing Recipe." });
+    });
 };
 
 exports.importRecipe = (req, res) => {
@@ -52,5 +55,4 @@ exports.importRecipe = (req, res) => {
     .catch(err => {
       res.status(500).send({ message: err.message || "Error occurred while importing Recipe." });
     });
-
 };
