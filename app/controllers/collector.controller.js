@@ -22,6 +22,7 @@ exports.collect = (req, res) => {
   console.log("calling for recipes: ", req.query.query)
   SpoonacularService.search(req.query.query)
     .then(res=> {
+      console.log("some response came in")
       return res.clone().json()
     })
     .then(data => {
@@ -33,6 +34,7 @@ exports.collect = (req, res) => {
       });
     })
     .catch(error => {
+      console.log("there was an error")
       console.log(error)
       res.status(500).send({ message: err.message || "Error occurred while searching." });
     });
