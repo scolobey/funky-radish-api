@@ -4,6 +4,9 @@ module.exports = function (app) {
     const recipes = require('../controllers/recipe.controller.js');
 
     // Retrieve all Recipes belonging to you
+    app.get('admin/recipes', Auth.verifyAdmin, recipes.returnAllRecipes);
+
+    // Retrieve all Recipes belonging to you
     app.get('/recipes', Auth.verifyToken, recipes.findAll);
     app.get('/', Auth.verifyToken, recipes.findAll);
 

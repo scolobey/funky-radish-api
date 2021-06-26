@@ -61,6 +61,18 @@ exports.create = (req, res) => {
 
 };
 
+// Retrieve all recipes if you have admin privileges.
+exports.returnAllRecipes = (req, res) => {
+  Recipe.find({})
+  .populate('author')
+  .then(recipes => {
+    res.send(recipes);
+  })
+  .catch(err => {
+    res.status(500).send({ message: err.message || "Error retrieving Recipes." });
+  });
+}
+
 // Retrieve recipes owned by user specified in token.
 exports.findAll = (req, res) => {
   Recipe.find({author: {_id: req.decoded.user}})
