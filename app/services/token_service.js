@@ -45,16 +45,18 @@ exports.generateToken = (payload) => {
   return token
 }
 
-exports.verifyToken = (token, callback) => {
-  jwt.verify(token, publicKey, function(err, decoded) {
-    if (err) {
-      return res.json({
-        success: false,
-        message: 'Failed to authenticate token.'
-      });
-    }
-    else {
-      callback(decoded)
-    }
+exports.verifyToken = (token) => {
+
+  let tokenVerificationPromise = new Promise(function(resolve, reject) {
+    jwt.verify(token, publicKey, function(err, decoded) {
+      if (err) {
+        reject(err)
+      }
+      else {
+        resolve(decoded)
+      }
+    });
   });
+
+  return tokenVerificationPromise
 }

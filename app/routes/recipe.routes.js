@@ -3,7 +3,7 @@ const Auth = require('../controllers/auth.controller.js');
 module.exports = function (app) {
     const recipes = require('../controllers/recipe.controller.js');
 
-    // Retrieve all Recipes belonging to you
+    // Retrieve all Recipes belonging to anyone
     app.get('/admin/recipes', Auth.verifyAdmin, recipes.returnAllRecipes);
 
     // Retrieve all Recipes belonging to you

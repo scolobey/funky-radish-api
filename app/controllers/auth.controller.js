@@ -10,6 +10,7 @@ exports.getToken = (req, res) => {
   },
   function(err, user) {
     if (err) {
+      console.log(err)
       res.json({
         message: "Token creation failed.",
         token: "",
@@ -88,19 +89,18 @@ exports.verifyToken = (req, res, next) => {
 exports.verifyAdmin = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
+  console.log("verifying admin")
   if (token) {
-    TokenService.verifyToken(token, function(decoded) {
-      if (decoded.admin) {
-        req.decoded = decoded;
-        next();
-      }
-      else {
-        return res.status(404).send({
-          success: false,
-          message: 'That which you seek does not exist.'
-        });
-      }
-    });
+    TokenService.verifyToken(token)
+      .then((decoded) => {
+        if (decoded.admin) {
+          req.decoded = decoded;
+          next();
+        }
+      }).catch((error) => {
+          res.json({ message: "Invalid token.", token: "", error: error });
+      })
+
   }
   else {
     return res.status(403).send({
@@ -318,10 +318,10 @@ exports.resendSecret = (req, res) => {
                   console.log("Error", error);
                   res.json({ message: "Verification email sending failure.", token: "", error: error });
               })
-        }).catch((error) => {
-            console.log("Error", error);
-            res.json({ message: "Token creation failed.", token: "", error: error });
-        })
+          }).catch((error) => {
+              console.log("Error", error);
+              res.json({ message: "Token creation failed.", token: "", error: error });
+          })
       })
       .catch(err => {
             if(err.kind === 'ObjectId') {
