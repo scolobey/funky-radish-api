@@ -1,5 +1,11 @@
 const Recipe = require('../models/recipe.model.js');
 
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+// const url = 'mongodb://$[username]:$[password]@$[hostlist]/$[database]?authSource=$[authSource]';
+const url = 'mongodb+srv://chef:mise@funkyradish.eurby.mongodb.net/funky_radish_db?retryWrites=true&w=majority'
+
+
 exports.create = (req, res) => {
   // Is it a list of recipes?
   if(Array.isArray(req.body)) {
@@ -63,13 +69,54 @@ exports.create = (req, res) => {
 
 // Retrieve all recipes if you have admin privileges.
 exports.returnAllRecipes = (req, res) => {
-  Recipe.find({})
-  .populate('author')
-  .then(recipes => {
-    res.send(recipes);
-  })
-  .catch(err => {
-    res.status(500).send({ message: err.message || "Error retrieving Recipes." });
+  console.log("connecting")
+
+  MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+    assert.equal(null, err);
+
+    console.log("lets try to get some data")
+
+    const db = client.db("funky_radish_db")
+
+    // var cursor = db.collection('Recipe').find({})
+    //
+    //     assert.equal(err, null);
+    //     console.log('Found the following records');
+    //     console.log(docs);
+    //
+    //     db.collection('Ingredient').find({})
+    //     .toArray(function(err, docs) {
+    //
+    //     })
+    //
+    //     // res.send(docs);
+    // })
+
+
+    var cursor = db.collection('Recipe').aggregate([
+         {
+           $lookup:
+             {
+               from: "Ingredient",
+               localField: "ingredients",
+               foreignField: "_id",
+               as: "ingredient_list"
+             }
+        }
+      ])
+          .toArray(function(err, docs) {
+            assert.equal(err, null);
+            console.log('Found the following records');
+            console.log(docs[0].ingredient_list);
+          })
+
+
+
+
+        // res.send(docs);
+
+
+
   });
 }
 
