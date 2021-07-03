@@ -71,52 +71,58 @@ exports.create = (req, res) => {
 exports.returnAllRecipes = (req, res) => {
   console.log("connecting")
 
+
+  // Recipe.find({})
+  // .then(recipes => {
+  //   console.log("here?")
+  //   console.log(recipes)
+  //   res.send(recipes);
+  // })
+  // .catch(err => {
+  //   res.status(500).send({ message: err.message || "Error retrieving Recipes." });
+  // });
+
+
   MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
-
-    console.log("lets try to get some data")
-
+    
     const db = client.db("funky_radish_db")
 
-    // var cursor = db.collection('Recipe').find({})
-    //
-    //     assert.equal(err, null);
-    //     console.log('Found the following records');
-    //     console.log(docs);
-    //
-    //     db.collection('Ingredient').find({})
-    //     .toArray(function(err, docs) {
-    //
-    //     })
-    //
-    //     // res.send(docs);
-    // })
-
-
     var cursor = db.collection('Recipe').aggregate([
-         {
-           $lookup:
-             {
-               from: "Ingredient",
-               localField: "ingredients",
-               foreignField: "_id",
-               as: "ingredient_list"
-             }
-        }
-      ])
-          .toArray(function(err, docs) {
-            assert.equal(err, null);
-            console.log('Found the following records');
-            console.log(docs[0].ingredient_list);
-          })
+        {
+           $lookup: {
+             from: "Ingredient",
+             localField: "ingredients",
+             foreignField: "_id",
+             as: "ingredient_list"
+           }
+        },
+        {
+           $lookup: {
+             from: "Direction",
+             localField: "directions",
+             foreignField: "_id",
+             as: "direction_list"
+           }
+        },
+       {
+          $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$ingredient_list", 0 ] }, "$$ROOT" ] } }
+       },
+       { $project: { fromItems: 0 } }
+    ])
+    .toArray(function(err, docs) {
+      assert.equal(err, null);
 
+      docs.forEach((item, i) => {
+        item.directions = item.direction_list
+        item.ingredients = item.ingredient_list
 
+        delete item.direction_list
+        delete item.ingredient_list
+      });
 
-
-        // res.send(docs);
-
-
-
+      res.send(docs);
+    })
   });
 }
 

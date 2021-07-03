@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
 
 const RecipeSchema = mongoose.Schema({
+    _id: String,
     title: String,
-    realmID: String,
-    clientID: String,
-    ingredients: [String],
-    directions: [String],
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    ingredients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient' }],
+    directions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Direction' }]
 }, {
     timestamps: true
 });
