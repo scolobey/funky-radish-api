@@ -2,9 +2,7 @@ const Recipe = require('../models/recipe.model.js');
 
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
-// const url = 'mongodb://$[username]:$[password]@$[hostlist]/$[database]?authSource=$[authSource]';
-const url = 'mongodb+srv://chef:mise@funkyradish.eurby.mongodb.net/funky_radish_db?retryWrites=true&w=majority'
-
+const config = require('config');
 
 exports.create = (req, res) => {
   // Is it a list of recipes?
@@ -69,23 +67,10 @@ exports.create = (req, res) => {
 
 // Retrieve all recipes if you have admin privileges.
 exports.returnAllRecipes = (req, res) => {
-  console.log("connecting")
 
-
-  // Recipe.find({})
-  // .then(recipes => {
-  //   console.log("here?")
-  //   console.log(recipes)
-  //   res.send(recipes);
-  // })
-  // .catch(err => {
-  //   res.status(500).send({ message: err.message || "Error retrieving Recipes." });
-  // });
-
-
-  MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+  MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
-    
+
     const db = client.db("funky_radish_db")
 
     var cursor = db.collection('Recipe').aggregate([
