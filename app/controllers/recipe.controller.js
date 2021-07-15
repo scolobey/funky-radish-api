@@ -4,6 +4,54 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const config = require('config');
 
+const SpoonacularService = require('../services/spoonacular_service.js');
+
+// Retrieve all recipes if you have admin privileges.
+exports.returnAllRecipes = (req, res) => {
+
+  MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+    assert.equal(null, err);
+
+    const db = client.db("funky_radish_db")
+
+    var cursor = db.collection('Recipe').aggregate([
+        {
+           $lookup: {
+             from: "Ingredient",
+             localField: "ingredients",
+             foreignField: "_id",
+             as: "ingredient_list"
+           }
+        },
+        {
+           $lookup: {
+             from: "Direction",
+             localField: "directions",
+             foreignField: "_id",
+             as: "direction_list"
+           }
+        },
+       {
+          $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$ingredient_list", 0 ] }, "$$ROOT" ] } }
+       },
+       { $project: { fromItems: 0 } }
+    ])
+    .toArray(function(err, docs) {
+      assert.equal(err, null);
+
+      docs.forEach((item, i) => {
+        item.directions = item.direction_list
+        item.ingredients = item.ingredient_list
+
+        delete item.direction_list
+        delete item.ingredient_list
+      });
+
+      res.send(docs);
+    })
+  });
+}
+
 exports.create = (req, res) => {
   // Is it a list of recipes?
   if(Array.isArray(req.body)) {
@@ -65,52 +113,6 @@ exports.create = (req, res) => {
 
 };
 
-// Retrieve all recipes if you have admin privileges.
-exports.returnAllRecipes = (req, res) => {
-
-  MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
-    assert.equal(null, err);
-
-    const db = client.db("funky_radish_db")
-
-    var cursor = db.collection('Recipe').aggregate([
-        {
-           $lookup: {
-             from: "Ingredient",
-             localField: "ingredients",
-             foreignField: "_id",
-             as: "ingredient_list"
-           }
-        },
-        {
-           $lookup: {
-             from: "Direction",
-             localField: "directions",
-             foreignField: "_id",
-             as: "direction_list"
-           }
-        },
-       {
-          $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$ingredient_list", 0 ] }, "$$ROOT" ] } }
-       },
-       { $project: { fromItems: 0 } }
-    ])
-    .toArray(function(err, docs) {
-      assert.equal(err, null);
-
-      docs.forEach((item, i) => {
-        item.directions = item.direction_list
-        item.ingredients = item.ingredient_list
-
-        delete item.direction_list
-        delete item.ingredient_list
-      });
-
-      res.send(docs);
-    })
-  });
-}
-
 // Retrieve recipes owned by user specified in token.
 exports.findAll = (req, res) => {
   Recipe.find({author: {_id: req.decoded.user}})
@@ -163,24 +165,44 @@ exports.findOne = (req, res) => {
 
 // Find a single recipe with a recipeId
 exports.findByTitle = (req, res) => {
-  let title = req.params.recipeTitle.replace(/-/g, " ");
 
-  Recipe.findOne({ 'title': title })
-    .populate('author')
-    .then(recipe => {
-      if(!recipe) {
+  // Check if this is an external recipe.
+  if ( req.params.recipeTitle.substring(0, 3) === "sp-") {
+    // Call Spoonacular API
+    SpoonacularService.getRecipe(req.params.recipeTitle.substring(3))
+      .then(res=> {
+        return res.clone().json()
+      })
+      .then(data => {
+        res.json({
+          message: 'Have a recipe, punk!',
+          recipe: data[0],
+          error: ""
+        });
+      })
+      .catch(err => {
+        res.status(500).send({ message: err.message || "Error occurred while importing Recipe." });
+      });
+  }
+  else {
+    let title = req.params.recipeTitle.replace(/-/g, " ");
+
+    Recipe.findOne({ 'title': title })
+      .populate('author')
+      .then(recipe => {
+        if(!recipe) {
+          return res.status(404).send({
+            message: "No recipe found with the title: " + title
+          });
+        }
+        res.send(recipe);
+      })
+      .catch(err => {
         return res.status(404).send({
           message: "No recipe found with the title: " + title
         });
-      }
-      res.send(recipe);
-    })
-    .catch(err => {
-      return res.status(404).send({
-        message: "No recipe found with the title: " + title
       });
-    });
-
+  }
 };
 
 // Update the recipe identified by the recipeId in the request
