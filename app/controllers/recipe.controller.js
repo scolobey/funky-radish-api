@@ -171,12 +171,28 @@ exports.findByTitle = (req, res) => {
     // Call Spoonacular API
     SpoonacularService.getRecipe(req.params.recipeTitle.substring(3))
       .then(res=> {
+        console.log("here the res: ", res)
         return res.clone().json()
       })
       .then(data => {
+        // Let's make the recipe look more like the DB version
+        console.log("here the return: ", data)
+
+        if (data[0].error != "") {
+          res.status(500).send({ message: data[0].error || "Error occurred while importing Recipe." });
+        }
+
+        let recipe = {
+          title: data[0].name,
+          ingredients: data[0].ingredients,
+          directions: data[0].name
+        }
+
+        console.log(recipe)
+
         res.json({
           message: 'Have a recipe, punk!',
-          recipe: data[0],
+          recipe: recipe,
           error: ""
         });
       })

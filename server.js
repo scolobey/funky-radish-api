@@ -35,7 +35,6 @@ mongoose.set('useCreateIndex', true);
 
 // Connect to db.
 mongoose.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true })
-
 .then(() => {
     console.log("Database connection successful");
 }).catch(err => {

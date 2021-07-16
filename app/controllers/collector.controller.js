@@ -19,15 +19,11 @@ exports.autocomplete = (req, res) => {
 
 exports.collect = (req, res) => {
   //TODO: handle overloaded api code.
-  console.log("calling for recipes: ", req.query.query)
   SpoonacularService.recipeSearch(req.query.query)
     .then(res=> {
-      console.log("some response came in")
-      console.log(res)
       return res.clone().json()
     })
     .then(data => {
-      console.log("response received: ", data)
       res.json({
         message: 'Here ya go, punk!',
         recipes: data,
@@ -35,7 +31,6 @@ exports.collect = (req, res) => {
       });
     })
     .catch(error => {
-      console.log("there was an error")
       console.log(error)
       res.status(500).send({ message: err.message || "Error occurred while searching." });
     });
