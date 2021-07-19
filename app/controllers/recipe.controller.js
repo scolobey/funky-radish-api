@@ -166,33 +166,30 @@ exports.findOne = (req, res) => {
 // Find a single recipe with a recipeId
 exports.findByTitle = (req, res) => {
 
+  // TODO: should probably rename this method if it only returns the directions.
+
   // Check if this is an external recipe.
   if ( req.params.recipeTitle.substring(0, 3) === "sp-") {
     // Call Spoonacular API
     SpoonacularService.getRecipe(req.params.recipeTitle.substring(3))
       .then(res=> {
-        console.log("here the res: ", res)
         return res.clone().json()
       })
       .then(data => {
-        // Let's make the recipe look more like the DB version
-        console.log("here the return: ", data)
-
-        if (data[0].error != "") {
-          res.status(500).send({ message: data[0].error || "Error occurred while importing Recipe." });
+        if (data[0].error != "" && data[0].error != null) {
+          return res.status(500).send({ message: data[0].error || "Error occurred while importing Recipe." });
         }
 
-        let recipe = {
-          title: data[0].name,
-          ingredients: data[0].ingredients,
-          directions: data[0].name
-        }
+        var directions = data[0].steps.map((step) => {
+          return step["step"]
+        })
 
-        console.log(recipe)
-
-        res.json({
+        return directions
+      })
+      .then(directions => {
+        return res.json({
           message: 'Have a recipe, punk!',
-          recipe: recipe,
+          recipe: directions,
           error: ""
         });
       })

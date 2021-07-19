@@ -45,7 +45,6 @@ exports.importRecipe = (req, res) => {
       return res.clone().json()
     })
     .then(data => {
-
       res.json({
         message: 'Have a recipe, punk!',
         recipe: data[0],
