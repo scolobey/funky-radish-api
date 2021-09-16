@@ -245,42 +245,39 @@ exports.verifyBulkDelete = (req, res, next) => {
 // Verify a new user with the token they got in their email.
 exports.verify = (req, res) => {
   var token = req.params.secret
+  console.log("verifying user")
 
   if (token) {
-    TokenService.verifyToken(token, function(decoded) {
-      if (decoded) {
-        console.log(decoded)
-        User.findByIdAndUpdate(decoded.user, {
-            verified: true
-        })
-        .then(user => {
-          if(!user) {
-            return res.status(404).send({
-              message: "User not found. userId = " + req.params.userId
-            });
-          }
-          return res.send({
-            message: "Email verified.",
-            token: token,
-            user: user
+    TokenService.verifyToken(token)
+    .then(decoded => {
+      User.findByIdAndUpdate(decoded.user, {
+          verified: true
+      })
+      .then(user => {
+        if(!user) {
+          return res.status(404).send({
+            message: "User not found. userId = " + req.params.userId
           });
-        }).catch(err => {
-          if(err.kind === 'ObjectId') {
-            return res.status(404).send({
-              message: "No user found with id: " + req.params.userId
-            });
-          }
-          return res.status(500).send({
-            message: "Error updating user with id: " + req.params.userId
+        }
+        return res.send({
+          message: "Email verified.",
+          token: token,
+          user: user
+        });
+      }).catch(err => {
+        if(err.kind === 'ObjectId') {
+          return res.status(404).send({
+            message: "No user found with id: " + req.params.userId
           });
+        }
+        return res.status(500).send({
+          message: "Error updating user with id: " + req.params.userId
         });
-      }
-      else {
-        return res.status(403).send({
-          success: false,
-          message: 'secret key failed.'
-        });
-      }
+      });
+    }).catch(err => {
+      return res.status(500).send({
+        message: "Validation error: " + err
+      });
     });
   }
   else {

@@ -15,6 +15,7 @@ generateKeyPair('rsa', {
     passphrase: process.env.SECRET
   }
 }, (err, public, private) => {
+
   // Handle errors and use the generated key pair.
   fs.writeFile('publickey.pem', public, function (err) {
     if (err) throw err;
