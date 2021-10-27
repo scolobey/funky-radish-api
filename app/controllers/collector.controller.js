@@ -77,16 +77,15 @@ exports.inspectRecipe = (req, res) => {
       try {
         console.log("trying: " + node)
         jsonld = JSON.parse(node.firstChild.data);
-        console.log(jsonld.headline);
-        console.log(jsonld.description);
-        console.log(jsonld.name);
-        console.log(jsonld.recipeIngredient);
-        console.log(jsonld.recipeIngredient);
-        console.log(jsonld.recipeInstructions);
 
+        res.json({
+          ingredients: jsonld.recipeIngredient,
+          directions: jsonld.recipeInstructions.map((dir) => dir.text),
+          title: jsonld.name
+        });
       } catch (err) {
         // In case of error, you can try to debug by logging the node
-        console.log(node);
+        res.status(500).send({ message: err.message || "Error occurred while importing Recipe." });
       }
 
     })
