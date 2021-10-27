@@ -6,4 +6,6 @@ module.exports = function (app) {
     app.get('/collector/autocomplete/', collector.autocomplete);
 
     app.get('/collector/import/:id', collector.importRecipe);
+
+    app.get('/collector/inspect/:url', collector.inspectRecipe);
 }

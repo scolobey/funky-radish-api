@@ -1,5 +1,9 @@
+
 const SpoonacularService = require('../services/spoonacular_service.js');
 const Recipe = require('../models/recipe.model.js');
+
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 
 exports.autocomplete = (req, res) => {
@@ -54,4 +58,37 @@ exports.importRecipe = (req, res) => {
     .catch(err => {
       res.status(500).send({ message: err.message || "Error occurred while importing Recipe." });
     });
+};
+
+exports.inspectRecipe = (req, res) => {
+  let url = req.params.url
+  console.log("crawling: " + url)
+
+  axios(url)
+    .then(response => {
+
+      const html = response.data;
+      const $ = cheerio.load(html);
+
+      let jsonld;
+
+      const node = $('script[type="application/ld+json"]').get(0);
+
+      try {
+        console.log("trying: " + node)
+        jsonld = JSON.parse(node.firstChild.data);
+        console.log(jsonld.headline);
+        console.log(jsonld.description);
+        console.log(jsonld.name);
+        console.log(jsonld.recipeIngredient);
+        console.log(jsonld.recipeIngredient);
+        console.log(jsonld.recipeInstructions);
+
+      } catch (err) {
+        // In case of error, you can try to debug by logging the node
+        console.log(node);
+      }
+
+    })
+    .catch(console.error);
 };
