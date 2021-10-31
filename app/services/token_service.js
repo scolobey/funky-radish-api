@@ -50,13 +50,14 @@ exports.generateToken = (payload) => {
 }
 
 exports.verifyToken = (token) => {
+  //TODO: This is why expiration rarely occurs. Ignore Expiration is set to true.
   let tokenVerificationPromise = new Promise(function(resolve, reject) {
     jwt.verify(token, publicKey, { format: 'PKCS8', algorithms: ['RS256'], ignoreExpiration: true }, function(err, decoded) {
       if (err) {
+        console.log(err)
         reject(err)
       }
       else {
-        console.log("verified?")
         resolve(decoded)
       }
     });

@@ -5,7 +5,6 @@ const Recipe = require('../models/recipe.model.js');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-
 exports.autocomplete = (req, res) => {
   //TODO: handle overloaded api code.
   SpoonacularService.autocomplete(req.query.query)

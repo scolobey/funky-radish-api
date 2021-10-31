@@ -69,6 +69,7 @@ exports.getToken = (req, res) => {
 };
 
 exports.verifyToken = (req, res, next) => {
+  console.log("token Verification")
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
   if (token) {

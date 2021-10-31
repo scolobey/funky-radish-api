@@ -53,6 +53,7 @@ exports.returnAllRecipes = (req, res) => {
 }
 
 exports.create = (req, res) => {
+  console.log("creating recipe")
   // Is it a list of recipes?
   if(Array.isArray(req.body)) {
     var recipeList = []
@@ -86,6 +87,7 @@ exports.create = (req, res) => {
 
   // Or a single recipe?
   else {
+    console.log("adding a single recipe.")
     if(req.body.directions.length == 0 && !req.body.title && req.body.ingredients.length == 0 ) {
       return res.status(400).send({ message: "Recipe cannot be empty." });
     }
@@ -115,6 +117,7 @@ exports.create = (req, res) => {
 
 // Retrieve recipes owned by user specified in token.
 exports.findAll = (req, res) => {
+  console.log("this oen")
   Recipe.find({author: {_id: req.decoded.user}})
   .populate('author')
   .then(recipes => {

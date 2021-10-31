@@ -4,16 +4,15 @@ module.exports = function (app) {
     const recipes = require('../controllers/recipe.controller.js');
 
     // Retrieve all Recipes belonging to anyone
-    app.get('/admin/recipes', recipes.returnAllRecipes);
+    app.get('/admin/recipes', Auth.verifyAdmin, recipes.returnAllRecipes);
 
     // Retrieve all Recipes belonging to you
-    app.get('/recipes', Auth.verifyToken, recipes.findAll);
-    app.get('/', Auth.verifyToken, recipes.findAll);
+    app.get('/recipes', Auth.verifyAdmin, recipes.findAll);
+    app.get('/', Auth.verifyAdmin, recipes.findAll);
 
     // Create new Recipe or Recipes
-    app.post('/recipes', Auth.verifyToken, recipes.create);
+    app.post('/recipes', Auth.verifyAdmin, recipes.create);
 
-    // app.get('/recipes/:recipeTitle', recipes.findByTitle);
     app.get('/recipes/:recipeTitle', recipes.findByTitle);
 
     // Find any user's recipes, if you're admin.
