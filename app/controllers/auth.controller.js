@@ -69,7 +69,6 @@ exports.getToken = (req, res) => {
 };
 
 exports.verifyToken = (req, res, next) => {
-  console.log("token Verification")
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
   if (token) {
@@ -94,14 +93,17 @@ exports.verifyAdmin = (req, res, next) => {
   if (token) {
     TokenService.verifyToken(token)
       .then((decoded) => {
+        console.log(decoded)
         if (decoded.admin) {
           req.decoded = decoded;
           next();
         }
+        else {
+          res.json({ message: "You need admin privileges for that.", token: "" });
+        }
       }).catch((error) => {
           res.json({ message: "Invalid token.", token: "", error: error });
       })
-
   }
   else {
     return res.status(403).send({

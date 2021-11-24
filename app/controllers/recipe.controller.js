@@ -92,23 +92,28 @@ exports.create = (req, res) => {
       return res.status(400).send({ message: "Recipe cannot be empty." });
     }
 
+    let rec = req.body
+    console.log(req.decoded)
+    console.log(req.decoded.user)
+
+    let recipeID =
+
     // Create
     const recipe = new Recipe({
-      title: req.body.title,
-      realmId: req.body.realmID || "",
-      ingredients: req.body.ingredients,
-      directions: req.body.directions,
-      author: {_id: req.decoded.user}
+      _id: recipeID
+      title: rec.title,
+      realmId: req.body.realmID || ""
     });
 
     // Save
     recipe
-    .populate('author')
+    .populate("author")
     .save()
     .then(data => {
       res.send(data);
     })
     .catch(err => {
+      console.log("error saving")
       res.status(500).send({ message: err.message || "Error occurred while uploading Recipe." });
     });
   }
@@ -117,7 +122,6 @@ exports.create = (req, res) => {
 
 // Retrieve recipes owned by user specified in token.
 exports.findAll = (req, res) => {
-  console.log("this oen")
   Recipe.find({author: {_id: req.decoded.user}})
   .populate('author')
   .then(recipes => {
