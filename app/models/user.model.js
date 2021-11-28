@@ -15,6 +15,7 @@ const UserSchema = mongoose.Schema({
     },
     password: String,
     recipes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }],
+    realmUser: String,
     admin: Boolean,
     verified: Boolean
 }, {

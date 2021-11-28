@@ -3,6 +3,11 @@ const Recipe = require('../models/recipe.model.js');
 const bcrypt = require('bcrypt');
 const TokenService = require('../services/token_service.js');
 const EmailService = require('../services/email_service.js');
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+const config = require('config');
+const realmKey = config.get('RealmKey');
+
 
 exports.getToken = (req, res) => {
   User.findOne({
@@ -28,10 +33,17 @@ exports.getToken = (req, res) => {
     else if (user && user.verified) {
       bcrypt.compare(req.body.password, user.password, function (err, result) {
         // if password hashes to user.password
+
         if (result === true) {
+          console.log("user keys: " + Object.keys(user))
+          console.log("email: " + user.email)
+          console.log("id: " + user._id)
+
           const payload = {
             admin: user.admin,
-            user: user.email
+            user: user.email,
+            sub: user._id,
+            aud: realmKey
           }
 
           TokenService.asynchToken(payload)
@@ -89,7 +101,6 @@ exports.verifyToken = (req, res, next) => {
 exports.verifyAdmin = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
-  console.log("verifying admin")
   if (token) {
     TokenService.verifyToken(token)
       .then((decoded) => {
@@ -118,23 +129,35 @@ exports.verifyUserOwner = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
   if (token) {
-    TokenService.verifyToken(token, function(decoded) {
-      if (decoded.admin) {
-        req.decoded = decoded;
-        next();
-      }
-      else if (decoded.user == req.params.userId) {
-        // if the user is the same as the provided user id
-        req.decoded = decoded;
-        next();
-      }
-      else {
-        return res.status(403).send({
-          success: false,
-          message: 'You are not yourself.'
-        });
-      }
-    });
+    console.log("found a token")
+    TokenService.verifyToken(token)
+      .then((decoded) => {
+          console.log(decoded)
+          //sub is the user id.
+          console.log("sub: " + decoded.sub)
+          console.log("realmUser: " + req.body.user)
+
+          if (decoded.admin) {
+            console.log("user is admin")
+            req.decoded = decoded;
+            next();
+          }
+          else if (decoded.sub == req.body.user) {
+            // if the user is the same as the provided user id
+            console.log("user is that user")
+
+            req.decoded = decoded;
+            next();
+          }
+          else {
+            return res.status(403).send({
+              success: false,
+              message: 'You are not yourself.'
+            });
+          }
+        }).catch((error) => {
+            res.json({ message: "Invalid token.", token: "", error: error });
+        })
   }
   else {
     return res.status(403).send({
@@ -146,39 +169,46 @@ exports.verifyUserOwner = (req, res, next) => {
 
 // Check for admin or recipe owner.
 exports.verifyRecipeOwner = (req, res, next) => {
+  console.log("verifying recipe owner.")
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
   if (token) {
-    TokenService.verifyToken(token, function(decoded) {
-      let recipeId = ""
+    TokenService.verifyToken(token)
+    .then((decoded) => {
+      recipeId = req.params.recipeId
 
-      // When updating a list of recipes, you must include recipe._id with each recipe in body of request.
-      if(Array.isArray(req.body)) {
-        recipeId = req.body[0]._id
-      }
-      else {
-        recipeId = req.params.recipeId
-      }
+      console.log("figure out how to match these")
+      console.log("rec id: " + recipeId)
+      console.log("decoded user: " + decoded.user)
+      console.log("decoded sub: " + decoded.sub)
 
-      Recipe.findOne({ _id: recipeId })
-      .populate('author')
-      .then(recipe => {
-        if (!recipe) {
-          res.json({ success: false, message: 'Recipe not found.' });
-        }
-        else if (decoded.user == recipe.author._id) {
-          req.decoded = decoded;
-          next();
-        }
-        else {
-          return res.status(403).send({
-            success: false,
-            message: 'This action requires authentication.'
-          });
-        }
+      MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+        assert.equal(null, err);
+
+        const db = client.db("funky_radish_db")
+
+
+        var cursor = db.collection('Recipe').findOne({_id: recipeId}, function(err, result) {
+          if (err) throw err;
+
+          if (!result) {
+            res.json({ success: false, message: 'Nothing found.' });
+          }
+          else {
+            console.log("found something: " + result.author)
+
+          }
+
+        });
       });
-
-    });
+    }).catch((error) => {
+        console.log("Error", error);
+        res.json({
+          message: "Recipe token verification failed.",
+          token: "",
+          error: error.message || "no message"
+        });
+    })
   }
   else {
     return res.status(403).send({
@@ -253,7 +283,7 @@ exports.verify = (req, res) => {
   if (token) {
     TokenService.verifyToken(token)
     .then(decoded => {
-      User.findByIdAndUpdate(decoded.user, {
+      User.findByIdAndUpdate(decoded.sub, {
           verified: true
       })
       .then(user => {
@@ -303,10 +333,16 @@ exports.resendSecret = (req, res) => {
           });
         }
 
+        console.log("user keys: " + Object.keys(user))
+        console.log("email: " + user.email)
+        console.log("id: " + user._id)
+
         const payload = {
           admin: user.admin,
-          user: user._id
-        };
+          user: user.email,
+          sub: user._id,
+          aud: realmKey
+        }
 
         TokenService.asynchToken(payload)
           .then((token) => {
@@ -380,6 +416,117 @@ exports.deleteUnverifiedUser = (req, res) => {
     return res.status(403).send({
       success: false,
       message: 'Parameter missing: userId.'
+    });
+  }
+};
+
+exports.createRecipeToken = (req, res) => {
+  // User.findOne({
+  //   email: req.body.email
+  // },
+  // function(err, user) {
+  //   if (err) {
+  //     console.log(err)
+  //     res.json({
+  //       message: "Token creation failed.",
+  //       token: "",
+  //       error: "Authentication error."
+  //     });
+  //   }
+  //
+  //   if (!user) {
+  //     res.json({
+  //       message: "Token creation failed.",
+  //       token: "",
+  //       error: "User not found"
+  //     });
+  //   }
+  //   else if (user && user.verified) {
+  //     bcrypt.compare(req.body.password, user.password, function (err, result) {
+  //       // if password hashes to user.password
+  //       if (result === true) {
+  //         const payload = {
+  //           admin: user.admin,
+  //           user: user.email
+  //         }
+  //
+  //         TokenService.asynchToken(payload)
+  //           .then((token) => {
+  //             res.json({
+  //               message: 'Enjoy your token, ya filthy animal!',
+  //               token: token,
+  //               error: ""
+  //             });
+  //         }).catch((error) => {
+  //             console.log("Error", error);
+  //             res.json({
+  //               message: "Token creation failed.",
+  //               token: "",
+  //               error: error.message || "no message"
+  //             });
+  //         })
+  //       }
+  //       else {
+  //         res.json({
+  //           token: '',
+  //           message: 'Authentication failed. Wrong password.',
+  //           error: 'Incorrect password.'
+  //         });
+  //       }
+  //     })
+  //   }
+  //   else {
+  //     res.json({
+  //       success: false,
+  //       message: 'Email not verified.'
+  //     });
+  //   }
+  // });
+};
+
+// Verify a new user with the token they got in their email.
+exports.verifyRecipeToken = (req, res) => {
+  var token = req.params.recipeToken
+  console.log("verifying user")
+
+  if (token) {
+    TokenService.verifyToken(token)
+    .then(decoded => {
+      console.log("decoded: " + decoded)
+      // User.findByIdAndUpdate(decoded.user, {
+      //     verified: true
+      // })
+      // .then(user => {
+      //   if(!user) {
+      //     return res.status(404).send({
+      //       message: "User not found. userId = " + req.params.userId
+      //     });
+      //   }
+      //   return res.send({
+      //     message: "Email verified.",
+      //     token: token,
+      //     user: user
+      //   });
+      // }).catch(err => {
+      //   if(err.kind === 'ObjectId') {
+      //     return res.status(404).send({
+      //       message: "No user found with id: " + req.params.userId
+      //     });
+      //   }
+      //   return res.status(500).send({
+      //     message: "Error updating user with id: " + req.params.userId
+      //   });
+      // });
+    }).catch(err => {
+      return res.status(500).send({
+        message: "Validation error: " + err
+      });
+    });
+  }
+  else {
+    return res.status(403).send({
+      success: false,
+      message: 'This action requires a secret key.'
     });
   }
 };

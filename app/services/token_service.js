@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const config = require('config');
-const realmKey = config.get('RealmKey');
-
 
 //TODO: This is an issue when the process is not set.
 const secret = process.env.SECRET || config.get('SECRET');
@@ -16,9 +14,6 @@ const privateKey = process.env.PRIVATE || config.get('PRIVATE');
 exports.asynchToken = (payload) => {
   let currentTime = Date.now();
   let expTime = currentTime + 86400
-
-  payload.sub = payload.user
-  payload.aud = realmKey
 
   let tokenPromise = new Promise(function(resolve, reject) {
     const token = jwt.sign(payload, { key: privateKey, passphrase: secret }, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
@@ -34,20 +29,21 @@ exports.asynchToken = (payload) => {
   return tokenPromise
 }
 
-exports.generateToken = (payload) => {
-  let currentTime = Date.now();
-  let expTime = currentTime + 86400
+// TODO: I believe this is basically deprecated in favor of asynchToken
 
-  payload.sub = payload.user
-  payload.aud = realmKey
-
-  const token = jwt.sign(payload, privateKey, {
-    algorithm: 'RS256',
-    expiresIn: 86400
-  })
-
-  return token
-}
+// exports.generateToken = (payload) => {
+//   let currentTime = Date.now();
+//   let expTime = currentTime + 86400
+//
+//   payload.sub = payload.user
+//   payload.aud = realmKey
+//
+//   const token = jwt.sign(payload, privateKey, {
+//     algorithm: 'RS256',
+//     expiresIn: 86400
+//   })
+//   return token
+// }
 
 exports.verifyToken = (token) => {
   //TODO: This is why expiration rarely occurs. Ignore Expiration is set to true.
@@ -64,4 +60,23 @@ exports.verifyToken = (token) => {
   });
 
   return tokenVerificationPromise
+}
+
+exports.asynchRecipeToken = (payload) => {
+  let currentTime = Date.now();
+  // TODO: Verify that this is 1 day, and use this instead of the har-dcoded number below.
+  let expTime = currentTime + 86400
+
+  let tokenPromise = new Promise(function(resolve, reject) {
+    const token = jwt.sign(payload, { key: privateKey, passphrase: secret }, { algorithm: 'RS256', expiresIn: 86400 }, function(err, token) {
+      if (err) {
+        reject(err);
+      }
+      else {
+        resolve(token)
+      }
+    });
+  });
+
+  return tokenPromise
 }

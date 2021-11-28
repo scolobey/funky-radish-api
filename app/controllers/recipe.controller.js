@@ -4,6 +4,7 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const config = require('config');
 
+const TokenService = require('../services/token_service.js');
 const SpoonacularService = require('../services/spoonacular_service.js');
 
 // Retrieve all recipes if you have admin privileges.
@@ -92,17 +93,15 @@ exports.create = (req, res) => {
       return res.status(400).send({ message: "Recipe cannot be empty." });
     }
 
-    let rec = req.body
-    console.log(req.decoded)
-    console.log(req.decoded.user)
-
-    let recipeID =
+    // TODO: I don't really get why I was messing with this. Kinda need to make sure creating 1 recipe via API still works.
 
     // Create
     const recipe = new Recipe({
-      _id: recipeID
-      title: rec.title,
-      realmId: req.body.realmID || ""
+      title: req.body.title,
+      realmId: req.body.realmID || "",
+      ingredients: req.body.ingredients,
+      directions: req.body.directions,
+      author: {_id: req.decoded.user}
     });
 
     // Save
@@ -349,3 +348,62 @@ exports.deleteMany = (req, res) => {
       });
     })
 };
+
+// Create a token for recipe access
+exports.getRecipeToken = (req, res) => {
+  console.log("calling for a recipe token: " + req.body)
+
+  const payload = {
+    recipeID: req.params.recipeId
+  }
+
+  TokenService.asynchRecipeToken(payload)
+    .then((token) => {
+      res.json({
+        message: 'Share this token to share your recipe.',
+        token: token,
+        error: ""
+      });
+  }).catch((error) => {
+      console.log("Error", error);
+      res.json({
+        message: "Recipe token creation failed.",
+        token: "",
+        error: error.message || "no message"
+      });
+  })
+}
+
+// Connect a user to a recipe
+exports.connect = (req, res) => {
+
+
+  // Recipe.findByIdAndUpdate(req.params.recipeId, {
+  //   $set: {
+  //     title: req.body.title || "Untitled",
+  //     realmID: req.body.realmID || "",
+  //     clientID: req.body.clientID || "",
+  //     ingredients: req.body.ingredients,
+  //     directions: req.body.directions,
+  //     updatedAt: req.body.updatedAt
+  //   }
+  // }, {new: true})
+  // .populate('author')
+  // .then(recipe => {
+  //   if(!recipe) {
+  //     return res.status(404).send({
+  //       message: "Recipe not found. recipeId = " + req.params.recipeId
+  //     });
+  //   }
+  //   res.send(recipe);
+  // }).catch(err => {
+  //   if(err.kind === 'ObjectId') {
+  //     return res.status(404).send({
+  //       message: "No recipe found with id: " + req.params.recipeId
+  //     });
+  //   }
+  //   return res.status(500).send({
+  //     message: "Error updating recipe with id: " + req.params.recipeId
+  //   });
+  // });
+}

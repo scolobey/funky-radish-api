@@ -5,6 +5,9 @@ const Recipe = require('../models/recipe.model.js');
 const TokenService = require('../services/token_service.js');
 const EmailService = require('../services/email_service.js');
 
+const config = require('config');
+const realmKey = config.get('RealmKey');
+
 // Create and Save a new User
 exports.create = (req, res) => {
   // Validate
@@ -33,8 +36,11 @@ exports.create = (req, res) => {
     .then(userData => {
       const payload = {
         admin: userData.admin,
-        user: userData._id
-      };
+        user: req.body.email,
+        sub: userData._id,
+        aud: realmKey
+      }
+
 
       console.log("trying that asynch call: ", payload.user)
 
@@ -95,7 +101,7 @@ exports.findOne = (req, res) => {
 // Update a user identified by the userId in the request
 exports.update = (req, res) => {
   // Validate
-     if(!req.body.email || !req.body.name || !req.body.password) {
+     if(!req.body.email || !req.body.password) {
          return res.status(400).send({
              message: "User cannot be empty."
          });
@@ -103,9 +109,9 @@ exports.update = (req, res) => {
 
      // Find and update user from request body
      User.findByIdAndUpdate(req.params.userId, {
-         name: req.body.name,
          email: req.body.email,
          password: req.body.password,
+         realmUser: req.body.realmUser,
          admin: req.body.admin || false
      }, {new: true})
      .then(user => {
@@ -126,6 +132,33 @@ exports.update = (req, res) => {
          });
      });
 };
+
+// Update a user identified by the userId in the request
+exports.updateRealmUser = (req, res) => {
+     // Find and update user from request body
+     User.findByIdAndUpdate(req.decoded.sub, {
+         realmUser: req.body.realmUser
+     }, {new: true})
+     .then(user => {
+         if(!user) {
+             return res.status(404).send({
+                 message: "User not found. userId = " + req.params.userId
+             });
+         }
+         res.send(user);
+     }).catch(err => {
+         if(err.kind === 'ObjectId') {
+             return res.status(404).send({
+                 message: "No user found with id: " + req.params.userId
+             });
+         }
+         return res.status(500).send({
+             message: "Error updating user with id: " + req.params.userId
+         });
+     });
+};
+
+
 
 // Delete the user specified by the userId in the request
 exports.delete = (req, res) => {

@@ -32,4 +32,10 @@ module.exports = function (app) {
 
     // Delete a Recipe with recipeId
     app.delete('/recipe/:recipeId', Auth.verifyRecipeOwner, recipes.delete);
+
+    // Create a token to claim a recipe.
+    app.get('/createRecipeToken/:recipeId', Auth.verifyRecipeOwner, recipes.getRecipeToken);
+
+    // Claim a recipe via a recipe token.
+    app.get('/claimRecipe/:recipeToken', Auth.verifyRecipeToken, recipes.connect);
 }
