@@ -43,7 +43,8 @@ exports.getToken = (req, res) => {
             admin: user.admin,
             user: user.email,
             sub: user._id,
-            aud: realmKey
+            aud: realmKey,
+            realmUser: user.realmUser || ""
           }
 
           TokenService.asynchToken(payload)
@@ -132,20 +133,14 @@ exports.verifyUserOwner = (req, res, next) => {
     console.log("found a token")
     TokenService.verifyToken(token)
       .then((decoded) => {
-          console.log(decoded)
-          //sub is the user id.
-          console.log("sub: " + decoded.sub)
-          console.log("realmUser: " + req.body.user)
-
+          console.log("decoded: " + JSON.stringify(decoded))
           if (decoded.admin) {
             console.log("user is admin")
             req.decoded = decoded;
             next();
           }
-          else if (decoded.sub == req.body.user) {
-            // if the user is the same as the provided user id
-            console.log("user is that user")
-
+          else if ((decoded.user == req.body.email)) {
+            // The user in the token is the user you're trying to edit.
             req.decoded = decoded;
             next();
           }
@@ -341,7 +336,8 @@ exports.resendSecret = (req, res) => {
           admin: user.admin,
           user: user.email,
           sub: user._id,
-          aud: realmKey
+          aud: realmKey,
+          realmUser: user.realmUser || ""
         }
 
         TokenService.asynchToken(payload)

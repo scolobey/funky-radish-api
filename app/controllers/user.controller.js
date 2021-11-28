@@ -38,7 +38,8 @@ exports.create = (req, res) => {
         admin: userData.admin,
         user: req.body.email,
         sub: userData._id,
-        aud: realmKey
+        aud: realmKey,
+        realmUser: ""
       }
 
 
@@ -135,27 +136,52 @@ exports.update = (req, res) => {
 
 // Update a user identified by the userId in the request
 exports.updateRealmUser = (req, res) => {
-     // Find and update user from request body
-     User.findByIdAndUpdate(req.decoded.sub, {
-         realmUser: req.body.realmUser
-     }, {new: true})
-     .then(user => {
-         if(!user) {
-             return res.status(404).send({
-                 message: "User not found. userId = " + req.params.userId
-             });
-         }
-         res.send(user);
-     }).catch(err => {
-         if(err.kind === 'ObjectId') {
-             return res.status(404).send({
-                 message: "No user found with id: " + req.params.userId
-             });
-         }
-         return res.status(500).send({
-             message: "Error updating user with id: " + req.params.userId
-         });
-     });
+    // If the token has a realmUser, fuggedaboutit.
+    if (req.decoded.realmUser.length > 0) {
+      console.log("realmUser set: " + req.decoded.realmUser)
+      User.findById(req.decoded.sub, { password: 0 })
+      .then(user => {
+          if(!user) {
+              return res.status(404).send({
+                  message: "User not found. userId = " + req.params.userId
+              });
+          }
+          res.send(user);
+      }).catch(err => {
+          if(err.kind === 'ObjectId') {
+              return res.status(404).send({
+                  message: "No user found with id: " + req.params.userId
+              });
+          }
+          return res.status(500).send({
+              message: "Error retrieving user with id: " + req.params.userId
+          });
+      });
+    }
+    else {
+      // Else, find and update user from request body
+      User.findByIdAndUpdate(req.decoded.sub, {
+          realmUser: req.body.realmUser
+      }, {new: true})
+      .then(user => {
+          if(!user) {
+              return res.status(404).send({
+                  message: "User not found. userId = " + req.params.userId
+              });
+          }
+          res.send(user);
+      }).catch(err => {
+          if(err.kind === 'ObjectId') {
+              return res.status(404).send({
+                  message: "No user found with id: " + req.params.userId
+              });
+          }
+          return res.status(500).send({
+              message: "Error updating user with id: " + req.params.userId
+          });
+      });
+    }
+
 };
 
 
