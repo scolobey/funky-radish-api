@@ -25,6 +25,6 @@ module.exports = function (app) {
     app.delete('/users/:userId', Auth.verifyAdmin, users.delete);
 
     // Update a User's realmUser'
-    app.get('/realmUser', Auth.verifyUserOwner, users.updateRealmUser);
+    app.post('/realmUser', Auth.verifyUserOwner, users.updateRealmUser);
 
 }
