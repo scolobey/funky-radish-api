@@ -21,3 +21,20 @@ exports.sendVerificationEmail = (email, user, secret) => {
 
   return sgMail.send(msg)
 }
+
+exports.sendPasswordResetEmail = (email, secret) => {
+  console.log("emailing: " + email + ", secret: "+ secret)
+
+  const msg = {
+    to: email, // Change to your recipient
+    from: 'no-reply@funkyradish.com', // Change to your verified sender
+    templateId: 'd-e86cd153fca84ba5bacadc6654513fdd',
+    dynamicTemplateData: {
+      "sender_secret": secret,
+      "sender_email": email
+    },
+    subject: 'Reset your FunkyRadish password.'
+  }
+
+  return sgMail.send(msg)
+}

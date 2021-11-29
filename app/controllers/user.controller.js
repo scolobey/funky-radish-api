@@ -184,8 +184,6 @@ exports.updateRealmUser = (req, res) => {
 
 };
 
-
-
 // Delete the user specified by the userId in the request
 exports.delete = (req, res) => {
   User.findByIdAndRemove(req.params.userId)
@@ -206,4 +204,46 @@ exports.delete = (req, res) => {
               message: "Error deleting user with id: " + req.params.userId
           });
       });
+};
+
+// Delete the user specified by the userId in the request
+exports.resetPassword = (req, res) => {
+  console.log("hit the method: " + req.params.userId)
+  // Send an email to the user with a link to reset their email.
+
+  let payload = {
+    userId: req.params.userId
+  }
+
+  User.findById(req.params.userId, { password: 0 })
+  .then(user => {
+      if(!user) {
+          return res.status(404).send({
+              message: "User not found. userId = " + req.params.userId
+          });
+      }
+      TokenService.asynchToken(payload)
+        .then((token) => {
+          EmailService.sendPasswordResetEmail(user.email, token)
+            .then(() => {
+              res.json({ message: "Password reset email sent.", token: "", error: "" });
+            })
+            .catch((error) => {
+              console.log("Error", error);
+              res.json({ message: "Password reset email sending failure.", token: "", error: error.message || "error without message" });
+            })
+      }).catch((error) => {
+          console.log("Error", error);
+          res.json({ message: "Token creation failed.", token: "", error: error.message || "error without message" });
+      })
+  }).catch(err => {
+      if(err.kind === 'ObjectId') {
+          return res.status(404).send({
+              message: "No user found with id: " + req.params.userId
+          });
+      }
+      return res.status(500).send({
+          message: "Error retrieving user with id: " + req.params.userId
+      });
+  });
 };

@@ -27,4 +27,7 @@ module.exports = function (app) {
     // Update a User's realmUser'
     app.put('/realmUser', Auth.verifyUserOwner, users.updateRealmUser);
 
+    // Reset user password
+    app.get('/resetPassword/:userId', users.resetPassword);
+
 }
