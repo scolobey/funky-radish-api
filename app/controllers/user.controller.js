@@ -134,7 +134,7 @@ exports.update = (req, res) => {
      });
 };
 
-// Update a user identified by the userId in the request
+// Update a user's realmUSer identified by the userId in the request
 exports.updateRealmUser = (req, res) => {
     // If the token has a realmUser, fuggedaboutit.
     if (req.decoded.realmUser.length > 0) {
@@ -181,7 +181,6 @@ exports.updateRealmUser = (req, res) => {
           });
       });
     }
-
 };
 
 // Delete the user specified by the userId in the request
@@ -206,7 +205,6 @@ exports.delete = (req, res) => {
       });
 };
 
-// Delete the user specified by the userId in the request
 exports.resetPassword = (req, res) => {
   console.log("hit the method: " + req.params.userId)
   // Send an email to the user with a link to reset their email.
@@ -246,4 +244,33 @@ exports.resetPassword = (req, res) => {
           message: "Error retrieving user with id: " + req.params.userId
       });
   });
+};
+
+exports.changePassword = (req, res) => {
+  // Else, find and update user from request body
+
+  console.log("newPassword: " + req.body.newPassword)
+  console.log("user: " + req.decoded.userId)
+
+  User.findByIdAndUpdate(req.decoded.userId, {
+    password: req.body.newPassword
+  }, {new: false})
+  .then(user => {
+    if(!user) {
+      return res.status(404).send({
+        message: "User not found. userId = " + req.decoded.userId
+      });
+    }
+    res.send(user);
+  }).catch(err => {
+    if(err.kind === 'ObjectId') {
+      return res.status(404).send({
+        message: "No user found with id: " + req.params.userId
+      });
+    }
+    return res.status(500).send({
+      message: "Error updating user with id: " + req.params.userId
+    });
+  });
+
 };

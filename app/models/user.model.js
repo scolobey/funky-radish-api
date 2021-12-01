@@ -27,6 +27,8 @@ UserSchema.plugin(uniqueValidator, {message: 'email is already taken.'});
 UserSchema.pre('save', function (next) {
   var user = this;
 
+  console.log("bout to save. Better hash.")
+
   bcrypt.hash(user.password, 12, function (err, hash){
     if (err) {
       console.log("error in bcrypt hashing")
@@ -36,6 +38,20 @@ UserSchema.pre('save', function (next) {
     next();
   })
 });
+
+UserSchema.pre('findOneAndUpdate', async function() {
+  console.log("finding and updating.")
+  const userToUpdate = await this.model.findOne(this.getQuery())
+
+  console.log("old: " + userToUpdate.password)
+  console.log("new: " + this._update.password)
+
+  if (userToUpdate.password !== this._update.password) {
+ 
+
+    this._update.password = await bcrypt.hash(this._update.password, 12)
+  }
+})
 
 const tokenSchema = mongoose.Schema({
     _userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },

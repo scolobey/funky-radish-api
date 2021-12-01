@@ -30,4 +30,6 @@ module.exports = function (app) {
     // Reset user password
     app.get('/resetPassword/:userId', users.resetPassword);
 
+    // Change user password, if a token is provided.
+    app.put('/changePassword/:userId', Auth.verifyUserOwner, users.changePassword);
 }
