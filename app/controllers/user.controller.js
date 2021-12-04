@@ -39,7 +39,7 @@ exports.create = (req, res) => {
         user: req.body.email,
         sub: userData._id,
         aud: realmKey,
-        realmUser: ""
+        author: ""
       }
 
 
@@ -112,7 +112,7 @@ exports.update = (req, res) => {
      User.findByIdAndUpdate(req.params.userId, {
          email: req.body.email,
          password: req.body.password,
-         realmUser: req.body.realmUser,
+         author: req.body.author,
          admin: req.body.admin || false
      }, {new: true})
      .then(user => {
@@ -136,9 +136,9 @@ exports.update = (req, res) => {
 
 // Update a user's realmUSer identified by the userId in the request
 exports.updateRealmUser = (req, res) => {
-    // If the token has a realmUser, fuggedaboutit.
-    if (req.decoded.realmUser.length > 0) {
-      console.log("realmUser set: " + req.decoded.realmUser)
+    // If the token has a author, fuggedaboutit.
+    if (req.decoded.author.length > 0) {
+      console.log("author set: " + req.decoded.author)
       User.findById(req.decoded.sub, { password: 0 })
       .then(user => {
           if(!user) {
@@ -161,7 +161,7 @@ exports.updateRealmUser = (req, res) => {
     else {
       // Else, find and update user from request body
       User.findByIdAndUpdate(req.decoded.sub, {
-          realmUser: req.body.realmUser
+          author: req.body.author
       }, {new: true})
       .then(user => {
           if(!user) {
@@ -251,6 +251,7 @@ exports.changePassword = (req, res) => {
 
   console.log("newPassword: " + req.body.newPassword)
   console.log("user: " + req.decoded.userId)
+
 
   User.findByIdAndUpdate(req.decoded.userId, {
     password: req.body.newPassword

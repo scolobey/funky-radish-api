@@ -15,7 +15,7 @@ const UserSchema = mongoose.Schema({
     },
     password: String,
     recipes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }],
-    realmUser: String,
+    author: String,
     admin: Boolean,
     verified: Boolean
 }, {
@@ -47,8 +47,6 @@ UserSchema.pre('findOneAndUpdate', async function() {
   console.log("new: " + this._update.password)
 
   if (userToUpdate.password !== this._update.password) {
- 
-
     this._update.password = await bcrypt.hash(this._update.password, 12)
   }
 })

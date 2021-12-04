@@ -43,7 +43,7 @@ exports.getToken = (req, res) => {
             user: user.email,
             sub: user._id,
             aud: realmKey,
-            realmUser: user.realmUser || ""
+            author: user.author || ""
           }
 
           TokenService.asynchToken(payload)
@@ -336,7 +336,7 @@ exports.resendSecret = (req, res) => {
           user: user.email,
           sub: user._id,
           aud: realmKey,
-          realmUser: user.realmUser || ""
+          author: user.author || ""
         }
 
         TokenService.asynchToken(payload)
