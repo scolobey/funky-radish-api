@@ -277,6 +277,7 @@ exports.verify = (req, res) => {
   if (token) {
     TokenService.verifyToken(token)
     .then(decoded => {
+      console.log("token checks out: " + decoded.sub)
       User.findByIdAndUpdate(decoded.sub, {
           verified: true
       })

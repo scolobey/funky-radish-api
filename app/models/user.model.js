@@ -40,7 +40,11 @@ UserSchema.pre('save', function (next) {
 });
 
 UserSchema.pre('findOneAndUpdate', async function() {
-  console.log("finding and updating.")
+  // If the password is not being changed, move along.
+  if (!this._update.password) {
+    return
+  }
+
   const userToUpdate = await this.model.findOne(this.getQuery())
 
   console.log("old: " + userToUpdate.password)
