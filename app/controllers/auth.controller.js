@@ -333,13 +333,15 @@ exports.resendSecret = (req, res) => {
       .then(user => {
         if(!user) {
           return res.status(404).send({
-            message: "User not found. userEmail = " + userEmail
+            message: "User not found: " + userEmail
           });
         }
 
-        console.log("user keys: " + Object.keys(user))
-        console.log("email: " + user.email)
-        console.log("id: " + user._id)
+        if(user.verified) {
+          return res.status(404).send({
+            message: "User already verified: " + userEmail
+          });
+        }
 
         const payload = {
           admin: user.admin,
@@ -357,11 +359,11 @@ exports.resendSecret = (req, res) => {
               })
               .catch((error) => {
                   console.log("Error", error);
-                  res.json({ message: "Verification email sending failure.", token: "", error: error });
+                  res.json({ message: "Verification email sending failure:", token: "", error: error });
               })
           }).catch((error) => {
               console.log("Error", error);
-              res.json({ message: "Token creation failed.", token: "", error: error });
+              res.json({ message: "Token creation failed: ", token: "", error: error });
           })
       })
       .catch(err => {
