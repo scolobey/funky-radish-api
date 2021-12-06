@@ -317,14 +317,23 @@ exports.verify = (req, res) => {
 };
 
 exports.resendSecret = (req, res) => {
-  var userId = req.params.userId
 
-  if (userId) {
-    User.findById(userId, { password: 0 })
+  if(!req.body.email) {
+    return res.status(400).send({
+      message: "Email must be provided.", token: ""
+    });
+  }
+
+  var userEmail = req.body.email
+
+  if (userEmail) {
+    User.findOne({
+      email: req.body.email
+    })
       .then(user => {
         if(!user) {
           return res.status(404).send({
-            message: "User not found. userId = " + userId
+            message: "User not found. userEmail = " + userEmail
           });
         }
 
@@ -358,12 +367,12 @@ exports.resendSecret = (req, res) => {
       .catch(err => {
             if(err.kind === 'ObjectId') {
                 return res.status(404).send({
-                    message: "No user found with id: " + userId
+                    message: "Email not found: " + userEmail
                 });
             }
             console.log(err)
             return res.status(500).send({
-                message: "Error retrieving user with id: " + userId
+                message: "Email not found."
             });
       });
   }
