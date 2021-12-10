@@ -35,6 +35,7 @@ exports.create = (req, res) => {
 
   user.save()
     .then(userData => {
+      console.log("created: " + JSON.stringify(userData))
       const payload = {
         admin: userData.admin,
         user: req.body.email,
@@ -42,7 +43,6 @@ exports.create = (req, res) => {
         aud: realmKey,
         author: ""
       }
-
 
       console.log("trying that asynch call: ", payload.user)
 
