@@ -129,7 +129,7 @@ exports.verifyUserOwner = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
   if (token) {
-    console.log("found a token")
+    console.log("found a token: " + token)
     TokenService.verifyToken(token)
       .then((decoded) => {
           console.log("decoded: " + JSON.stringify(decoded))
@@ -138,7 +138,7 @@ exports.verifyUserOwner = (req, res, next) => {
             req.decoded = decoded;
             next();
           }
-          else if ((decoded.user == req.body.email)) {
+          else if (decoded.user == req.body.email) {
             // The user in the token is the user you're trying to edit.
             req.decoded = decoded;
             next();

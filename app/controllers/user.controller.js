@@ -29,7 +29,8 @@ exports.create = (req, res) => {
       email: req.body.email,
       password: req.body.password,
       admin: false,
-      verified: false
+      verified: false,
+      author: ""
   });
 
   user.save()
@@ -206,9 +207,7 @@ exports.delete = (req, res) => {
 };
 
 exports.resetPassword = (req, res) => {
-  console.log("hit the method: " + req.params.userId)
   // Send an email to the user with a link to reset their email.
-
   let payload = {
     userId: req.params.userId
   }
