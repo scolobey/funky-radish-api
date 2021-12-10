@@ -80,6 +80,7 @@ exports.getToken = (req, res) => {
   });
 };
 
+// TODO: This no longer works. Ditch it!
 exports.verifyToken = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
@@ -124,8 +125,8 @@ exports.verifyAdmin = (req, res, next) => {
   }
 };
 
-// Check for admin or user owner.
-exports.verifyUserOwner = (req, res, next) => {
+// Check the token.
+exports.verifyUserAction = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
   if (token) {
@@ -133,22 +134,9 @@ exports.verifyUserOwner = (req, res, next) => {
     TokenService.verifyToken(token)
       .then((decoded) => {
           console.log("decoded: " + JSON.stringify(decoded))
-          if (decoded.admin) {
-            console.log("user is admin")
-            req.decoded = decoded;
-            next();
-          }
-          else if (decoded.user == req.body.email) {
-            // The user in the token is the user you're trying to edit.
-            req.decoded = decoded;
-            next();
-          }
-          else {
-            return res.status(403).send({
-              success: false,
-              message: 'You are not yourself.'
-            });
-          }
+
+          req.decoded = decoded;
+          next();
         }).catch((error) => {
             res.json({ message: "Invalid token.", token: "", error: error });
         })

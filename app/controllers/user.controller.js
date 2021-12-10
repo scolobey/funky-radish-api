@@ -208,17 +208,24 @@ exports.delete = (req, res) => {
 
 exports.resetPassword = (req, res) => {
   // Send an email to the user with a link to reset their email.
-  let payload = {
-    userId: req.params.userId
+  if(!req.body.email) {
+    return res.status(400).send({
+      message: "Email must be provided.", token: ""
+    });
   }
 
-  User.findById(req.params.userId, { password: 0 })
+  User.findOne({email: req.body.email})
   .then(user => {
       if(!user) {
           return res.status(404).send({
               message: "User not found. userId = " + req.params.userId
           });
       }
+
+      let payload = {
+        userId: user._id
+      }
+
       TokenService.asynchToken(payload)
         .then((token) => {
           EmailService.sendPasswordResetEmail(user.email, token)
