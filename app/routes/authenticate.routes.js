@@ -9,7 +9,7 @@ module.exports = function (app) {
     app.get('/verify/:secret', auth.verify);
 
     // // Resend verification
-    app.get('/resendVerification/', auth.resendSecret);
+    app.post('/resendVerification/', auth.resendSecret);
 
     // Delete an unverified user
     app.get('/deleteRecord/:userId', auth.deleteUnverifiedUser);
