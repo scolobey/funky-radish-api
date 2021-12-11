@@ -28,7 +28,7 @@ module.exports = function (app) {
     app.put('/realmUser', Auth.verifyUserAction, users.updateRealmUser);
 
     // Reset user password
-    app.get('/resetPassword/', users.resetPassword);
+    app.post('/resetPassword/', users.resetPassword);
 
     // Change user password, if a token is provided.
     app.put('/changePassword/', Auth.verifyUserAction, users.changePassword);
