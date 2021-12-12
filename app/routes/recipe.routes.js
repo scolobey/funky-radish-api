@@ -11,7 +11,7 @@ module.exports = function (app) {
     app.get('/', Auth.verifyAdmin, recipes.findAll);
 
     // Create new Recipe or Recipes
-    app.post('/recipes', Auth.verifyAdmin, recipes.create);
+    // app.post('/recipes', Auth.verifyAdmin, recipes.create);
 
     app.get('/recipes/:recipeTitle', recipes.findByTitle);
 
