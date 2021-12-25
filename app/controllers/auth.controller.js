@@ -161,24 +161,27 @@ exports.verifyRecipeOwner = (req, res, next) => {
 
       console.log("figure out how to match these")
       console.log("rec id: " + recipeId)
-      console.log("decoded user: " + decoded.user)
-      console.log("decoded sub: " + decoded.sub)
+      console.log("decoded user: " + JSON.stringify(decoded))
 
       MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
         assert.equal(null, err);
 
         const db = client.db("funky_radish_db")
 
-
         var cursor = db.collection('Recipe').findOne({_id: recipeId}, function(err, result) {
           if (err) throw err;
 
           if (!result) {
-            res.json({ success: false, message: 'Nothing found.' });
+            res.json({ success: false, message: 'Recipe not found.' });
           }
           else {
-            console.log("found something: " + result.author)
-
+            if (result.author == decoded.author) {
+              console.log("Looks like you are the owner.")
+              next();
+            }
+            else {
+              res.json({ success: false, message: 'That recipe is not yours to give.' });
+            }
           }
 
         });
@@ -415,103 +418,19 @@ exports.deleteUnverifiedUser = (req, res) => {
   }
 };
 
-exports.createRecipeToken = (req, res) => {
-  // User.findOne({
-  //   email: req.body.email
-  // },
-  // function(err, user) {
-  //   if (err) {
-  //     console.log(err)
-  //     res.json({
-  //       message: "Token creation failed.",
-  //       token: "",
-  //       error: "Authentication error."
-  //     });
-  //   }
-  //
-  //   if (!user) {
-  //     res.json({
-  //       message: "Token creation failed.",
-  //       token: "",
-  //       error: "User not found"
-  //     });
-  //   }
-  //   else if (user && user.verified) {
-  //     bcrypt.compare(req.body.password, user.password, function (err, result) {
-  //       // if password hashes to user.password
-  //       if (result === true) {
-  //         const payload = {
-  //           admin: user.admin,
-  //           user: user.email
-  //         }
-  //
-  //         TokenService.asynchToken(payload)
-  //           .then((token) => {
-  //             res.json({
-  //               message: 'Enjoy your token, ya filthy animal!',
-  //               token: token,
-  //               error: ""
-  //             });
-  //         }).catch((error) => {
-  //             console.log("Error", error);
-  //             res.json({
-  //               message: "Token creation failed.",
-  //               token: "",
-  //               error: error.message || "no message"
-  //             });
-  //         })
-  //       }
-  //       else {
-  //         res.json({
-  //           token: '',
-  //           message: 'Authentication failed. Wrong password.',
-  //           error: 'Incorrect password.'
-  //         });
-  //       }
-  //     })
-  //   }
-  //   else {
-  //     res.json({
-  //       success: false,
-  //       message: 'Email not verified.'
-  //     });
-  //   }
-  // });
-};
-
 // Verify a new user with the token they got in their email.
-exports.verifyRecipeToken = (req, res) => {
-  var token = req.params.recipeToken
-  console.log("verifying user")
+exports.verifyRecipeToken = (req, res, next) => {
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+  console.log('verifying: ' + token)
 
   if (token) {
     TokenService.verifyToken(token)
     .then(decoded => {
-      console.log("decoded: " + decoded)
-      // User.findByIdAndUpdate(decoded.user, {
-      //     verified: true
-      // })
-      // .then(user => {
-      //   if(!user) {
-      //     return res.status(404).send({
-      //       message: "User not found. userId = " + req.params.userId
-      //     });
-      //   }
-      //   return res.send({
-      //     message: "Email verified.",
-      //     token: token,
-      //     user: user
-      //   });
-      // }).catch(err => {
-      //   if(err.kind === 'ObjectId') {
-      //     return res.status(404).send({
-      //       message: "No user found with id: " + req.params.userId
-      //     });
-      //   }
-      //   return res.status(500).send({
-      //     message: "Error updating user with id: " + req.params.userId
-      //   });
-      // });
+      console.log("decoded: " + JSON.stringify(decoded))
+      req.decoded = decoded
+      req.member = req.body.member
+      next()
     }).catch(err => {
       return res.status(500).send({
         message: "Validation error: " + err

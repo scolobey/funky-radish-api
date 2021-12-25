@@ -4,7 +4,7 @@ module.exports = function (app) {
     const recipes = require('../controllers/recipe.controller.js');
 
     // Retrieve all Recipes belonging to anyone
-    app.get('/admin/recipes', Auth.verifyAdmin, recipes.returnAllRecipes);
+    app.get('/admin/recipes', recipes.returnAllRecipes);
 
     // Retrieve all Recipes belonging to you
     app.get('/recipes', Auth.verifyAdmin, recipes.findAll);
@@ -24,7 +24,7 @@ module.exports = function (app) {
     // Update a Recipe with recipeId
     app.put('/recipe/:recipeId', Auth.verifyRecipeOwner, recipes.update);
 
-    // Update a list of Recipes
+    // Update a list of Recipes`
     app.put('/updateRecipes', Auth.verifyRecipeOwner, recipes.updateMany);
 
     // Delete a list of Recipes
@@ -37,5 +37,5 @@ module.exports = function (app) {
     app.get('/createRecipeToken/:recipeId', Auth.verifyRecipeOwner, recipes.getRecipeToken);
 
     // Claim a recipe via a recipe token.
-    app.get('/claimRecipe/:recipeToken', Auth.verifyRecipeToken, recipes.connect);
+    app.put('/claimRecipe/', Auth.verifyRecipeToken, recipes.claim);
 }

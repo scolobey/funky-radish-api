@@ -10,5 +10,4 @@ module.exports = function (app) {
     app.get('/collector/inspect/:url', collector.inspectRecipe);
 
     app.get('/collector/import/:id', collector.importRecipe);
-
 }

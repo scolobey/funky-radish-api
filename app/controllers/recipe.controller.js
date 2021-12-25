@@ -1,4 +1,5 @@
 const Recipe = require('../models/recipe.model.js');
+const User = require('../models/user.model.js');
 
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
@@ -9,6 +10,7 @@ const SpoonacularService = require('../services/spoonacular_service.js');
 
 // Retrieve all recipes if you have admin privileges.
 exports.returnAllRecipes = (req, res) => {
+  console.log("recipes")
 
   MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
@@ -353,6 +355,7 @@ exports.deleteMany = (req, res) => {
 // Create a token for recipe access
 exports.getRecipeToken = (req, res) => {
   console.log("calling for a recipe token: " + req.body)
+  // Now we just need to code the recipe into a token that can then be redeemed via /claimRecipe:token
 
   const payload = {
     recipeID: req.params.recipeId
@@ -361,7 +364,7 @@ exports.getRecipeToken = (req, res) => {
   TokenService.asynchRecipeToken(payload)
   .then((token) => {
       res.json({
-        message: 'Share this token to share your recipe.',
+        message: 'Share this token to share your recipe. It expires in X days.',
         token: token,
         error: ""
       });
@@ -376,35 +379,36 @@ exports.getRecipeToken = (req, res) => {
 }
 
 // Connect a user to a recipe
-exports.connect = (req, res) => {
+exports.claim = (req, res) => {
 
+  let info = req.decoded
+  let member = req.member
 
-  // Recipe.findByIdAndUpdate(req.params.recipeId, {
-  //   $set: {
-  //     title: req.body.title || "Untitled",
-  //     realmID: req.body.realmID || "",
-  //     clientID: req.body.clientID || "",
-  //     ingredients: req.body.ingredients,
-  //     directions: req.body.directions,
-  //     updatedAt: req.body.updatedAt
-  //   }
-  // }, {new: true})
-  // .populate('author')
-  // .then(recipe => {
-  //   if(!recipe) {
-  //     return res.status(404).send({
-  //       message: "Recipe not found. recipeId = " + req.params.recipeId
-  //     });
-  //   }
-  //   res.send(recipe);
-  // }).catch(err => {
-  //   if(err.kind === 'ObjectId') {
-  //     return res.status(404).send({
-  //       message: "No recipe found with id: " + req.params.recipeId
-  //     });
-  //   }
-  //   return res.status(500).send({
-  //     message: "Error updating recipe with id: " + req.params.recipeId
-  //   });
-  // });
+  console.log("connect user: " + member)
+  console.log("to recipe: " + info.recipeID)
+
+  // Alright. Now we gotta basically add the user id to the recipe's
+  User.findByIdAndUpdate(member, {
+    $push: {
+      recipes: info.recipeID
+    }
+  })
+  .then(user => {
+    if(!user) {
+      return res.status(404).send({
+        message: "User not found. Id = " + member
+      });
+    }
+    res.send(user);
+  }).catch(err => {
+    if(err.kind === 'ObjectId') {
+      return res.status(404).send({
+        message: "No user found with id: " + member
+      });
+    }
+    return res.status(500).send({
+      message: "Error updating recipe with id: " + member
+    });
+  });
+
 }
