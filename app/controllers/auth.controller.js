@@ -46,21 +46,89 @@ exports.getToken = (req, res) => {
             author: user.author || ""
           }
 
-          TokenService.asynchToken(payload)
-            .then((token) => {
-              res.json({
-                message: 'Enjoy your token, ya filthy animal!',
-                token: token,
-                error: ""
+          if (req.body.claimRecipeToken && req.body.claimRecipeToken.length > 0) {
+            console.log("claim token present")
+            TokenService.verifyToken(req.body.claimRecipeToken)
+            .then(decoded => {
+              console.log("decoded: " + JSON.stringify(decoded))
+
+              User.findByIdAndUpdate(user._id, {
+                $push: {
+                  recipes: decoded.recipeID
+                }
+              })
+              .then(user => {
+                TokenService.asynchToken(payload)
+                  .then((token) => {
+                    res.json({
+                      message: 'Enjoy your token, ya filthy animal!',
+                      token: token,
+                      error: "Recipe claimed."
+                    });
+                }).catch((error) => {
+                    console.log("Error", error);
+                    res.json({
+                      message: "Token creation failed.",
+                      token: "",
+                      error: error.message || "no message"
+                    });
+                })
+              }).catch(err => {
+                TokenService.asynchToken(payload)
+                  .then((token) => {
+                    res.json({
+                      message: 'Enjoy your token, ya filthy animal!',
+                      token: token,
+                      error: "Recipe claim failed."
+                    });
+                }).catch((error) => {
+                    console.log("Error", error);
+                    res.json({
+                      message: "Token creation failed.",
+                      token: "",
+                      error: error.message || "no message"
+                    });
+                })
               });
-          }).catch((error) => {
-              console.log("Error", error);
-              res.json({
-                message: "Token creation failed.",
-                token: "",
-                error: error.message || "no message"
-              });
-          })
+
+
+            }).catch(err => {
+              TokenService.asynchToken(payload)
+                .then((token) => {
+                  res.json({
+                    message: 'Enjoy your token, ya filthy animal!',
+                    token: token,
+                    error: "Recipe claim failed."
+                  });
+              }).catch((error) => {
+                  console.log("Error", error);
+                  res.json({
+                    message: "Token creation failed.",
+                    token: "",
+                    error: error.message || "no message"
+                  });
+              })
+            });
+            payload.recipes = []
+          }
+          else {
+            TokenService.asynchToken(payload)
+              .then((token) => {
+                res.json({
+                  message: 'Enjoy your token, ya filthy animal!',
+                  token: token,
+                  error: ""
+                });
+            }).catch((error) => {
+                console.log("Error", error);
+                res.json({
+                  message: "Token creation failed.",
+                  token: "",
+                  error: error.message || "no message"
+                });
+            })
+          }
+
         }
         else {
           res.json({
