@@ -74,7 +74,7 @@ exports.inspectRecipe = (req, res) => {
       const node = $('script[type="application/ld+json"]').get(0);
 
       try {
-        console.log("trying: " + node)
+        console.log("trying: " + node.firstChild.data)
         jsonld = JSON.parse(node.firstChild.data);
 
         res.json({
@@ -84,7 +84,7 @@ exports.inspectRecipe = (req, res) => {
         });
       } catch (err) {
         // In case of error, you can try to debug by logging the node
-        res.status(500).send({ message: err.message || "Error occurred while importing Recipe." });
+        res.status(500).send({ message: "Page does not follow proper JSON-LD Recipe formatting" });
       }
 
     })
