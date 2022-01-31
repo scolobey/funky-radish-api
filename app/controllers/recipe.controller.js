@@ -8,9 +8,49 @@ const config = require('config');
 const TokenService = require('../services/token_service.js');
 const SpoonacularService = require('../services/spoonacular_service.js');
 
+// Recipe Search API.
+exports.search = (req, res) => {
+  console.log("searching for recipes")
+
+  MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+    assert.equal(null, err);
+
+    const db = client.db("funky_radish_db")
+
+    var cursor = db.collection('Recipe')
+    .find({
+      $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" } ],
+      title : { '$regex' : 'ookie', '$options' : 'i' }
+    })
+    .toArray(function(err, docs) {
+      assert.equal(err, null);
+
+      docs.forEach((item, i) => {
+        item.directions = item.direction_list
+        item.ingredients = item.ingredient_list
+
+        delete item.direction_list
+        delete item.ingredient_list
+      });
+
+      res.send(docs);
+    })
+  });
+}
+
 // Retrieve all recipes if you have admin privileges.
 exports.returnAllRecipes = (req, res) => {
   console.log("recipes")
+
+  Recipe.find({author: {_id: req.params.userId}})
+    .populate('author')
+    .then(recipes => {
+      res.send(recipes);
+    }).catch(err => {
+      res.status(500).send({
+        message: err.message || "Error occurred while retrieving Recipes for user " + req.params.userId
+      });
+    });
 
   MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
@@ -354,9 +394,6 @@ exports.deleteMany = (req, res) => {
 
 // Create a token for recipe access
 exports.getRecipeToken = (req, res) => {
-  console.log("calling for a recipe token: " + req.body)
-  // Now we just need to code the recipe into a token that can then be redeemed via /claimRecipe:token
-
   const payload = {
     recipeID: req.params.recipeId
   }
