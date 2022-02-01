@@ -20,7 +20,7 @@ exports.search = (req, res) => {
     var cursor = db.collection('Recipe')
     .find({
       $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" } ],
-      title : { '$regex' : 'ookie', '$options' : 'i' }
+      title : { '$regex' : req.params.query, '$options' : 'i' }
     })
     .toArray(function(err, docs) {
       assert.equal(err, null);
