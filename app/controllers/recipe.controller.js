@@ -190,27 +190,65 @@ exports.findAllByUser = (req, res) => {
 
 // Find a single recipe with a recipeId
 exports.findOne = (req, res) => {
-  Recipe.findById(req.params.recipeId)
-    .populate('author')
-    .then(recipe => {
+  console.log("find one: " + req.params.recipeId)
 
-      if(!recipe) {
-        return res.status(404).send({
-          message: "Recipe not found. recipeId = " + req.params.recipeId
-        });
-      }
-      res.send(recipe);
+  let query = req.params.recipeId.replace(/-/g, ' ')
 
-    }).catch(err => {
-      if(err.kind === 'ObjectId') {
-        return res.status(404).send({
-          message: "No recipe found with id: " + req.params.recipeId
-        });
-      }
-      return res.status(500).send({
-        message: "Error retrieving recipe with id: " + req.params.recipeId
-      });
+  MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+    assert.equal(null, err);
+
+    const db = client.db("funky_radish_db")
+
+    console.log("querying: " + query)
+
+    db.collection('Recipe')
+    .findOne({
+      $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" } ],
+      title : { '$regex' : query, '$options' : 'i' }
+    }, function(err, item) {
+      assert.equal(null, err);
+      console.log(item)
+
+      let ingredientIds = item.ingredients.map(ing => { return {_id: ing} })
+      let directionIds = item.directions.map(dir => { return {_id: dir} })
+
+      db.collection('Ingredient').find({
+        $or: ingredientIds
+      })
+      .toArray(function(err, ingredients) {
+        assert.equal(err, null);
+
+        item.ingredients = ingredients
+
+        db.collection('Direction').find({
+          $or: directionIds
+        })
+        .toArray(function(err, directions) {
+          assert.equal(err, null);
+
+          item.directions = directions
+
+          res.send(item)
+        })
+      })
+
     });
+
+    // .toArray(function(err, docs) {
+    //   console.log("made it here: " + docs)
+    //   assert.equal(err, null);
+    //
+    //   docs.forEach((item, i) => {
+    //     item.directions = item.direction_list
+    //     item.ingredients = item.ingredient_list
+    //
+    //     delete item.direction_list
+    //     delete item.ingredient_list
+    //   });
+    //
+    //   res.send(docs);
+    // })
+  });
 };
 
 // Find a single recipe with a recipeId
