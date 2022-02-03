@@ -1,5 +1,6 @@
 const Recipe = require('../models/recipe.model.js');
 const User = require('../models/user.model.js');
+const EmailService = require('../services/email_service.js');
 
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
@@ -447,5 +448,28 @@ exports.claim = (req, res) => {
       message: "Error updating recipe with id: " + member
     });
   });
+
+}
+
+// Request for a recipe with a provided email address
+exports.request = (req, res) => {
+
+  let query = req.body.query
+  let email = req.body.email
+
+  console.log("recipe requested: " + query)
+
+  // TODO: ...
+  // Is the email in the system already?
+  // Has the user requested a recipe today?
+
+  // Send an email to me with the email and request?
+  EmailService.sendRecipeRequestEmail(query, email)
+    .then(() => {
+      res.json({ message: "Email sent.", token: "", error: "" });
+    })
+    .catch((error) => {
+        res.json({ message: "Email sending failure.", token: "", error: error.message || "error without message" });
+    })
 
 }

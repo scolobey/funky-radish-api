@@ -38,3 +38,19 @@ exports.sendPasswordResetEmail = (email, secret) => {
 
   return sgMail.send(msg)
 }
+
+exports.sendRecipeRequestEmail = (query, email) => {
+
+  const msg = {
+    to: 'minedied@gmail.com', // Change to your recipient
+    from: 'no-reply@funkyradish.com', // Change to your verified sender
+    templateId: 'd-3fa3330327644e49b6e9412ebc6b0a4d',
+    dynamicTemplateData: {
+      "email": email,
+      "query": query
+    },
+    subject: "Recipe Request - Let's goooooo!"
+  }
+
+  return sgMail.send(msg)
+}

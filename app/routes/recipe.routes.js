@@ -42,4 +42,6 @@ module.exports = function (app) {
     // Claim a recipe via a recipe token.
     app.put('/claimRecipe/', Auth.verifyRecipeToken, recipes.claim);
 
+    // Request a recipe .
+    app.post('/requestRecipe', recipes.request);
 }
