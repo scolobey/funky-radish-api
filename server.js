@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 8080
 const app = express();
 
 var corsOptions = {
-    origin: 'http://www.funkyradish.com',
+    origin: /\.funkyradish\.com$/,
     optionsSuccessStatus: 200 // For legacy browser support
 }
 

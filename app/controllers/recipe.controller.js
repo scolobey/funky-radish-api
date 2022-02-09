@@ -233,21 +233,6 @@ exports.findOne = (req, res) => {
       })
 
     });
-
-    // .toArray(function(err, docs) {
-    //   console.log("made it here: " + docs)
-    //   assert.equal(err, null);
-    //
-    //   docs.forEach((item, i) => {
-    //     item.directions = item.direction_list
-    //     item.ingredients = item.ingredient_list
-    //
-    //     delete item.direction_list
-    //     delete item.ingredient_list
-    //   });
-    //
-    //   res.send(docs);
-    // })
   });
 };
 
