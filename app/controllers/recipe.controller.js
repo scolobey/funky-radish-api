@@ -209,6 +209,10 @@ exports.findOne = (req, res) => {
       assert.equal(null, err);
       console.log(item)
 
+      if (item == null) {
+        return res.status(500).send({ message: "No recipe matches that title." });
+      }
+
       let ingredientIds = item.ingredients.map(ing => { return {_id: ing} })
       let directionIds = item.directions.map(dir => { return {_id: dir} })
 
