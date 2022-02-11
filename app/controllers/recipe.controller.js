@@ -190,8 +190,6 @@ exports.findAllByUser = (req, res) => {
 
 // Find a single recipe with a recipeId
 exports.findOne = (req, res) => {
-  console.log("find one: " + req.params.recipeId)
-
   let query = req.params.recipeId.replace(/-/g, ' ')
 
   MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
@@ -201,42 +199,82 @@ exports.findOne = (req, res) => {
 
     console.log("querying: " + query)
 
-    db.collection('Recipe')
-    .findOne({
-      $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" } ],
-      title : { '$regex' : query, '$options' : 'i' }
-    }, function(err, item) {
-      assert.equal(null, err);
-      console.log(item)
+    var ObjectID = require("mongodb").ObjectID
 
-      if (item == null) {
-        return res.status(500).send({ message: "No recipe matches that title." });
-      }
+    if (ObjectID.isValid(query)) {
+      console.log("id")
+      db.collection('Recipe')
+      .findOne({
+        _id: query
+      }, function(err, item) {
+        assert.equal(null, err);
 
-      let ingredientIds = item.ingredients.map(ing => { return {_id: ing} })
-      let directionIds = item.directions.map(dir => { return {_id: dir} })
+        if (item == null) {
+          return res.status(500).send({ message: "No recipe matches that title." });
+        }
 
-      db.collection('Ingredient').find({
-        $or: ingredientIds
-      })
-      .toArray(function(err, ingredients) {
-        assert.equal(err, null);
+        let ingredientIds = item.ingredients.map(ing => { return {_id: ing} })
+        let directionIds = item.directions.map(dir => { return {_id: dir} })
 
-        item.ingredients = ingredients
-
-        db.collection('Direction').find({
-          $or: directionIds
+        db.collection('Ingredient').find({
+          $or: ingredientIds
         })
-        .toArray(function(err, directions) {
+        .toArray(function(err, ingredients) {
           assert.equal(err, null);
 
-          item.directions = directions
+          item.ingredients = ingredients
 
-          res.send(item)
+          db.collection('Direction').find({
+            $or: directionIds
+          })
+          .toArray(function(err, directions) {
+            assert.equal(err, null);
+
+            item.directions = directions
+
+            res.send(item)
+          })
         })
-      })
+      });
+    }
+    else {
+      console.log("title")
+      db.collection('Recipe')
+      .findOne({
+        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" } ],
+        title : { '$regex' : query, '$options' : 'i' }
+      }, function(err, item) {
+        assert.equal(null, err);
 
-    });
+        if (item == null) {
+          return res.status(500).send({ message: "No recipe matches that title." });
+        }
+
+        let ingredientIds = item.ingredients.map(ing => { return {_id: ing} })
+        let directionIds = item.directions.map(dir => { return {_id: dir} })
+
+        db.collection('Ingredient').find({
+          $or: ingredientIds
+        })
+        .toArray(function(err, ingredients) {
+          assert.equal(err, null);
+
+          item.ingredients = ingredients
+
+          db.collection('Direction').find({
+            $or: directionIds
+          })
+          .toArray(function(err, directions) {
+            assert.equal(err, null);
+
+            item.directions = directions
+
+            res.send(item)
+          })
+        })
+      });
+    }
+
   });
 };
 
