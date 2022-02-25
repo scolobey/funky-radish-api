@@ -489,6 +489,15 @@ exports.claim = (req, res) => {
 
   console.log("connect user: " + member)
   console.log("to recipe: " + info.recipeID)
+  console.log("type?: " + typeof(info.recipeID))
+  console.log("stringified?: " + JSON.stringify(info.recipeID))
+
+  if(!info.recipeID || info.recipeID == null) {
+    console.log("no id")
+    return res.status(404).send({
+      message: "no recipe indicated."
+    });
+  }
 
   // Alright. Now we gotta basically add the user id to the recipe's
   User.findByIdAndUpdate(member, {
@@ -497,6 +506,7 @@ exports.claim = (req, res) => {
     }
   })
   .then(user => {
+    console.log("user came back though?")
     if(!user) {
       return res.status(404).send({
         message: "User not found. Id = " + member

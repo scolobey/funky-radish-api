@@ -14,7 +14,7 @@ const UserSchema = mongoose.Schema({
       match: [/\S+@\S+\.\S+/, 'is invalid']
     },
     password: String,
-    recipes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Recipe' }],
+    recipes: [String],
     author: String,
     admin: Boolean,
     verified: Boolean
