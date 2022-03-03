@@ -190,6 +190,7 @@ exports.findAllByUser = (req, res) => {
 
 // Find a single recipe with a recipeId
 exports.findOne = (req, res) => {
+  console.log("hunh?")
   let query = req.params.recipeId.replace(/-/g, ' ')
 
   MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
@@ -241,7 +242,7 @@ exports.findOne = (req, res) => {
       console.log("title")
       db.collection('Recipe')
       .findOne({
-        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" } ],
+        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
         title : { '$regex' : query, '$options' : 'i' }
       }, function(err, item) {
         assert.equal(null, err);
