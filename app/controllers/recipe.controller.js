@@ -23,6 +23,7 @@ exports.search = (req, res) => {
       $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
       title : { '$regex' : req.params.query, '$options' : 'i' }
     })
+    .limit(15)
     .toArray(function(err, docs) {
       assert.equal(err, null);
 
