@@ -191,7 +191,6 @@ exports.findAllByUser = (req, res) => {
 
 // Find a single recipe with a recipeId
 exports.findOne = (req, res) => {
-  console.log("hunh?")
   let query = req.params.recipeId.replace(/-/g, ' ')
 
   MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {

@@ -74,8 +74,15 @@ exports.inspectRecipe = (req, res) => {
       const node = $('script[type="application/ld+json"]').get(0);
 
       try {
-        console.log("trying: " + node.firstChild.data)
-        jsonld = JSON.parse(node.firstChild.data);
+        jsonld = JSON.parse(node.firstChild.data)
+
+        if (Array.isArray(jsonld)) {
+          let filteredList = jsonld.filter(function(schemaFilter) {
+            return schemaFilter["@type"] == "Recipe";
+          })
+
+          jsonld = filteredList.pop()
+        }
 
         res.json({
           ingredients: jsonld.recipeIngredient,
