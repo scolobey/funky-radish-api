@@ -84,11 +84,16 @@ exports.inspectRecipe = (req, res) => {
           jsonld = filteredList.pop()
         }
 
-        res.json({
-          ingredients: jsonld.recipeIngredient,
-          directions: jsonld.recipeInstructions.map((dir) => dir.text),
-          title: jsonld.name
-        });
+        if (jsonld && jsonld.recipeIngredient && jsonld.recipeInstructions && jsonld.name) {
+          res.json({
+            ingredients: jsonld.recipeIngredient,
+            directions: jsonld.recipeInstructions.map((dir) => dir.text),
+            title: jsonld.name
+          });
+        }
+        else {
+          res.status(500).send({ message: "Recipe markup missing" });
+        }
       } catch (err) {
         // In case of error, you can try to debug by logging the node
         res.status(500).send({ message: "Page does not follow proper JSON-LD Recipe formatting" });
