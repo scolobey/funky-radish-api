@@ -76,6 +76,7 @@ exports.inspectRecipe = (req, res) => {
       try {
         jsonld = JSON.parse(node.firstChild.data)
 
+        // jsonld presents as an array of jsonld objects
         if (Array.isArray(jsonld)) {
           let filteredList = jsonld.filter(function(schemaFilter) {
             return schemaFilter["@type"] == "Recipe";
@@ -84,19 +85,46 @@ exports.inspectRecipe = (req, res) => {
           jsonld = filteredList.pop()
         }
 
+        // Simplest format. Top level recipe
         if (jsonld && jsonld.recipeIngredient && jsonld.recipeInstructions && jsonld.name) {
+
+          // Rare issue. Instruction array is wrapped in an extra array.
+          // https%3A%2F%2Ffood52.com%2Frecipes%2F87220-sambal-potatoes-aioli-recipe
+          if (!jsonld.recipeInstructions[0].text) {
+            jsonld.recipeInstructions = jsonld.recipeInstructions[0]
+          }
+
           res.json({
-            ingredients: jsonld.recipeIngredient,
-            directions: jsonld.recipeInstructions.map((dir) => dir.text),
+            ingredients: jsonld.recipeIngredient.map((ing) => ing.replace(/<\/?[^>]+(>|$)/g, "")),
+            directions: jsonld.recipeInstructions.map((dir) => dir.text.replace(/<\/?[^>]+(>|$)/g, "")),
             title: jsonld.name
           });
         }
+        // Recipe is nested within @graph type
+        else if (jsonld["@graph"]){
+          let rec = jsonld["@graph"].filter(function(schemaFilter) {
+            return schemaFilter["@type"] == "Recipe";
+          })
+
+          if (rec.length > 0) {
+
+            res.json({
+              ingredients: rec[0].recipeIngredient.map((ing) => ing.replace(/<\/?[^>]+(>|$)/g, "")),
+              directions: rec[0].recipeInstructions.map((dir) => dir.text.replace(/<\/?[^>]+(>|$)/g, "")),
+              title: rec[0].name
+            });
+          } else {
+            res.status(500).send({ message: "Can't find recipe markup." });
+          }
+        }
         else {
+          console.log("jsonld: " + JSON.stringify(jsonld))
           res.status(500).send({ message: "Recipe markup missing" });
         }
       } catch (err) {
+        console.log(err)
         // In case of error, you can try to debug by logging the node
-        res.status(500).send({ message: "Page does not follow proper JSON-LD Recipe formatting" });
+        res.status(500).send({ message: "Can't find recipe markup." });
       }
 
     })
