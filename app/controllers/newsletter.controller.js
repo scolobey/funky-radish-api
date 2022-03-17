@@ -4,72 +4,73 @@ const config = require('config');
 const {google} = require('googleapis');
 
 // let credentials = require('../../credentials.json');
-const credentials = process.env.GCREDENTIALS || config.get('GCREDENTIALS');
+const client_email = process.env.GCEMAIL || config.get('GCEMAIL');
+const private_key = process.env.GCKEY || config.get('GCKEY');
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const TOKEN_PATH = 'token.json';
 
-function authorize(credentials, callback) {
-  const {client_secret, client_id, redirect_uris} = credentials;
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+// function authorize(credentials, callback) {
+//   const {client_secret, client_id, redirect_uris} = credentials;
+//   const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+//
+//   fs.readFile(TOKEN_PATH, (err, token) => {
+//     if (err) return refreshToken(oAuth2Client, callback);
+//     oAuth2Client.setCredentials(JSON.parse(token));
+//     callback(oAuth2Client);
+//   });
+// }
 
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return refreshToken(oAuth2Client, callback);
-    oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client);
-  });
-}
+// function refreshToken(oAuth2Client, callback) {
+//   const authUrl = oAuth2Client.generateAuthUrl({
+//     access_type: 'offline',
+//     scope: SCOPES,
+//   });
+//
+//   console.log('Authorize this app by visiting this url:', authUrl);
+//
+//   const rl = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout,
+//   });
+//
+//   rl.question('Enter the code from that page here: ', (code) => {
+//     rl.close();
+//     oAuth2Client.getToken(code, (err, token) => {
+//       if (err) return console.error('Error while trying to retrieve access token', err);
+//       oAuth2Client.setCredentials(token);
+//
+//       fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+//         if (err) return console.error(err);
+//         console.log('Token stored to', TOKEN_PATH);
+//       });
+//
+//       callback(oAuth2Client);
+//     });
+//   });
+// }
 
-function refreshToken(oAuth2Client, callback) {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
-
-  console.log('Authorize this app by visiting this url:', authUrl);
-
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close();
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error('Error while trying to retrieve access token', err);
-      oAuth2Client.setCredentials(token);
-
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) return console.error(err);
-        console.log('Token stored to', TOKEN_PATH);
-      });
-
-      callback(oAuth2Client);
-    });
-  });
-}
-
-function listSubscribers(auth) {
-  const sheets = google.sheets({version: 'v4', auth});
-  sheets.spreadsheets.values.get(
-    {
-      spreadsheetId: '1Y6GM3h3pUmcC_d2dN2SYs4JBIUvE3mNV8xnUFh6Tcfc',
-      range: 'newsletter_queue!A2:C',
-    },
-    (err, res) => {
-      if (err) return console.log('The API returned an error: ' + err);
-      const rows = res.data.values;
-      if (rows.length) {
-        // Print columns A and E, which correspond to indices 0 and 4.
-        rows.map((row) => {
-          console.log('Email: ' + row[0]);
-        });
-      } else {
-        console.log('No data found.');
-      }
-    }
-  );
-}
+// function listSubscribers(auth) {
+//   const sheets = google.sheets({version: 'v4', auth});
+//   sheets.spreadsheets.values.get(
+//     {
+//       spreadsheetId: '1Y6GM3h3pUmcC_d2dN2SYs4JBIUvE3mNV8xnUFh6Tcfc',
+//       range: 'newsletter_queue!A2:C',
+//     },
+//     (err, res) => {
+//       if (err) return console.log('The API returned an error: ' + err);
+//       const rows = res.data.values;
+//       if (rows.length) {
+//         // Print columns A and E, which correspond to indices 0 and 4.
+//         rows.map((row) => {
+//           console.log('Email: ' + row[0]);
+//         });
+//       } else {
+//         console.log('No data found.');
+//       }
+//     }
+//   );
+// }
 
 // const googleToken = process.env.GTOKEN || config.get('GTOKEN');
 
@@ -77,9 +78,9 @@ exports.getSubscribers = (req, res) => {
   console.log("getting subscribers")
 
   let jwtClient = new google.auth.JWT(
-     credentials.client_email,
+     client_email,
      null,
-     credentials.private_key,
+     private_key,
      ['https://www.googleapis.com/auth/spreadsheets']);
 
   //authenticate request
@@ -123,9 +124,10 @@ exports.signup = (req, res) => {
   let code = req.query.code
   let email = req.query.email
 
-  console.log("let us check them credentials: " + JSON.stringify(credentials));
+  console.log("gcemail: " + client_email);
+  console.log("gcemail: " + private_key);
 
-  let jwtClient = new google.auth.JWT( credentials.client_email, null, credentials.private_key, ['https://www.googleapis.com/auth/spreadsheets']);
+  let jwtClient = new google.auth.JWT( client_email, null, private_key, ['https://www.googleapis.com/auth/spreadsheets']);
 
   //authenticate request
   jwtClient.authorize(function (err, tokens) {
