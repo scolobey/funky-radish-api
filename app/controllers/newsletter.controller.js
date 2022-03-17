@@ -123,6 +123,8 @@ exports.signup = (req, res) => {
   let code = req.query.code
   let email = req.query.email
 
+  console.log("let us check them credentials: " + JSON.stringify(credentials));
+
   let jwtClient = new google.auth.JWT( credentials.client_email, null, credentials.private_key, ['https://www.googleapis.com/auth/spreadsheets']);
 
   //authenticate request
