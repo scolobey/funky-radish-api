@@ -47,6 +47,7 @@ require('./app/routes/authenticate.routes.js')(app);
 require('./app/routes/user.routes.js')(app);
 require('./app/routes/recipe.routes.js')(app);
 require('./app/routes/collector.routes.js')(app);
+require('./app/routes/newsletter.routes.js')(app);
 
 // listen for requests
 app.listen(PORT, () =>
