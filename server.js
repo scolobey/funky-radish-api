@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const config = require('config');
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 8080
+const SchedulerService = require('./app/services/scheduler_service.js');
 
 // create express app
 const app = express();
@@ -48,6 +49,9 @@ require('./app/routes/user.routes.js')(app);
 require('./app/routes/recipe.routes.js')(app);
 require('./app/routes/collector.routes.js')(app);
 require('./app/routes/newsletter.routes.js')(app);
+
+// Launch scheduled launchScheduledTasks
+SchedulerService.launchScheduledTasks()
 
 // listen for requests
 app.listen(PORT, () =>
