@@ -6,7 +6,7 @@ const TokenService = require('../services/token_service.js');
 const EmailService = require('../services/email_service.js');
 
 const config = require('config');
-const realmKey = config.get('RealmKey');
+const realmKey = process.env.RealmKey || config.get('RealmKey');
 
 // Create and Save a new User
 exports.create = (req, res) => {

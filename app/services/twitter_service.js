@@ -1,13 +1,6 @@
-// const { TwitterApi } = require('twitter-api-v2');
-//
-// const client = new TwitterApi('AAAAAAAAAAAAAAAAAAAAAFzBaQEAAAAAE%2FjyIpJ9Wl6CV5Z7z6054PSpQ3s%3Dbw5QWZger7hwifwaMhf4wwSinkp6Iqz8s3V8DqBdrsPilKSDtm');
-
-
 const fetch = require('node-fetch');
 
-const token = 'AAAAAAAAAAAAAAAAAAAAAFzBaQEAAAAAE%2FjyIpJ9Wl6CV5Z7z6054PSpQ3s%3Dbw5QWZger7hwifwaMhf4wwSinkp6Iqz8s3V8DqBdrsPilKSDtm';
-
-var Twit = require('twit')
+const Twit = require('twit')
 const MongoClient = require('mongodb').MongoClient;
 
 const config = require('config');
@@ -21,96 +14,12 @@ var T = new Twit({
   strictSSL:            true,     // optional - requires SSL certificates to be valid.
 })
 
-
-// const qs = require('querystring');
-// const request = require('request');
-// const readline = require('readline').createInterface({
-//   input: process.stdin,
-//   output: process.stdout
-// });
-// const util = require('util');
-//
-// const get = util.promisify(request.get);
-// const post = util.promisify(request.post);
-
-const consumer_key = 'hWQQsToTwGDsHPOrk75Z6zmez';
-const consumer_secret = 'Jhk1mrcX4hs7oJWnysyruDmB0zo47P9PToTbESTfyI3uHAyDWl';
-
-const requestTokenURL = new URL('https://api.twitter.com/oauth/request_token');
-const accessTokenURL = new URL('https://api.twitter.com/oauth/access_token');
-const authorizeURL = new URL('https://api.twitter.com/oauth/authorize');
-const endpointURL = new URL('https://api.twitter.com/labs/2/tweets');
-
-const params = {
-  query: '#funkyradish',
-  'tweet.fields': 'text'
-}
-
-// async function input(prompt) {
-//   return new Promise(async (resolve, reject) => {
-//     readline.question(prompt, (out) => {
-//       readline.close();
-//       resolve(out);
-//     });
-//   });
-// }
-//
-// async function requestToken() {
-//   const oAuthConfig = {
-//     callback: 'oob',
-//     consumer_key: consumer_key,
-//     consumer_secret: consumer_secret,
-//   };
-//
-//   const req = await post({url: requestTokenURL, oauth: oAuthConfig});
-//   if (req.body) {
-//     return qs.parse(req.body);
-//   } else {
-//     throw new Error('Cannot get an OAuth request token');
-//   }
-// }
-//
-// async function accessToken({oauth_token, oauth_token_secret}, verifier) {
-//   const oAuthConfig = {
-//     consumer_key: consumer_key,
-//     consumer_secret: consumer_secret,
-//     token: oauth_token,
-//     token_secret: oauth_token_secret,
-//     verifier: verifier,
-//   };
-//
-//   const req = await post({url: accessTokenURL, oauth: oAuthConfig});
-//   if (req.body) {
-//     return qs.parse(req.body);
-//   } else {
-//     throw new Error('Cannot get an OAuth request token');
-//   }
-// }
-//
-// async function getRequest({oauth_token, oauth_token_secret}) {
-//   const oAuthConfig = {
-//     consumer_key: consumer_key,
-//     consumer_secret: consumer_secret,
-//     token: oauth_token,
-//     token_secret: oauth_token_secret,
-//   };
-//
-//   const req = await get({url: endpointURL, oauth: oAuthConfig, qs: params, json: true});
-//   if (req.body) {
-//     return req.body;
-//   } else {
-//     throw new Error('Cannot get an OAuth request token');
-//   }
-// }
-
 function embolden(text) {
   let diff;
-  if (/[A-Z]/.test (text))
-  {
+  if (/[A-Z]/.test (text)) {
       diff = "𝗔".codePointAt (0) - "A".codePointAt (0);
   }
-  else
-  {
+  else {
       diff = "𝗮".codePointAt (0) - "a".codePointAt (0);
   }
   return String.fromCodePoint (text.codePointAt (0) + diff);
@@ -121,17 +30,12 @@ function tweetStorm(thread, replyTo) {
   // if the thread has more tweets, send it down the line with the next id.
   let tweet = thread.shift()
 
-  console.log("tweetStorm: " + replyTo + " length: " + thread.length)
+  console.log("sending thread: " + replyTo + " length: " + thread.length)
 
   if (replyTo) {
     T.post('statuses/update', { status: tweet, in_reply_to_status_id: replyTo }, function(err, data, response) {
-      console.log("response from post: " + JSON.stringify(response))
-      console.log("data from post: " + JSON.stringify(data))
       if (thread.length > 0) {
-        console.log
         tweetStorm(thread, data.id_str)
-      } else {
-        console.log("I think I finished.")
       }
     })
   }
@@ -139,15 +43,12 @@ function tweetStorm(thread, replyTo) {
     T.post('statuses/update', { status: tweet, in_reply_to_status_id: replyTo }, function(err, data, response) {
       if (thread.length > 0) {
         tweetStorm(thread, null)
-      } else {
-        console.log("I think I'm done.")
       }
     })
   }
 }
 
 function divideDirections(text) {
-
   let base = text.split(' ')
   var tweet1 = ''
   var tweet2 = ''
@@ -175,7 +76,6 @@ function divideDirections(text) {
 }
 
 function divideIngredients(text) {
-
   let base = text.split('\n')
   var tweet1 = ''
   var tweet2 = ''
@@ -203,15 +103,13 @@ function divideIngredients(text) {
 }
 
 function formatTweet(recipe, replyTo) {
-  console.log("formatting: " + replyTo)
   let tweet = []
-
   let ing = recipe.ingredients.join('\n')
+  let recipeTitle = recipe.title.replace(/[A-Za-z]/g, embolden);
 
-  let ti = recipe.title.replace(/[A-Za-z]/g, embolden);
+  var lead = recipeTitle + '\n' + ing
 
-  var lead = ti + '\n' + ing
-
+  // Emojis can save characters and they look kinda exciting.
   lead = lead
     .replace(' butter', ' 🧈' )
     .replace(' Butter', ' 🧈' )
@@ -225,6 +123,8 @@ function formatTweet(recipe, replyTo) {
     .replace(' Lemon', ' 🍋' )
     .replace(' tomato', ' 🍅' )
     .replace(' Tomato', ' 🍅' )
+    .replace(' tomatoes', " 🍅" )
+    .replace(' Tomatoes', " 🍅" )
     .replace(' avocado', ' 🥑' )
     .replace(' Avocado', ' 🥑' )
     .replace(' egg', ' 🥚' )
@@ -233,8 +133,8 @@ function formatTweet(recipe, replyTo) {
     .replace(' Bacon', ' 🥓' )
     .replace(' carrot', ' 🥕' )
     .replace(' Carrot', ' 🥕' )
-    .replace(' carrot', ' 🥕' )
-    .replace(' Carrot', ' 🥕' )
+    .replace(' carrots', ' 🥕' )
+    .replace(' Carrots', ' 🥕' )
 
   if (lead.length > 270) {
     divideIngredients(lead).forEach((item, i) => {
@@ -298,34 +198,20 @@ function findRecipe(query, replyTo) {
                     let ingredients = dirs.map((dir) => {
                       retrievedRecipe.directions.push(dir.text)
                     })
-
-                    console.log("retrieved recipe: " + replyTo)
-
                     formatTweet(retrievedRecipe, replyTo)
-                  } else {
-                    console.log("dir retrieve error")
                   }
                 })
-
-              } else {
-                console.log("ing retrieve error")
               }
             })
-
           }
           else {
             console.log("twitter ingredient search error: " + searchErr)
           }
-
         })
       } else {
         console.log("twitter mongo error: " + dbErr)
       }
     });
-}
-
-exports.replyWithRecipe = (user, query) => {
-  console.log("user: " + user + ", query: " + query)
 }
 
 exports.initializeTweetStream = () => {
@@ -334,14 +220,12 @@ exports.initializeTweetStream = () => {
   var stream = T.stream('statuses/filter', { track: '#funkyradish', language: 'en' })
 
   stream.on('tweet', function (tweet) {
-    console.log("incoming tweet: " + JSON.stringify(tweet))
 
-    let query = tweet.text.replace('#funkyradish', '').trim()
+    let query = tweet.text.replace(/^.+#funkyradish/i, '').replace('#funkyradish', '').trim()
     let replyTo = tweet.id_str
 
     console.log("querying: " + query)
 
     findRecipe(query, replyTo)
   })
-
 }
