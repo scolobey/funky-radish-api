@@ -24,24 +24,7 @@ const twitterQueryTask = new AsyncTask(
     });
   })
 
-// const twitterStreamTask = new AsyncTask(
-//   'twitter stream task',
-//   () => {
-//     return TwitterService.initializeTweetStream()
-//     // .then(response => {
-//     //   console.log(response)
-//     // })
-//     // .catch(function(err) {
-//     //   console.log('stream failed: ', err);
-//     // });
-//   })
-
 const twitterQueryJob = new SimpleIntervalJob({ seconds: 10, }, twitterQueryTask)
-
-// const twitterStreamJob = new SimpleIntervalJob({ seconds: 5, }, twitterStreamTask)
-
-// when stopping your app
-// scheduler.stop()
 
 exports.launchScheduledTasks = () => {
   // scheduler.addSimpleIntervalJob(twitterQueryJob)

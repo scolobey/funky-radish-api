@@ -121,6 +121,8 @@ function tweetStorm(thread, replyTo) {
   // if the thread has more tweets, send it down the line with the next id.
   let tweet = thread.shift()
 
+  console.log("tweetStorm: " + replyTo + " length: " + thread.length)
+
   if (replyTo) {
     T.post('statuses/update', { status: tweet, in_reply_to_status_id: replyTo }, function(err, data, response) {
       console.log("response from post: " + JSON.stringify(response))
@@ -138,7 +140,7 @@ function tweetStorm(thread, replyTo) {
       if (thread.length > 0) {
         tweetStorm(thread, null)
       } else {
-        console.log("I think I'm done.'")
+        console.log("I think I'm done.")
       }
     })
   }
@@ -200,7 +202,8 @@ function divideIngredients(text) {
   return tweetArray
 }
 
-function formatTweet(recipe) {
+function formatTweet(recipe, replyTo) {
+  console.log("formatting: " + replyTo)
   let tweet = []
 
   let ing = recipe.ingredients.join('\n')
@@ -252,13 +255,12 @@ function formatTweet(recipe) {
     }
   });
 
-  tweetStorm(tweet, '1506018080908283905')
+  tweetStorm(tweet, replyTo)
 }
 
-exports.findRecipe = (query) => {
+function findRecipe(query, replyTo) {
     // query for a recipe
     MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(dbErr, client) {
-
       if (dbErr == null) {
         const db = client.db("funky_radish_db")
 
@@ -297,9 +299,9 @@ exports.findRecipe = (query) => {
                       retrievedRecipe.directions.push(dir.text)
                     })
 
-                    console.log("retrieved recipe")
+                    console.log("retrieved recipe: " + replyTo)
 
-                    formatTweet(retrievedRecipe)
+                    formatTweet(retrievedRecipe, replyTo)
                   } else {
                     console.log("dir retrieve error")
                   }
@@ -326,69 +328,20 @@ exports.replyWithRecipe = (user, query) => {
   console.log("user: " + user + ", query: " + query)
 }
 
-exports.findRecipeRequests = async (query) => {
-  const endpoint = "https://api.twitter.com/2/tweets/search/recent?query=%23funkyradish";
-
-  // const params = {
-  //   'query': 'the ancient mariner',
-  //   'tweet.fields': 'text'
-  // }
-
-  // console.log(params)
-
-  let response = fetch(endpoint, {
-      method: 'GET',
-      headers: {
-        "User-Agent": "v2RecentSearchJS",
-        "authorization": `Bearer ${token}`
-      },
-      json: true
-  })
-
-  let data = await response
-  return data;
-
-  // try {
-  //
-  //   // Get request token
-  //   const oAuthRequestToken = await requestToken();
-  //
-  //   // Get authorization
-  //   authorizeURL.searchParams.append('oauth_token', oAuthRequestToken.oauth_token);
-  //   console.log('Please go here and authorize:', authorizeURL.href);
-  //   const pin = await input('Paste the PIN here: ');
-  //
-  //   // Get the access token
-  //   const oAuthAccessToken = await accessToken(oAuthRequestToken, pin.trim());
-  //
-  //   // Make the request
-  //   const response = await getRequest(oAuthAccessToken);
-  //   console.log(response);
-  // } catch(e) {
-  //   console.error(e);
-  //   process.exit(-1);
-  // }
-  // process.exit();
-}
-
-// bearer_token:  'AAAAAAAAAAAAAAAAAAAAAFzBaQEAAAAAMNl0Bm%2BG1kxT8Zpj1%2BrlV%2FPDHdA%3DzQanMvQ5eFnwDOU0mCce2dPmcdya7ZwxZm1s5yr14FwgSoCaSF',
-
-
 exports.initializeTweetStream = () => {
-
   console.log("initializing tweet streamer.")
 
   var stream = T.stream('statuses/filter', { track: '#funkyradish', language: 'en' })
 
   stream.on('tweet', function (tweet) {
-    console.log("incoming tweet: " + tweet)
+    console.log("incoming tweet: " + JSON.stringify(tweet))
 
     let query = tweet.text.replace('#funkyradish', '').trim()
-    let replyTo = tweet.id
+    let replyTo = tweet.id_str
 
     console.log("querying: " + query)
 
-    findRecipe(query)
+    findRecipe(query, replyTo)
   })
 
 }
