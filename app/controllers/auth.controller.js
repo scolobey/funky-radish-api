@@ -6,7 +6,7 @@ const EmailService = require('../services/email_service.js');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const config = require('config');
-const realmKey = config.get('RealmKey');
+const realmKey = process.env.RealmKey || config.get('RealmKey');
 
 exports.getToken = (req, res) => {
   User.findOne({
