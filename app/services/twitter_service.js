@@ -212,7 +212,11 @@ function findRecipe(query, replyTo) {
             })
           }
           else {
-            console.log("twitter ingredient search error: " + searchErr)
+            if (searchErr == null) {
+              console.log("twitter search error: " + searchErr)
+            } else {
+              console.log("twitter bot couldn't find a recipe.")
+            }
           }
         })
       } else {
@@ -228,10 +232,13 @@ exports.initializeTweetStream = () => {
 
   stream.on('tweet', function (tweet) {
 
-    let query = tweet.text.replace(/^.+#funkyradish/i, '').replace('#funkyradish', '').trim()
+    let idOfEnd = tweet.extended_tweet.full_text.indexOf('#funkyradish') + 12
+    let query = tweet.extended_tweet.full_text.slice(idOfEnd).trim();
     let replyTo = tweet.id_str
 
-    console.log("querying: " + query)
+    console.log("twitter bot querying: " + query)
+    console.log("index: " + idOfEnd)
+    console.log("query: " + query)
 
     findRecipe(query, replyTo)
   })
