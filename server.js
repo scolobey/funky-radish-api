@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const config = require('config');
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 8080
+const DBHost = process.env.DBHost || config.get('DBHost');
+
 const SchedulerService = require('./app/services/scheduler_service.js');
 
 // create express app
@@ -35,7 +37,7 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 
 // Connect to db.
-mongoose.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
     console.log("Database connection successful");
 }).catch(err => {

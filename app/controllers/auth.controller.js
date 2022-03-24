@@ -231,7 +231,7 @@ exports.verifyRecipeOwner = (req, res, next) => {
       console.log("rec id: " + recipeId)
       console.log("decoded user: " + JSON.stringify(decoded))
 
-      MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+      MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
         assert.equal(null, err);
 
         const db = client.db("funky_radish_db")

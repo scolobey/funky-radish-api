@@ -5,11 +5,16 @@ const MongoClient = require('mongodb').MongoClient;
 
 const config = require('config');
 
+const consumer_key = process.env.twit_consumer_key || config.get('twit_consumer_key');
+const consumer_secret = process.env.twit_consumer_secret || config.get('twit_consumer_secret');
+const access_token = process.env.twit_access_token || config.get('twit_access_token');
+const access_token_secret = process.env.twit_access_token_secret || config.get('twit_access_token_secret');
+
 var T = new Twit({
-  consumer_key:         'mWFMtlyhmIkHwqwMX2Aj83z4d',
-  consumer_secret:      'zdSajDpYS7IXd4hKaiylFsGj6z5lGbb2rIh6DYwrvuNTsz97Zt',
-  access_token:         '30712452-Fo8lhLulogDjcshA028tPImAiLokf4ZWckRdvCT0o',
-  access_token_secret:  '2CT3Srjv1d6Ck1uQ3NbbWTOeGZcvr0D8bgaKeW2GhIPoi',
+  consumer_key:         consumer_key,
+  consumer_secret:      consumer_secret,
+  access_token:         access_token,
+  access_token_secret:  access_token_secret,
   timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
   strictSSL:            true,     // optional - requires SSL certificates to be valid.
 })
@@ -160,7 +165,7 @@ function formatTweet(recipe, replyTo) {
 
 function findRecipe(query, replyTo) {
     // query for a recipe
-    MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(dbErr, client) {
+    MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(dbErr, client) {
       if (dbErr == null) {
         const db = client.db("funky_radish_db")
 

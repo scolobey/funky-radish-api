@@ -13,7 +13,7 @@ const SpoonacularService = require('../services/spoonacular_service.js');
 exports.search = (req, res) => {
   console.log("searching for recipes")
 
-  MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
 
     const db = client.db("funky_radish_db")
@@ -54,7 +54,7 @@ exports.returnAllRecipes = (req, res) => {
       });
     });
 
-  MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
 
     const db = client.db("funky_radish_db")
@@ -193,7 +193,7 @@ exports.findAllByUser = (req, res) => {
 exports.findOne = (req, res) => {
   let query = req.params.recipeId.replace(/-/g, ' ')
 
-  MongoClient.connect(config.DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
 
     const db = client.db("funky_radish_db")
