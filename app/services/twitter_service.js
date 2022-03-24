@@ -5,6 +5,8 @@ const MongoClient = require('mongodb').MongoClient;
 
 const config = require('config');
 
+const DBHost = process.env.DBHost || config.get('DBHost');
+
 const consumer_key = process.env.twit_consumer_key || config.get('twit_consumer_key');
 const consumer_secret = process.env.twit_consumer_secret || config.get('twit_consumer_secret');
 const access_token = process.env.twit_access_token || config.get('twit_access_token');

@@ -5,6 +5,7 @@ const EmailService = require('../services/email_service.js');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const config = require('config');
+const DBHost = process.env.DBHost || config.get('DBHost');
 
 const TokenService = require('../services/token_service.js');
 const SpoonacularService = require('../services/spoonacular_service.js');
