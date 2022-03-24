@@ -3,7 +3,6 @@
 **/config/local_test.json
 **/config/local_start.json
 credentials.json
-default.json
 
 ###################
 *.class
