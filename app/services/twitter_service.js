@@ -42,6 +42,7 @@ function tweetStorm(thread, replyTo) {
   if (replyTo) {
     T.post('statuses/update', { status: tweet, in_reply_to_status_id: replyTo }, function(err, data, response) {
       if (thread.length > 0) {
+        console.log(JSON.stringify(data))
         tweetStorm(thread, data.id_str)
       }
     })
@@ -229,8 +230,27 @@ exports.initializeTweetStream = () => {
 
   var stream = T.stream('statuses/filter', { track: '#funkyradish', language: 'en' })
 
-  stream.on('tweet', function (tweet) {
+  stream.on('connect', function (request) {
+    console.log("tweet connect")
+  })
 
+  stream.on('connected', function (response) {
+    console.log("tweet connected")
+  })
+
+  stream.on('disconnect', function (disconnectMessage) {
+    console.log("tweet disconnect")
+  })
+
+  stream.on('limit', function (limitMessage) {
+    console.log("tweet limit")
+  })
+
+  stream.on('message', function (msg) {
+    console.log("event incoming: " + msg)
+  })
+
+  stream.on('tweet', function (tweet) {
     console.log("tweet incoming: " + JSON.stringify(tweet))
 
     let idOfEnd = ""
