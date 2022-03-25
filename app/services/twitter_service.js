@@ -178,7 +178,6 @@ function findRecipe(query, replyTo) {
         })
         .limit(1)
         .toArray(function(searchErr, docs) {
-
           if (searchErr == null && docs.length > 0) {
             let retrievedRecipe = {
               title: docs[0].title,
@@ -232,12 +231,20 @@ exports.initializeTweetStream = () => {
 
   stream.on('tweet', function (tweet) {
 
-    let idOfEnd = tweet.extended_tweet.full_text.indexOf('#funkyradish') + 12
-    let query = tweet.extended_tweet.full_text.slice(idOfEnd).trim();
+    console.log("tweet incoming: " + JSON.stringify(tweet))
+
+    let idOfEnd = ""
+    let query = ""
     let replyTo = tweet.id_str
 
-    console.log("twitter bot querying: " + query)
-    console.log("index: " + idOfEnd)
+    if (tweet.extended_tweet) {
+      idOfEnd = tweet.extended_tweet.full_text.indexOf('#funkyradish') + 12
+      query = tweet.extended_tweet.full_text.slice(idOfEnd).trim();
+    } else {
+      idOfEnd = tweet.text.indexOf('#funkyradish') + 12
+      query = tweet.text.slice(idOfEnd).trim();
+    }
+
     console.log("query: " + query)
 
     findRecipe(query, replyTo)
