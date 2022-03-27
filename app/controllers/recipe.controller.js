@@ -10,6 +10,8 @@ const DBHost = process.env.DBHost || config.get('DBHost');
 const TokenService = require('../services/token_service.js');
 const SpoonacularService = require('../services/spoonacular_service.js');
 
+var pluralize = require('pluralize')
+
 // Recipe Search API.
 exports.search = (req, res) => {
   console.log("searching for recipes")
@@ -19,11 +21,29 @@ exports.search = (req, res) => {
 
     const db = client.db("funky_radish_db")
 
-    var cursor = db.collection('Recipe')
-    .find({
+    let query = req.params.query
+
+    var queryExpansion = [query]
+
+    if (pluralize.isPlural(query)) {
+      queryExpansion.push(pluralize.singular(query))
+    } else {
+      queryExpansion.push(pluralize.plural(query))
+    }
+
+    console.log(queryExpansion)
+
+    let mappedExpansion = queryExpansion.map(phrase => { return {title : { '$regex' : phrase, '$options' : 'i' }} })
+
+    console.log(mappedExpansion)
+
+    let mongoQuery = {
       $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-      title : { '$regex' : req.params.query, '$options' : 'i' }
-    })
+      $or: mappedExpansion
+    }
+
+    var cursor = db.collection('Recipe')
+    .find(mongoQuery)
     .limit(15)
     .toArray(function(err, docs) {
       assert.equal(err, null);
