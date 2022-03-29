@@ -110,10 +110,10 @@ function divideIngredients(text) {
   return tweetArray
 }
 
-function formatTweet(recipe, replyTo) {
+function formatTweet(recipe, replyTo, user) {
   let tweet = []
   let ing = recipe.ingredients.join('\n')
-  let recipeTitle = recipe.title.replace(/[A-Za-z]/g, embolden);
+  let recipeTitle = recipe.title.replace(/[A-Za-z]/g, embolden) + " @" + user;
 
   var lead = recipeTitle + '\n' + ing
 
@@ -166,7 +166,7 @@ function formatTweet(recipe, replyTo) {
   tweetStorm(tweet, replyTo)
 }
 
-function findRecipe(query, replyTo) {
+function findRecipe(query, replyTo, user) {
     // query for a recipe
     MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(dbErr, client) {
       if (dbErr == null) {
@@ -205,7 +205,7 @@ function findRecipe(query, replyTo) {
                     let ingredients = dirs.map((dir) => {
                       retrievedRecipe.directions.push(dir.text)
                     })
-                    formatTweet(retrievedRecipe, replyTo)
+                    formatTweet(retrievedRecipe, replyTo, user)
                   }
                 })
               }
@@ -256,6 +256,7 @@ exports.initializeTweetStream = () => {
     let idOfEnd = ""
     let query = ""
     let replyTo = tweet.id_str
+    let requester = tweet.user.screen_name
 
     if (tweet.extended_tweet) {
       idOfEnd = tweet.extended_tweet.full_text.indexOf('#funkyradish') + 12
@@ -267,6 +268,6 @@ exports.initializeTweetStream = () => {
 
     console.log("query: " + query)
 
-    findRecipe(query, replyTo)
+    findRecipe(query, replyTo, requester)
   })
 }

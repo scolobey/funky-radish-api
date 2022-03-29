@@ -24,8 +24,6 @@ exports.search = (req, res) => {
 
     let mongoQuery = SearchQueryService.build(query)
 
-    console.log("query: " + JSON.stringify(mongoQuery))
-    
     var cursor = db.collection('Recipe')
     .find(mongoQuery)
     .limit(15)

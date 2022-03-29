@@ -1,0 +1,17 @@
+{
+  "cocktail": {
+    "code": 2
+  },
+  "cookie": {
+    "code": 4
+  },
+  "beef": {
+    "code": 1
+  },
+  "chicken": {
+    "code": 1
+  },
+  "egg": {
+    "code": 1
+  }
+}
