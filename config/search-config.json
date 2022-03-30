@@ -2,16 +2,25 @@
   "cocktail": {
     "code": 2
   },
+  "tiki cocktail": {
+    "code": 2
+  },
+  "classic cocktail": {
+    "code": 2
+  },
   "cookie": {
     "code": 4
   },
   "beef": {
-    "code": 1
+    "code": 4
   },
   "chicken": {
-    "code": 1
+    "code": 4
   },
   "egg": {
-    "code": 1
+    "code": 4
+  },
+  "rum": {
+    "code": 4
   }
 }

@@ -14,22 +14,8 @@ function pluralExpand(query) {
 }
 
 
-// query structures
-// 1. title
-// {
-//   $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-//   $or: [{title : { '$regex' : phrase, '$options' : 'i' }}, {title : { '$regex' : phrase, '$options' : 'i' }}]
-// }
-
-// 2. category
-// {
-//   $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-//   tags: { $elemMatch: phrase }
-// }
-
-// Query process
-// Expand plurals
-// structure query
+// query structures and process
+// https://docs.google.com/document/d/1_pveDDTd-s2K1POHEsHv09I-D0BL2s_LWXSRw8QSORQ/edit
 
 function structureMongoQuery(queries) {
   let baseQuery
@@ -51,26 +37,34 @@ function structureMongoQuery(queries) {
   return mongoQuery
 }
 
-function switchQueryType(phrase, phraseConfig, expansion) {
+function analyzeQueryStructure(phrase) {
+  let phraseArray = phrase.split(" ")
+  let phraseArrayLength = phraseArray.length
+}
 
+function switchQueryType(phrase, phraseConfig, titleExpansion) {
+  // default for unmatched phrases.
   if (!phraseConfig || !phraseConfig.code) {
     let query = {
       $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-      $or: expansion
+      $or: titleExpansion
     }
 
     return query
   }
 
+  // 1 = title
   switch (phraseConfig.code) {
+
     case 1: {
       let query = {
         $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        $or: expansion
+        $or: titleExpansion
       }
 
       return query
     }
+    // 2 = category
     case 2: {
       // Add a search clause to search for tagged recipes.
       let query = {
@@ -80,10 +74,20 @@ function switchQueryType(phrase, phraseConfig, expansion) {
 
       return query
     }
+    // 3 = title + category TODO (this is still standard implementation)
+    case 3: {
+      let query = {
+        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
+        $or: titleExpansion
+      }
+
+      return query
+    }
+    // 4 = ingredient
     case 4: {
       let query = {
         $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        $or: expansion
+        ingredients: "62215b9c5e3df2d232fb949b"
       }
 
       return query
@@ -91,16 +95,16 @@ function switchQueryType(phrase, phraseConfig, expansion) {
     default: {
       let query = {
         $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        $or: expansion
+        $or: titleExpansion
       }
 
       return query
     }
   }
-
 }
 
 exports.build = (query) => {
+  let queryAnalysis = analyzeQueryStructure(query)
   let pluralExpansion = pluralExpand(query)
   let mongoQuery = structureMongoQuery(pluralExpansion)
 
