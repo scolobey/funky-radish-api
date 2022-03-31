@@ -145,56 +145,91 @@ function removeDuplicates(phraseSet) {
 // if matched, replace the phrase with the config object.
 // if not matched, add the corresponding singular/plural alternate to the expansion.
 // remove duplicate entries.
-function expandByPluralization(phraseSet) {
-  var pluralExpansion = phraseSet
+function expandByMatchAndPluralization(phrase) {
+  var pluralExpansion = []
+  let phraseObj = {}
+  let matched = false
 
-  phraseSet.forEach((phrase, i) => {
-    let phraseObj = {}
+  if (pluralize.isPlural(phrase)) {
+    let singular = pluralize.singular(phrase)
 
-    if (pluralize.isPlural(phrase)) {
-      let singular = pluralize.singular(phrase)
-
-      if (searchConfig[singular]) {
-        phraseObj[singular] = searchConfig[singular]
-        pluralExpansion.splice(i, 1, phraseObj)
-      } else {
-        pluralExpansion.push(singular)
-      }
+    if (searchConfig[singular]) {
+      phraseObj[singular] = searchConfig[singular]
+      pluralExpansion.push(phraseObj)
+      matched = true
     } else {
-      if (searchConfig[phrase]) {
-        phraseObj[phrase] = searchConfig[phrase]
-        pluralExpansion.splice(i, 1, phraseObj)
-      } else {
-        pluralExpansion.push(pluralize.plural(phrase))
-      }
+      pluralExpansion.push(singular)
     }
-  });
+  } else {
+    if (searchConfig[phrase]) {
+      phraseObj[phrase] = searchConfig[phrase]
+      pluralExpansion.push(phraseObj)
+      matched = true
+    } else {
+      pluralExpansion.push(pluralize.plural(phrase))
+    }
+  }
 
   let paredPluralExpansion = removeDuplicates(pluralExpansion)
 
-  return paredPluralExpansion
+  let returnExpansion = {
+    expansion: paredPluralExpansion,
+    matched: matched
+  }
+
+  console.log("expansion: " + JSON.stringify(returnExpansion))
+
+  return returnExpansion
 }
 
 function expandPhrase(phrase) {
   let expandedPhrase = []
   let splitQuery = phrase.split(" ")
+  // ["butter","sprout"]
 
   let length = splitQuery.length
 
   let stageLength
 
+  // split the phrase by word
+  // iterate possible word combinations ([1, 2, 3]), ([1, 2], [2,3]), ([1], [2], [3])
+  // iterate possible word combinations ([1,2,3,4,5]), ([1,2,3,4],[2,3,4,5]), ([1,2,3],[2,3,4],[3,4,5])
+
   for (let stageLength = length; stageLength > 0; stageLength--) {
+
     let start = 0
 
     while (start + stageLength <= length) {
-      expandedPhrase.push(splitQuery.slice(start, start + stageLength).join(' '))
-      start++
+      let currentPhrase = splitQuery.slice(start, start + stageLength).join(' ')
+      let pluralMatchExpansion = expandByMatchAndPluralization(currentPhrase)
+      expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
+
+      if (pluralMatchExpansion.matched) {
+        // ([1,2,3],*[2,3,4]*,[3,4,5])([1]),([5])
+
+        if (start > 0) {
+          // cut splitQuery up to match and after match
+          let startPhrase = splitQuery.slice(0, start).join(' ')
+          let finishPhrase = splitQuery.slice(start+stageLength, length-1).join(' ')
+          console.log("expand break")
+          console.log("start: " + startPhrase + " finish: " + finishPhrase)
+          expandedPhrase = expandedPhrase.concat(expandPhrase(startPhrase))
+          expandedPhrase = expandedPhrase.concat(expandPhrase(finishPhrase))
+        } else {
+          start = stageLength
+          stageLength = length - start
+        }
+
+        console.log("start: " + start + ", stageLength: " + stageLength)
+      } else {
+        start++
+      }
     }
   }
 
-  let pluralExpandedQuery = expandByPluralization(expandedPhrase)
+  // let pluralExpandedQuery = expandByMatchAndPluralization(expandedPhrase)
 
-  return pluralExpandedQuery
+  return expandedPhrase
 }
 
 function expandQuery(query) {
