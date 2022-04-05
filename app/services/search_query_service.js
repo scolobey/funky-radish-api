@@ -6,25 +6,7 @@ const searchConfig = require('../../config/search-config.json')
 // query structures and process
 // https://docs.google.com/document/d/1_pveDDTd-s2K1POHEsHv09I-D0BL2s_LWXSRw8QSORQ/edit
 
-function structureMongoQuery(queries) {
-  let baseQuery
-  let mongoQuery
-  let phraseConfig
-  let matchedPhrase
-
-  let mappedExpansion = queries.map(phrase => {
-    // Check if the phrase is there
-    if (searchConfig[phrase]) {
-      phraseConfig = searchConfig[phrase]
-      matchedPhrase = phrase
-    }
-    return {title : { '$regex' : phrase, '$options' : 'i' }}
-  })
-
-  mongoQuery = switchQueryType(matchedPhrase, phraseConfig, mappedExpansion)
-
-  return mongoQuery
-}
+// function orderByLength()
 
 function processPhrase(phrase) {
   let analysisArray = []
@@ -51,24 +33,29 @@ function analyzeQueryStructure(phrases) {
   console.log("analysis: " + JSON.stringify(analysisArray))
 }
 
-function switchQueryType(phrase, phraseConfig, titleExpansion) {
-  // default for unmatched phrases.
-  if (!phraseConfig || !phraseConfig.code) {
-    let query = {
-      $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-      $or: titleExpansion
-    }
+function compressQuery(queryList) {
+  console.log("list: " + JSON.stringify(queryList))
+  let mainQuery = {}
+  let baseQuery = [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ]
 
-    return query
-  }
+  mainQuery["$or"] = baseQuery
+  mainQuery["$and"] = queryList
+
+  return mainQuery
+}
+
+function switchQueryType(phrase, phraseConfig) {
+
+  console.log("phrase: " + phrase);
+  console.log("phraseConfig: " + JSON.stringify(phraseConfig));
+  console.log("code: " + phraseConfig.code);
 
   // 1 = title
   switch (phraseConfig.code) {
 
     case 1: {
       let query = {
-        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        $or: titleExpansion
+          $or: phrase
       }
 
       return query
@@ -77,8 +64,7 @@ function switchQueryType(phrase, phraseConfig, titleExpansion) {
     case 2: {
       // Add a search clause to search for tagged recipes.
       let query = {
-        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        tags: phrase
+          tags: phrase
       }
 
       return query
@@ -86,8 +72,7 @@ function switchQueryType(phrase, phraseConfig, titleExpansion) {
     // 3 = title + category TODO (this is still standard implementation)
     case 3: {
       let query = {
-        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        $or: titleExpansion
+          $or: phrase
       }
 
       return query
@@ -95,16 +80,14 @@ function switchQueryType(phrase, phraseConfig, titleExpansion) {
     // 4 = ingredient
     case 4: {
       let query = {
-        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        ingredients: "62215b9c5e3df2d232fb949b"
+          ingredients: "62215b9c5e3df2d232fb949b"
       }
 
       return query
     }
     default: {
       let query = {
-        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        $or: titleExpansion
+        $or: phrase
       }
 
       return query
@@ -112,24 +95,32 @@ function switchQueryType(phrase, phraseConfig, titleExpansion) {
   }
 }
 
+function generateMongoQuery(expandedQuery) {
 
+  let mappedExpansion = expandedQuery.query.map(phrase => {
 
+    console.log("phrizase: " + JSON.stringify(phrase))
 
+    if (phrase.$or) {
+      return phrase
+    } else {
+      let phraseString = Object.keys(phrase)[0]
+      let phraseDictionary = phrase[Object.keys(phrase)[0]]
+      return switchQueryType(phraseString, phraseDictionary)
+    }
 
-function matchPhrase(phrase) {
-  let analysisArray = []
-  // remove last element. remove first element.
+    // if (typeof phrase === 'object' && phrase[Object.keys(phrase)[0]]) {
+    //   let phraseString = Object.keys(phrase)[0]
+    //   let phraseDictionary = phrase[Object.keys(phrase)[0]]
+    //   return switchQueryType(phraseString, phraseDictionary, ["butter"])
+    // } else {
+    //   return query
+    // }
 
-  if (searchConfig[phrase]) {
-    analysisArray.push(searchConfig[phrase])
-  }
+  })
 
-  return analysisArray
+  return mappedExpansion
 }
-
-
-
-// function orderByLength()
 
 function removeDuplicates(phraseSet) {
   let uniquePhraseSet = phraseSet.filter(function(item, pos) {
@@ -138,13 +129,6 @@ function removeDuplicates(phraseSet) {
 
   return uniquePhraseSet
 }
-
-// Check each phrase for plurality.
-// If plural, singularize.
-// Check singular against search-config.json
-// if matched, replace the phrase with the config object.
-// if not matched, add the corresponding singular/plural alternate to the expansion.
-// remove duplicate entries.
 
 function expandByMatchAndPluralization(phrase) {
   var pluralExpansion = []
@@ -191,7 +175,7 @@ function expandPhrase(phrase) {
   if (!phrase || phrase.length === 0) {
     return expandedPhrase
   }
-  
+
   let splitQuery = phrase.split(" ")
   console.log("expanding: " + splitQuery)
 
@@ -200,12 +184,7 @@ function expandPhrase(phrase) {
 
   console.log("entering | length: " + length + ", stage length: " + stageLength )
 
-  // split the phrase by word
-  // iterate possible word combinations ([1, 2, 3]), ([1, 2], [2,3]), ([1], [2], [3])
-  // iterate possible word combinations ([1,2,3,4,5]), ([1,2,3,4],[2,3,4,5]), ([1,2,3],[2,3,4],[3,4,5])
-
   while (stageLength > 0) {
-
     let start = 0
     console.log("decrementing stage size | length: " + length + ", stage length: " + stageLength + ", start: " + start)
     console.log("---------------------------------------------------")
@@ -249,6 +228,7 @@ function expandPhrase(phrase) {
 
         } else {
           console.log("adding to expansion: start is 0")
+
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
           splitQuery = splitQuery.slice(stageLength-1, length-1)
@@ -263,7 +243,14 @@ function expandPhrase(phrase) {
 
         if (stageLength === 1) {
           console.log("not matched: but just 1 word")
-          expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
+
+          let pluralQuery = {
+            $or: pluralMatchExpansion.expansion.map(phrase => {
+              return {title: {$regex: phrase, $options: "i"}}
+            })
+          }
+
+          expandedPhrase = expandedPhrase.concat(pluralQuery)
         }
 
         // what do you add to the phrase expansion though?
@@ -301,11 +288,7 @@ function handleWithWithout(query) {
   let withIndex = query.indexOf(" with ")
   let withoutIndex = query.indexOf(" without ")
 
-  console.log("withIndex: " + withIndex);
-  console.log("withoutIndex: " + withoutIndex);
-
   if (withIndex>0 && withoutIndex>0 && (withIndex < withoutIndex)) {
-    console.log("with comes first");
     let segmentA = query.split(" with ")
     let segmentB = segmentA[1].split(" without ")
 
@@ -314,7 +297,6 @@ function handleWithWithout(query) {
     segmentedQuery.without.push(segmentB[1].trim())
   }
   else if (withIndex>0 && withoutIndex>0 && (withIndex > withoutIndex)) {
-    console.log("without comes first");
     let segmentA = query.split(" without ")
     let segmentB = segmentA[1].split(" with ")
 
@@ -323,19 +305,17 @@ function handleWithWithout(query) {
     segmentedQuery.with.push(segmentB[1].trim())
   }
   else if (withIndex && withoutIndex<0){
-    console.log("no without");
     let segment = query.split(" with ")
     segmentedQuery.query.push(segment[0].trim())
     segmentedQuery.with.push(segment[1].trim())
   }
   else if (withIndex<0 && withoutIndex){
-    console.log("no with");
     let segment = query.split(" without ")
     segmentedQuery.query.push(segment[0].trim())
     segmentedQuery.without.push(segment[1].trim())
   }
   else {
-    console.log("this shouldnt happen");
+    console.log("this should never happen");
   }
 
   return segmentedQuery
@@ -363,17 +343,34 @@ function formatQuery(query) {
   return segmentedQuery
 }
 
+// Discard useless words
+// Divide query data into (query / with / without) phrase
+// Expand each phrase
+//  a. Split phrase into words
+//  b. iterate all possible word combinations ([1,2,3,4,5]), ([1,2,3,4],[2,3,4,5]), ([1,2,3],[2,3,4],[3,4,5])
+//    1. Obtain pluralization alternate.
+//    2. Check borh singular and plural for match to search-config.js dictionary.
+//    3. If match, divide the query around the phrase. Push matched phrase object to extendedPhrase array.
+//    4. Continue checking remaining phrases which were not included in the match.
+//    5. If phrase includes only one word and is not matched in the dictionary, add both plural and singular to extendedPhrase array.
+//    6. Remove duplicate phrases.
+//  c. Translate to mongo queries
+//  d. Combine queries
+//  e. Compile with and without
+//  f. ranking
+
+
 exports.build = (query) => {
   let structuredQuery = formatQuery(query)
   let expandedQuery = expandQuery(structuredQuery)
 
   console.log("query so far: " + JSON.stringify(expandedQuery))
-  // let phraseMatchedQuery = phraseMatchQuery(expandedQuery)
 
-  // console.log("query so far: " + JSON.stringify(expandedQuery))
-  // let pluralExpansion = pluralExpand(query)
-  // let queryAnalysis = analyzeQueryStructure(pluralExpansion)
-  // let mongoQuery = structureMongoQuery(pluralExpansion)
+  let mongoQuery = generateMongoQuery(expandedQuery)
 
-  // return mongoQuery
+  let compressedQuery = compressQuery(mongoQuery)
+
+  console.log("returning query: " + JSON.stringify(compressedQuery))
+
+  return compressedQuery
 }

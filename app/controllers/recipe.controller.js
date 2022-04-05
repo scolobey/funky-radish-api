@@ -23,6 +23,7 @@ exports.search = (req, res) => {
     let query = req.params.query
 
     let mongoQuery = SearchQueryService.build(query)
+    console.log("mongo query: " + JSON.stringify(mongoQuery))
 
     var cursor = db.collection('Recipe')
     .find(mongoQuery)
