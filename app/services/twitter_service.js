@@ -32,6 +32,14 @@ function embolden(text) {
   return String.fromCodePoint (text.codePointAt (0) + diff);
 }
 
+function noRecipeTweet(query, replyTo, user) {
+  let tweet = "Couldn't find any recipes under the query: " + query
+
+  T.post('statuses/update', { status: tweet, in_reply_to_status_id: replyTo }, function(err, data, response) {
+    console.log(JSON.stringify(data))
+  })
+}
+
 function tweetStorm(thread, replyTo) {
   // remove the first tweet from the thread, tweet it, and on the callback,
   // if the thread has more tweets, send it down the line with the next id.
@@ -115,7 +123,7 @@ function formatTweet(recipe, replyTo, user) {
   let ing = recipe.ingredients.join('\n')
   let recipeTitle = recipe.title.replace(/[A-Za-z]/g, embolden) + " @" + user;
 
-  var lead = recipeTitle + '\n' + ing
+  var lead = recipeTitle + '\n' + 'http://www.funkyradish.com/recipe/' + recipe.title.toLowercase().replace(' ', '-') + '\n' + ing
 
   // Emojis can save characters and they look kinda exciting.
   lead = lead
@@ -214,8 +222,10 @@ function findRecipe(query, replyTo, user) {
           else {
             if (searchErr == null) {
               console.log("twitter search error: " + searchErr)
+              noRecipeTweet(query, replyTo, user)
             } else {
               console.log("twitter bot couldn't find a recipe.")
+              noRecipeTweet(query, replyTo, user)
             }
           }
         })
