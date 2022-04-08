@@ -79,9 +79,12 @@ function switchQueryType(phrase, phraseConfig) {
     }
     // 4 = ingredient
     case 4: {
+
       let query = {
-          ingredients: "62215b9c5e3df2d232fb949b"
+          ing: {$regex: phrase, $options: "i"}
       }
+
+      console.log("its and ing: " + JSON.stringify(query))
 
       return query
     }
