@@ -4,6 +4,7 @@ module.exports = function (app) {
     const recipes = require('../controllers/recipe.controller.js');
 
     // Recipe Search
+    app.get('/recipes/:query/:page', recipes.search);
     app.get('/recipes/:query', recipes.search);
 
     // Retrieve all Recipes belonging to anyone

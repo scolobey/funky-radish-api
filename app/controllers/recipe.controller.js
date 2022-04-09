@@ -21,13 +21,16 @@ exports.search = (req, res) => {
     const db = client.db("funky_radish_db")
 
     let query = req.params.query
+    let page = req.params.page || 1
 
     let mongoQuery = SearchQueryService.build(query)
     console.log("mongo query: " + JSON.stringify(mongoQuery))
+    console.log("page: " + page);
 
     var cursor = db.collection('Recipe')
     .find(mongoQuery)
-    .limit(15)
+    .skip((page-1)*30)
+    .limit(30)
     .toArray(function(err, docs) {
       assert.equal(err, null);
 
