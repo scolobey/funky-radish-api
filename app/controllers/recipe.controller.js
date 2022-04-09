@@ -207,7 +207,6 @@ exports.findOne = (req, res) => {
     var ObjectID = require("mongodb").ObjectID
 
     if (ObjectID.isValid(query)) {
-      console.log("id")
       db.collection('Recipe')
       .findOne({
         _id: query
@@ -218,32 +217,10 @@ exports.findOne = (req, res) => {
           return res.status(500).send({ message: "No recipe matches that title." });
         }
 
-        let ingredientIds = item.ingredients.map(ing => { return {_id: ing} })
-        let directionIds = item.directions.map(dir => { return {_id: dir} })
-
-        db.collection('Ingredient').find({
-          $or: ingredientIds
-        })
-        .toArray(function(err, ingredients) {
-          assert.equal(err, null);
-
-          item.ingredients = ingredients
-
-          db.collection('Direction').find({
-            $or: directionIds
-          })
-          .toArray(function(err, directions) {
-            assert.equal(err, null);
-
-            item.directions = directions
-
-            res.send(item)
-          })
-        })
+        res.send(item)
       });
     }
     else {
-      console.log("title")
       db.collection('Recipe')
       .findOne({
         $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
@@ -255,28 +232,7 @@ exports.findOne = (req, res) => {
           return res.status(500).send({ message: "No recipe matches that title." });
         }
 
-        let ingredientIds = item.ingredients.map(ing => { return {_id: ing} })
-        let directionIds = item.directions.map(dir => { return {_id: dir} })
-
-        db.collection('Ingredient').find({
-          $or: ingredientIds
-        })
-        .toArray(function(err, ingredients) {
-          assert.equal(err, null);
-
-          item.ingredients = ingredients
-
-          db.collection('Direction').find({
-            $or: directionIds
-          })
-          .toArray(function(err, directions) {
-            assert.equal(err, null);
-
-            item.directions = directions
-
-            res.send(item)
-          })
-        })
+        res.send(item)
       });
     }
 
