@@ -123,7 +123,7 @@ function formatTweet(recipe, replyTo, user) {
   let ing = recipe.ingredients.join('\n')
   let recipeTitle = recipe.title.replace(/[A-Za-z]/g, embolden) + " @" + user;
 
-  var lead = recipeTitle + '\n' + 'http://www.funkyradish.com/recipe/' + recipe.title.toLowercase().replace(' ', '-') + '\n' + ing
+  var lead = recipeTitle + '\n' + 'http://www.funkyradish.com/recipe/' + recipe.title.toLowerCase().replace(' ', '-') + '\n' + ing
 
   // Emojis can save characters and they look kinda exciting.
   lead = lead
