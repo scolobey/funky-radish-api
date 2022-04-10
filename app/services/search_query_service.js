@@ -81,10 +81,10 @@ function switchQueryType(phrase, phraseConfig) {
     case 4: {
 
       let query = {
-          ing: {$regex: phrase, $options: "i"}
+          ing: { $regex: phrase, $options: "i" }
       }
 
-      console.log("its and ing: " + JSON.stringify(query))
+      console.log("its an ing: " + JSON.stringify(query))
 
       return query
     }
@@ -139,11 +139,14 @@ function expandByMatchAndPluralization(phrase) {
   let matched = false
 
   if (pluralize.isPlural(phrase)) {
-    console.log("plural");
     let singular = pluralize.singular(phrase)
 
     if (searchConfig[singular]) {
       phraseObj[singular] = searchConfig[singular]
+      pluralExpansion.push(phraseObj)
+      matched = true
+    } else if (searchConfig[phrase]) {
+      phraseObj[phrase] = searchConfig[phrase]
       pluralExpansion.push(phraseObj)
       matched = true
     } else {
@@ -153,8 +156,13 @@ function expandByMatchAndPluralization(phrase) {
     }
   } else {
     console.log("not plural");
+    let plural = pluralize.plural(phrase)
     if (searchConfig[phrase]) {
       phraseObj[phrase] = searchConfig[phrase]
+      pluralExpansion.push(phraseObj)
+      matched = true
+    } else if (searchConfig[plural]) {
+      phraseObj[plural] = searchConfig[plural]
       pluralExpansion.push(phraseObj)
       matched = true
     } else {
@@ -164,6 +172,8 @@ function expandByMatchAndPluralization(phrase) {
   }
 
   let paredPluralExpansion = removeDuplicates(pluralExpansion)
+
+  console.log("exp: " + JSON.stringify(paredPluralExpansion));
 
   let returnExpansion = {
     expansion: paredPluralExpansion,
