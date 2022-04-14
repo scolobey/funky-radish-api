@@ -53,7 +53,7 @@ function switchQueryType(phrase, phraseConfig) {
 
     case 1: {
       let query = {
-          $or: phrase
+          title: { $regex: phrase, $options: "i" }
       }
 
       return query
@@ -386,24 +386,62 @@ exports.build = (query) => {
   return compressedQuery
 }
 
-function checkForDescription(plural, singular) {
-  console.log(plural, singular);
-  if (searchConfig[plural] && searchConfig[plural].description) {
-    return searchConfig[plural].description
-  } else if (searchConfig[singular] && searchConfig[singular].description) {
+function matchConfig(plural, singular) {
+  if (searchConfig[plural]) {
+    return searchConfig[plural]
+  } else if (searchConfig[singular]) {
     return searchConfig[singular].description
   } else {
     return ""
   }
 }
 
-exports.getDescription = (query) => {
-  console.log("summarizing: " + query);
+function findConfig(pluralities) {
+  let phraseConfig = {}
+
+  pluralities.forEach((item, i) => {
+    if (searchConfig[item]) {
+      phraseConfig = searchConfig[item]
+    }
+  });
+
+  return phraseConfig
+}
+
+function expandByPluralization(query) {
+  let pluralities = []
+
   if (pluralize.isPlural(query)) {
     let singular = pluralize.singular(query)
-    return checkForDescription(query, singular)
+    pluralities = [query, singular]
   } else {
     let plural = pluralize.plural(query)
-    return checkForDescription(plural, query)
+    pluralities = [plural, query]
   }
+
+  if (pluralities[0] == pluralities[1]) {
+    pluralities.pop()
+    return pluralities
+  } else {
+    return pluralities
+  }
+}
+
+exports.getDescription = (query) => {
+  console.log("summarizing: " + query);
+  // if (pluralize.isPlural(query)) {
+  //   let singular = pluralize.singular(query)
+  //   return checkForDescription(query, singular)
+  // } else {
+  //   let plural = pluralize.plural(query)
+  //   return checkForDescription(plural, query)
+  // }
+}
+
+exports.checkSearchConfig = (query) => {
+  let pluralities = expandByPluralization(query)
+  console.log("pluralities: " + pluralities);
+  let phraseConfig = findConfig(pluralities)
+  console.log("config: " + phraseConfig);
+  return phraseConfig
 }

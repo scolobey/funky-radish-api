@@ -24,11 +24,10 @@ exports.search = (req, res) => {
     let page = req.params.page || 1
 
     let mongoQuery = SearchQueryService.build(query)
-    let description = SearchQueryService.getDescription(query)
+    let phraseConfig = SearchQueryService.checkSearchConfig(query)
 
     console.log("mongo query: " + JSON.stringify(mongoQuery))
     console.log("page: " + page);
-    console.log("description: " + description);
 
     var cursor = db.collection('Recipe')
     .find(mongoQuery)
@@ -49,8 +48,8 @@ exports.search = (req, res) => {
         recipes: docs
       }
 
-      if (description && description.length > 0) {
-        response.description = description
+      if (phraseConfig) {
+        response.config = phraseConfig
       }
 
       res.send(response);
