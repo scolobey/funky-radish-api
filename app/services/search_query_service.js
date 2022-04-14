@@ -1,8 +1,6 @@
 const pluralize = require('pluralize')
 const searchConfig = require('../../config/search-config.json')
 
-
-
 // query structures and process
 // https://docs.google.com/document/d/1_pveDDTd-s2K1POHEsHv09I-D0BL2s_LWXSRw8QSORQ/edit
 
@@ -386,4 +384,26 @@ exports.build = (query) => {
   console.log("returning query: " + JSON.stringify(compressedQuery))
 
   return compressedQuery
+}
+
+function checkForDescription(plural, singular) {
+  console.log(plural, singular);
+  if (searchConfig[plural] && searchConfig[plural].description) {
+    return searchConfig[plural].description
+  } else if (searchConfig[singular] && searchConfig[singular].description) {
+    return searchConfig[singular].description
+  } else {
+    return ""
+  }
+}
+
+exports.getDescription = (query) => {
+  console.log("summarizing: " + query);
+  if (pluralize.isPlural(query)) {
+    let singular = pluralize.singular(query)
+    return checkForDescription(query, singular)
+  } else {
+    let plural = pluralize.plural(query)
+    return checkForDescription(plural, query)
+  }
 }
