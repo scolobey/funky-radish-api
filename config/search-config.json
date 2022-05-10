@@ -20,7 +20,8 @@
     "parents": [
       "home",
       "cocktails"
-    ]
+    ],
+    "content": "tiki_cocktail_blog_post.md"
   },
   "classic cocktail": {
     "code": 2,

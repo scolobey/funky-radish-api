@@ -10,9 +10,10 @@ const DBHost = process.env.DBHost || config.get('DBHost');
 const TokenService = require('../services/token_service.js');
 const SpoonacularService = require('../services/spoonacular_service.js');
 const SearchQueryService = require('../services/search_query_service.js');
+const ContentRetrievalService = require('../services/content_retrieval_service.js');
 
 // Recipe Search API.
-exports.search = (req, res) => {
+exports.search = async (req, res) => {
   console.log("searching for recipes")
 
   MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
@@ -51,8 +52,17 @@ exports.search = (req, res) => {
       if (phraseConfig) {
         response.config = phraseConfig
       }
-
-      res.send(response);
+      if (phraseConfig.content) {
+        ContentRetrievalService.getContent(phraseConfig.content)
+        .then(markdown => {
+          response.config.content = markdown
+          res.send(response);
+        }).catch(err => {
+          res.send(response);
+        });
+      } else {
+        res.send(response);
+      }
     })
   });
 }
