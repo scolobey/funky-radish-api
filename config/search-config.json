@@ -6,7 +6,7 @@
       "tiki cocktails",
       "classic cocktails",
       "day drinking",
-      "virgin cocktail"
+      "virgin cocktails"
     ],
     "parents": [
       "home"
@@ -27,7 +27,11 @@
   },
   "classic cocktail": {
     "code": 2,
-    "description": "Classic cocktails typically refers to cocktails that are very widely recognized and have a history of popularity. Regularly included in this category: the Old Fashioned, the Manhattan, Martinis, Margaritas, etc."
+    "description": "Classic cocktails typically refers to cocktails that are very widely recognized and have a history of popularity. Regularly included in this category: the Old Fashioned, the Manhattan, Martinis, Margaritas, etc.",
+    "parents": [
+      "home",
+      "cocktails"
+    ]
   },
   "day drinking": {
     "code": 2,
@@ -9165,7 +9169,7 @@
     "description": "Butterbean may refer to:Lima bean Phaseolus lunatus, an edible legume\nRunner bean Phaseolus coccineus, grown both as an edible bean and as an ornamental plant\nLablab known as butter bean in the Caribbean"
   },
   "soup": {
-    "code": 4,
+    "code": 1,
     "count": 34,
     "description": "Soup is a primarily liquid food, generally served warm or hot, that is made by combining ingredients of meat or vegetables with stock, milk, or water. Hot soups are additionally characterized by boiling solid ingredients in liquids in a pot until the flavors are extracted, forming a broth. Soups are similar to stews, and in some cases there may not be a clear distinction between the two; however, soups generally have more liquid (broth) than stews.",
     "children": [],
