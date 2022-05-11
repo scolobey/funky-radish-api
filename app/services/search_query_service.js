@@ -45,6 +45,7 @@ function compressQuery(queryList) {
 function switchQueryType(phrase, phraseConfig) {
 
   console.log("phrase: " + phrase);
+  phrase = " " + phrase + " "
   console.log("phraseConfig: " + JSON.stringify(phraseConfig));
   console.log("code: " + phraseConfig.code);
 
@@ -67,6 +68,7 @@ function switchQueryType(phrase, phraseConfig) {
 
       return query
     }
+
     // 3 = title + category TODO (this is still standard implementation)
     case 3: {
       let query = {
@@ -81,8 +83,6 @@ function switchQueryType(phrase, phraseConfig) {
       let query = {
           ing: { $regex: phrase, $options: "i" }
       }
-
-      console.log("its an ing: " + JSON.stringify(query))
 
       return query
     }
@@ -100,7 +100,7 @@ function generateMongoQuery(expandedQuery) {
 
   let mappedExpansion = expandedQuery.query.map(phrase => {
 
-    console.log("phrizase: " + JSON.stringify(phrase))
+    console.log("phrase: " + JSON.stringify(phrase))
 
     if (phrase.$or) {
       return phrase
