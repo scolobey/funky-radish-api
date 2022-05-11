@@ -63,13 +63,13 @@ function switchQueryType(phrase, phraseConfig) {
     case 2: {
       // Add a search clause to search for tagged recipes.
       let query = {
-          tags: phrase
+          tags: phrase.trim()
       }
 
       return query
     }
 
-    // 3 = title + category TODO (this is still standard implementation)
+    // 3 = title + category TODO
     case 3: {
       let query = {
           $or: phrase
@@ -77,6 +77,7 @@ function switchQueryType(phrase, phraseConfig) {
 
       return query
     }
+
     // 4 = ingredient
     case 4: {
 
@@ -86,9 +87,10 @@ function switchQueryType(phrase, phraseConfig) {
 
       return query
     }
+
     default: {
       let query = {
-        $or: phrase
+          title: { $regex: phrase, $options: "i" }
       }
 
       return query
