@@ -45,6 +45,24 @@
       "cocktails"
     ]
   },
+  "daiquiri": {
+    "code": 1,
+    "children": [],
+    "parents": [
+      "home",
+      "cocktails",
+      "day drinking"
+    ]
+  },
+  "mimosa": {
+    "code": 1,
+    "children": [],
+    "parents": [
+      "home",
+      "cocktails",
+      "day drinking"
+    ]
+  },
   "virgin cocktail": {
     "code": 2,
     "description": "Celebrate without excluding anyone.",
