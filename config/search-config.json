@@ -4,7 +4,9 @@
     "description": "A cocktail is an alcoholic mixed drink. The origins of the word are often debated. The term in its modern usage appears to have originated in the United States  in the early 1800's.",
     "children": [
       "tiki cocktails",
-      "classic cocktails"
+      "classic cocktails",
+      "day drinking",
+      "virgin cocktail"
     ],
     "parents": [
       "home"
@@ -26,6 +28,26 @@
   "classic cocktail": {
     "code": 2,
     "description": "Classic cocktails typically refers to cocktails that are very widely recognized and have a history of popularity. Regularly included in this category: the Old Fashioned, the Manhattan, Martinis, Margaritas, etc."
+  },
+  "day drinking": {
+    "code": 2,
+    "description": "Light and refreshing, these are some of the best afternoon cocktails to get your day drink on with.",
+    "children": [
+      "daiquiris",
+      "mimosas"
+    ],
+    "parents": [
+      "home",
+      "cocktails"
+    ]
+  },
+  "virgin cocktail": {
+    "code": 2,
+    "description": "Celebrate without excluding anyone.",
+    "parents": [
+      "home",
+      "cocktails"
+    ]
   },
   "romaine lettuce": {
     "code": 4,
@@ -7949,7 +7971,7 @@
     "count": 26,
     "description": "Shortcrust pastry is a type of pastry often used for the base of a tart, quiche, pie, or flan. Shortcrust pastry can be used to make both sweet and savory pies such as apple pie, quiche, lemon meringue or chicken pie."
   },
-  "chocolate chip cookies": {
+  "chocolate chip cookie": {
     "code": 1,
     "description": "Cookie genesis, the alpha and the omega of cookies, originating from the Toll House Chocolate Crunch Cookie, invented by Ruth Graves Wakefield in Whitman, Massechussetts in the late 1930's. this is the most widely recognized and consumed cookie in the modern world.",
     "children": [],
@@ -7959,7 +7981,7 @@
       "cookies"
     ]
   },
-  "oatmeal cookies": {
+  "oatmeal cookie": {
     "code": 1,
     "children": [],
     "parents": [
@@ -7968,7 +7990,7 @@
       "cookies"
     ]
   },
-  "peanut butter cookies": {
+  "peanut butter cookie": {
     "code": 1,
     "children": [],
     "parents": [
@@ -9996,7 +10018,12 @@
   "pudding": {
     "code": 4,
     "count": 4,
-    "description": "Pudding is a type of food that can be either a dessert or a savoury dish that is part of the main meal."
+    "description": "Pudding is a type of food that can be either a dessert or a savoury dish that is part of the main meal.",
+    "children": [],
+    "parents": [
+      "home",
+      "desserts"
+    ]
   },
   "whole wheat pastry flour": {
     "code": 4,
@@ -15828,10 +15855,20 @@
     "children": [
       "cookies",
       "cakes",
-      "pies"
+      "pies",
+      "cheesecake",
+      "pudding"
     ],
     "parents": [
       "home"
+    ]
+  },
+  "cheesecake": {
+    "code": 2,
+    "description": "A sweet dessert consisting of a soft, fresh cheese, eggs, and sugar, often with a bottom crust of crushed cookies or graham crackers.",
+    "parents": [
+      "home",
+      "dessert"
     ]
   },
   "ruby port": {
@@ -29242,7 +29279,7 @@
     "code": 4,
     "count": 1
   },
-  "orgeat syrup": {
+  "orgeat": {
     "code": 4,
     "count": 1,
     "description": "Orgeat syrup is a sweet syrup made from almonds, sugar, and rose water or orange flower water. It was originally made with a barley-almond blend. It has a pronounced almond taste and is used to flavor many cocktails. Orgeat syrup is an important ingredient in the Mai Tai and many Tiki drinks."
