@@ -21,7 +21,7 @@ exports.search = async (req, res) => {
 
     const db = client.db("funky_radish_db")
 
-    let query = req.params.query
+    let query = req.params.query.replace("(", "").replace(")", "")
     let page = req.params.page || 1
 
     let mongoQuery = SearchQueryService.build(query)
@@ -218,7 +218,9 @@ exports.findAllByUser = (req, res) => {
 
 // Find a single recipe with a recipeId
 exports.findOne = (req, res) => {
-  let query = req.params.recipeId.replace(/-/g, ' ')
+  let query = req.params.recipeId.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
+
+  console.log("findOne query: " + query);
 
   MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
@@ -244,10 +246,11 @@ exports.findOne = (req, res) => {
       });
     }
     else {
+      console.log("looking for a name: " + query);
       db.collection('Recipe')
       .findOne({
         $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        title : { '$regex' : query, '$options' : 'i' }
+        title : { '$regex' : query, '$options' : 'iu' }
       }, function(err, item) {
         assert.equal(null, err);
 

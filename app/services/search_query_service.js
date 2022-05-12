@@ -45,7 +45,7 @@ function compressQuery(queryList) {
 function switchQueryType(phrase, phraseConfig) {
 
   console.log("phrase: " + phrase);
-  phrase = " " + phrase + " "
+  phrase = phrase
   console.log("phraseConfig: " + JSON.stringify(phraseConfig));
   console.log("code: " + phraseConfig.code);
 
@@ -54,7 +54,7 @@ function switchQueryType(phrase, phraseConfig) {
 
     case 1: {
       let query = {
-          title: { $regex: phrase, $options: "i" }
+          title: { $regex: "(^| +|\\()" + phrase + "( +|$|\\))", $options: "i" }
       }
 
       return query
