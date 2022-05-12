@@ -33,12 +33,53 @@
       "cocktails"
     ]
   },
+  "martini": {
+    "code": 1,
+    "parents": [
+      "home",
+      "cocktails",
+      "classic coktails"
+    ]
+  },
+  "old fashioned": {
+    "code": 1,
+    "parents": [
+      "home",
+      "cocktails",
+      "classic coktails"
+    ]
+  },
+  "margarita": {
+    "code": 1,
+    "parents": [
+      "home",
+      "cocktails",
+      "classic coktails"
+    ]
+  },
+  "tom collins": {
+    "code": 1,
+    "parents": [
+      "home",
+      "cocktails",
+      "classic coktails"
+    ]
+  },
+  "bloody mary": {
+    "code": 1,
+    "parents": [
+      "home",
+      "cocktails",
+      "day drinking"
+    ]
+  },
   "day drinking": {
     "code": 2,
     "description": "Light and refreshing, these are some of the best afternoon cocktails to get your day drink on with.",
     "children": [
       "daiquiris",
-      "mimosas"
+      "mimosas",
+      "bloody mary"
     ],
     "parents": [
       "home",
@@ -1038,7 +1079,7 @@
     "count": 674,
     "description": "Hot sauce is a type of condiment, seasoning, or salsa made from chili peppers and other ingredients. Many commercial varieties of mass-produced hot sauce exist."
   },
-  "potatoes": {
+  "potato": {
     "code": 4,
     "count": 1018,
     "description": "The potato is a starchy tuber of the plant Solanum tuberosum and is a root vegetable native to the Americas. The plant is a perennial in the nightshade family Solanaceae."
@@ -8005,7 +8046,7 @@
       "cookies"
     ]
   },
-  "oatmeal cookie": {
+  "oatmeal raisin cookie": {
     "code": 1,
     "children": [],
     "parents": [
@@ -8016,6 +8057,16 @@
   },
   "peanut butter cookie": {
     "code": 1,
+    "children": [],
+    "parents": [
+      "home",
+      "desserts",
+      "cookies"
+    ]
+  },
+  "macaroon": {
+    "code": 1,
+    "description": "Not to be confused with the French Macaron, this cookie is typicall based on shredded coconut, held together by a sweet base, typically of condensed milk.",
     "children": [],
     "parents": [
       "home",
@@ -11714,8 +11765,9 @@
     "description": "A cookie is a baked or cooked snack or dessert that is typically small, flat and sweet. It usually contains flour, sugar, egg, and some type of oil, fat, or butter. It may include other ingredients such as raisins, oats, chocolate chips, nuts, etc.",
     "children": [
       "chocolate chip cookies",
-      "oatmeal cookies",
-      "peanut butter cookies"
+      "oatmeal raisin cookies",
+      "peanut butter cookies",
+      "macaroons"
     ],
     "parents": [
       "home",
@@ -14599,7 +14651,7 @@
     "description": "Cheese sauce is a sauce made with cheese or processed cheese as a primary ingredient. Sometimes dried cheese or cheese powder is used. Several varieties exist and it has many various culinary uses. Mass-produced commercial cheese sauces are also made by various companies, in both liquid and dry forms. These prepared sauces are used by consumers and restaurants, and commercial formulations are used in the production of various prepared foods, such as macaroni and cheese mixes and frozen meals."
   },
   "Potatoes O'Brien": {
-    "code": 4,
+    "code": 1,
     "count": 2,
     "description": "Potatoes O'Brien is a dish of pan-fried potatoes along with red and green bell peppers and onion. The potatoes and the bell peppers are fried and are served hot. The origin of the dish is disputed. The dish has been claimed to originate in the early 1900s from a Boston restaurant known as Jerome's and from a Manhattan restaurant known as Jack's during the same time period."
   },
@@ -19274,7 +19326,7 @@
     "count": 4
   },
   "potato bread": {
-    "code": 4,
+    "code": 1,
     "count": 3,
     "description": "Potato bread is a form of bread in which potato flour or potato replaces a portion of the regular wheat flour. It is cooked in a variety of ways, including baking it on a hot griddle or pan, or in an oven. It may be leavened or unleavened, and may have a variety of other ingredients baked into it. The ratio of potato to wheat flour varies significantly from recipe to recipe, with some recipes having a majority of potato, and others having a majority of wheat flour. Some recipes call for mashed potatoes, with others calling for dehydrated potato flakes. It is available as a commercial product in many countries, with similar variations in ingredients, cooking method, and other variables."
   },
