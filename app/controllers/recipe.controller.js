@@ -259,7 +259,7 @@ exports.findOne = (req, res) => {
           }
         }
 
-        if (configHolder.parents) {
+        if (configHolder && configHolder.parents) {
           item.tags = configHolder
         }
 
