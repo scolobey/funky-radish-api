@@ -399,15 +399,16 @@ function matchConfig(plural, singular) {
 }
 
 function findConfig(pluralities) {
-  let phraseConfig = {}
+  let mainPhraseConfig = {}
 
   pluralities.forEach((item, i) => {
     if (searchConfig[item]) {
-      phraseConfig = searchConfig[item]
+      // If you don't clone the segment, editing will end up persisting until reload.
+      mainPhraseConfig = JSON.parse(JSON.stringify(searchConfig[item]))
     }
   });
 
-  return phraseConfig
+  return mainPhraseConfig
 }
 
 function expandByPluralization(query) {
@@ -444,6 +445,28 @@ exports.checkSearchConfig = (query) => {
   let pluralities = expandByPluralization(query)
   console.log("pluralities: " + pluralities);
   let phraseConfig = findConfig(pluralities)
-  console.log("config: " + phraseConfig);
+  console.log("config: " + JSON.stringify(phraseConfig));
   return phraseConfig
+}
+
+exports.checkRecipeSearchConfig = (tags) => {
+  var config = {}
+
+  //TODO: This can certainly be more efficient.
+  for (int in tags) {
+    console.log("checking: " + tags[int]);
+    var temporaryConfig = this.checkSearchConfig(tags[int])
+    delete temporaryConfig.description
+    delete temporaryConfig.content
+
+    if (!config.parents && temporaryConfig.parents) {
+      temporaryConfig.parents.push(tags[int])
+      config = temporaryConfig
+    } else if (config.parents && (temporaryConfig.parents.length > config.parents.length)) {
+      temporaryConfig.parents.push(tags[int])
+      config = temporaryConfig
+    }
+  }
+
+  return config
 }

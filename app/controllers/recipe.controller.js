@@ -243,24 +243,8 @@ exports.findOne = (req, res) => {
         }
 
         if (item.tags && item.tags.length > 0) {
-          var configHolder = {}
-          //TODO: This can certainly be more efficient.
-          for (int in item.tags) {
-            console.log("checking: " +item.tags[int]);
-            let tempConfig = SearchQueryService.checkSearchConfig(item.tags[int])
-            delete tempConfig.description
-            delete tempConfig.content
-
-            if (!item.tags.parents && tempConfig.parents) {
-              configHolder = tempConfig
-            } else if (tempConfig.parents && (tempConfig.parents.length > item.tags.parents.length)) {
-              configHolder = tempConfig
-            }
-          }
-        }
-
-        if (configHolder && configHolder.parents) {
-          item.tags = configHolder
+          let tagConfig = SearchQueryService.checkRecipeSearchConfig(item.tags)
+          item.tags = tagConfig
         }
 
         res.send(item)
@@ -277,6 +261,11 @@ exports.findOne = (req, res) => {
 
         if (item == null) {
           return res.status(500).send({ message: "No recipe matches that title." });
+        }
+
+        if (item.tags && item.tags.length > 0) {
+          let tagConfig = SearchQueryService.checkRecipeSearchConfig(item.tags)
+          item.tags = tagConfig
         }
 
         res.send(item)
