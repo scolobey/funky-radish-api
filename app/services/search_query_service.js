@@ -470,3 +470,37 @@ exports.checkRecipeSearchConfig = (tags) => {
 
   return config
 }
+
+exports.matchTags = (title) => {
+
+  if (!title || title.length === 0) {
+    return {}
+  }
+
+  let splitTitle = title.toLowerCase().split(" ")
+
+  let length = splitTitle.length
+  let stageLength = length
+
+  while (stageLength > 0) {
+    let start = 0
+
+    while (stageLength > 0 && start + stageLength <= length)  {
+
+      let currentPhrase = splitTitle.slice(start, start + stageLength).join(' ')
+      let pluralMatchExpansion = expandByMatchAndPluralization(currentPhrase)
+      console.log("expansion: " + JSON.stringify(pluralMatchExpansion))
+
+      if (pluralMatchExpansion.matched) {
+        let returnedTitleConfig = this.checkRecipeSearchConfig([Object.keys(pluralMatchExpansion.expansion[0])[0]])
+        console.log("matched: " + Object.keys(pluralMatchExpansion.expansion[0])[0])
+        return returnedTitleConfig
+      } else {
+        start++
+      }
+    }
+    stageLength--
+  }
+
+  return {}
+}

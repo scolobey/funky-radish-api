@@ -1663,7 +1663,12 @@
   "pizza crust": {
     "code": 4,
     "count": 44,
-    "description": "Pizza is a dish of Italian origin consisting of a usually round, flat base of leavened wheat-based dough topped with tomatoes, cheese, and often various other ingredients, which is then baked at a high temperature, traditionally in a wood-fired oven. A small pizza is sometimes called a pizzetta. A person who makes pizza is known as a pizzaiolo."
+    "description": "Pizza is a dish of Italian origin consisting of a usually round, flat base of leavened wheat-based dough topped with tomatoes, cheese, and often various other ingredients, which is then baked at a high temperature, traditionally in a wood-fired oven. A small pizza is sometimes called a pizzetta. A person who makes pizza is known as a pizzaiolo.",
+    "children": [],
+    "parents": [
+      "home",
+      "pizza"
+    ]
   },
   "part-skim mozzarella cheese": {
     "code": 4,

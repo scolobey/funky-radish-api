@@ -266,6 +266,10 @@ exports.findOne = (req, res) => {
         if (item.tags && item.tags.length > 0) {
           let tagConfig = SearchQueryService.checkRecipeSearchConfig(item.tags)
           item.tags = tagConfig
+        } else {
+          let matchedTag = SearchQueryService.matchTags(item.title)
+          item.tags = matchedTag
+          console.log(matchedTag)
         }
 
         res.send(item)
