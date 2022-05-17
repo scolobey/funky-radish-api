@@ -9982,6 +9982,19 @@
     "code": 4,
     "count": 6
   },
+  "margherita pizza": {
+    "code": 1,
+    "description": "The traditional: basil, mozzarella, and tomato sauce. Maybe a little olive oil.",
+    "children": [
+      "pizza sauce",
+      "pizza dough",
+      "pizza crust"
+    ],
+    "parents": [
+      "home",
+      "pizza"
+    ]
+  },
   "pizza": {
     "code": 1,
     "description": "Dough, cheese, sauce and toppings. Pizza may have Italian origins, but today it belongs to the world as one of the most popular and widely recognized culinary delights on the planet.",

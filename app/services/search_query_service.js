@@ -456,6 +456,7 @@ exports.checkRecipeSearchConfig = (tags) => {
   for (int in tags) {
     console.log("checking: " + tags[int]);
     var temporaryConfig = this.checkSearchConfig(tags[int])
+
     delete temporaryConfig.description
     delete temporaryConfig.content
 
@@ -492,7 +493,7 @@ exports.matchTags = (title) => {
       console.log("expansion: " + JSON.stringify(pluralMatchExpansion))
 
       if (pluralMatchExpansion.matched) {
-        let returnedTitleConfig = this.checkRecipeSearchConfig([Object.keys(pluralMatchExpansion.expansion[0])[0]])
+        let returnedTitleConfig = this.checkRecipeSearchConfig(expandByPluralization(Object.keys(pluralMatchExpansion.expansion[0])[0]))
         console.log("matched: " + Object.keys(pluralMatchExpansion.expansion[0])[0])
         return returnedTitleConfig
       } else {
