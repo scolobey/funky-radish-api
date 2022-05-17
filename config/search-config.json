@@ -3478,15 +3478,23 @@
     "code": 4,
     "count": 73
   },
+  "chicken breast": {
+    "code": 4
+  },
+  "chicken thigh": {
+    "code": 4
+  },
   "chicken": {
     "code": 4,
     "count": 982,
-    "description": "The chicken is a domesticated subspecies of the red junglefowl, with attributes of wild species such as grey and ceylon junglefowl that are originally from Southeastern Asia. Rooster or cock is a term for an adult male bird, and a younger male may be called a cockerel. A male that has been castrated is a capon. An adult female bird is called a hen and a sexually immature female is called a pullet."
+    "description": "The chicken is a domesticated subspecies of the red junglefowl, with attributes of wild species such as grey and ceylon junglefowl that are originally from Southeastern Asia. Rooster or cock is a term for an adult male bird, and a younger male may be called a cockerel. A male that has been castrated is a capon. An adult female bird is called a hen and a sexually immature female is called a pullet.",
+    "parents": ["home"],
+    "children": ["chicken breast","chicken thighs","chicken casserole","chicken florentine"]
   },
   "chiles": {
     "code": 4,
     "count": 321,
-    "description": "Chiles may refer to:Chiles (surname)\nChiles (volcano), an extinct volcano in Ecuador\nChiles Center, a multi-purpose arena in Portland, Oregon\nLillis Business Complex, a building on the University of Oregon campus\nNew Mexico Chiles, an American soccer club"
+    "description": "Chili peppers are widely used in many cuisines as a spice to add 'heat' to a dish. Varieties of the berry-fruit of plants from the genus Capsicum, which are members of the nightshade family Solanaceae."
   },
   "adobo sauce": {
     "code": 4,
