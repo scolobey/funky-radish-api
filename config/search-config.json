@@ -12,18 +12,39 @@
       "home"
     ]
   },
+  "casserole": {
+    "code": 1,
+    "description": "A casserole is a large oven-safe dish, typically rectangular, used for cooking a variety of dishes in the oven. The term also refers to the category of foods that have been cooked in such a vessel.",
+    "children": [
+      "chicken casserole"
+    ],
+    "parents": [
+      "home"
+    ]
+  },
   "tiki cocktail": {
     "code": 2,
     "description": "Tiki cocktails are a class of cocktail popular in tropical locales. They often include rum or tropical juices.",
     "children": [
       "daiquiris",
-      "rum cocktails"
+      "rum cocktails",
+      "singapore sling"
     ],
     "parents": [
       "home",
       "cocktails"
     ],
     "content": "tiki_cocktail_blog_post.md"
+  },
+  "singapore sling": {
+    "code": 1,
+    "description": "A gin-based sling cocktail from Singapore. Developed sometime before 1915 by bartender Ngiam Tong Boon at the Long Bar at Raffles Hotel in Singapore. Typically contains gin, pineapple juice, lime juice, triple-sec (often Cointreau), an herbal liqueur (traditionally Benedictine D.O.M.), grenadine and bitters.",
+    "children": [],
+    "parents": [
+      "home",
+      "cocktails",
+      "tiki cocktails"
+    ]
   },
   "classic cocktail": {
     "code": 2,

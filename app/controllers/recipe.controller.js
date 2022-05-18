@@ -231,7 +231,7 @@ exports.findOne = (req, res) => {
 
     var ObjectID = require("mongodb").ObjectID
 
-    if (ObjectID.isValid(query)) {
+    if (ObjectID.isValid(query) && !query.includes(" ")) {
       console.log("an id?");
       db.collection('Recipe')
       .findOne({
