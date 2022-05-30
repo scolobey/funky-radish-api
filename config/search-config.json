@@ -33,8 +33,7 @@
     "parents": [
       "home",
       "cocktails"
-    ],
-    "content": "tiki_cocktail_blog_post.md"
+    ]
   },
   "singapore sling": {
     "code": 1,
@@ -44,7 +43,8 @@
       "home",
       "cocktails",
       "tiki cocktails"
-    ]
+    ],
+    "content": "singapore_sling_blog_post.md"
   },
   "classic cocktail": {
     "code": 2,
@@ -132,6 +132,18 @@
       "home",
       "cocktails"
     ]
+  },
+  "sling cocktail": {
+    "code": 2,
+    "description": "Celebrate without excluding anyone.",
+    "parents": [
+      "home",
+      "cocktails"
+    ]
+  },
+  "heering liqueur": {
+    "code": 4,
+    "description": "A Danish brand of cherry liqueur, since 1818"
   },
   "romaine lettuce": {
     "code": 4,
@@ -6967,8 +6979,8 @@
     "count": 11,
     "description": "Marmite ( MAR-myte) is a brand of savoury food spread from the United Kingdom, based on yeast extract invented by German scientist Justus von Liebig. It is made from by-products of beer brewing (see Lees (fermentation)) and is currently produced by British company Unilever. The product is notable as a vegan source of B vitamins, including supplemental vitamin B12. A traditional use is to spread it very thinly on buttered toast."
   },
-  "bagels": {
-    "code": 4,
+  "bagel": {
+    "code": 1,
     "count": 3,
     "description": "A bagel is a bread product originating in the Jewish communities of Poland. It is traditionally shaped by hand into the form of a ring from yeasted wheat dough, roughly hand-sized, that is first boiled for a short time in water and then baked. The result is a dense, chewy, doughy interior with a browned and sometimes crisp exterior. Bagels are often topped with seeds baked on the outer crust, with the traditional ones being poppy and sesame seeds. Some may have salt sprinkled on their surface, and there are different dough types, such as whole-grain and rye."
   },
@@ -7005,7 +7017,7 @@
     "description": "Maggi is an international brand of seasonings, instant soups, and noodles that originated in Switzerland in the late 19th century. The Maggi company was acquired by Nestlé in 1947."
   },
   "Alfredo sauce": {
-    "code": 4,
+    "code": 1,
     "count": 48,
     "description": "Fettuccine Alfredo or fettuccine al burro is an Italian pasta dish of fresh fettuccine tossed with butter and Parmesan cheese. As the cheese melts, it emulsifies the liquids to form a smooth and rich cheese sauce coating the pasta. The dish is named after Alfredo di Lelio, who featured the dish at his restaurant in Rome in the early to mid-20th century; the \"ceremony\" of preparing it tableside was an integral part of the dish."
   },
@@ -7014,7 +7026,7 @@
     "count": 42
   },
   "corned beef": {
-    "code": 4,
+    "code": 1,
     "count": 32,
     "description": "Corned beef, or salt beef in the British Commonwealth of Nations, is salt-cured brisket of beef. The term comes from the treatment of the meat with large-grained rock salt, also called \"corns\" of salt. Sometimes, sugar and spices are added to corned beef recipes. Corned beef is featured as an ingredient in many cuisines."
   },
@@ -7032,14 +7044,10 @@
     "count": 14,
     "description": "Morchella, the true morels, is a genus of edible sac fungi closely related to anatomically simpler cup fungi in the order Pezizales. These distinctive fungi have a honeycomb appearance due to the network of ridges with pits composing their caps. Morels are prized by gourmet cooks, particularly in Catalan and French cuisine. Due to difficulties in cultivation, commercial harvesting of wild morels has become a multimillion-dollar industry in the temperate Northern Hemisphere, in particular North America, Turkey, China, the Himalayas, India, and Pakistan where these highly prized fungi are found in abundance."
   },
-  "red bell pepper, sliced": {
-    "code": 4,
-    "count": 7
-  },
-  "snappers": {
+  "snapper": {
     "code": 4,
     "count": 9,
-    "description": "Snapper(s) may refer to:"
+    "description": "A family of fish, mainly marine, but with some members inhabiting estuaries, including over 100 species. Snapper inhabit tropical and subtropical regions of all oceans. Some are important food fish. One of the best known is the red snapper."
   },
   "1% low-fat cottage cheese": {
     "code": 4,
@@ -10030,10 +10038,28 @@
     "children": [
       "pizza sauce",
       "pizza dough",
-      "pizza crust"
+      "pizza crust",
+      "detroit style pizza",
+      "chicago style pizza"
     ],
     "parents": [
       "home"
+    ]
+  },
+  "detroit style pizza": {
+    "code": 1,
+    "children": [],
+    "parents": [
+      "home",
+      "pizza"
+    ]
+  },
+  "chicago style pizza": {
+    "code": 1,
+    "children": [],
+    "parents": [
+      "home",
+      "pizza"
     ]
   },
   "pizza doughs": {
