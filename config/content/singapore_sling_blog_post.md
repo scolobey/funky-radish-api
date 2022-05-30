@@ -1,10 +1,5 @@
----
-layout: recipe
-title:  "Singapore Sling"
-tags: cocktail
 
 ## Where was the Singapore Sling Invented?
-
 The Singapore Sling is widely said to have been invented around the year 1915 by Hainanese bartender Ngiam Tang Boon at Long Bar in the [Raffles hotel](https://www.rafflessingapore.com/the-raffles-stories/history-of-the-singapore-sling/#:~:text=The%20Singapore%20Sling%2C%20widely%20regarded,are%20grenadine%20and%20cherry%20liqueur.) in Singapore. However, it is likely that versions of the Singapore Sling were already circulating at this time, and the Raffles version is not the first, but rather that which gained popularity and eventually emerged as the standard.
 
 The Singapore Sling is a natural evolution of the Sling (similar if not indistinguishable from the Toddy), a style of cocktail present from the very birth of the cocktail in the early 1800’s. A classic Sling will typically call for sugar, water, bitters and any of a number of classic spirits, the Old Fashioned being among the most recognizable permutations of this class of cocktail. As is the case with Toddy’s, a Sling may appear in both hot and cold forms.
