@@ -29,6 +29,21 @@ exports.asynchToken = (payload) => {
   return tokenPromise
 }
 
+exports.specialToken = (payload) => {
+  let tokenPromise = new Promise(function(resolve, reject) {
+    const token = jwt.sign(payload, { key: privateKey, passphrase: secret }, { algorithm: 'RS256' }, function(err, token) {
+      if (err) {
+        reject(err);
+      }
+      else {
+        resolve(token)
+      }
+    });
+  });
+
+  return tokenPromise
+}
+
 // TODO: I believe this is basically deprecated in favor of asynchToken
 
 // exports.generateToken = (payload) => {

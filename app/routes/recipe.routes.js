@@ -4,8 +4,8 @@ module.exports = function (app) {
     const recipes = require('../controllers/recipe.controller.js');
 
     // Recipe Search
-    app.get('/recipes/:query/:page', recipes.search);
-    app.get('/recipes/:query', recipes.search);
+    app.get('/recipes/:query/:page', Auth.verifySource, recipes.search);
+    app.get('/recipes/:query', Auth.verifySource, recipes.search);
 
     // Retrieve all Recipes belonging to anyone
     app.get('/admin/recipes', recipes.returnAllRecipes);
@@ -23,7 +23,7 @@ module.exports = function (app) {
     app.get('/recipesByUser/:userId', Auth.verifyAdmin, recipes.findAllByUser);
 
     // Retrieve a single Recipe with recipeId
-    app.get('/recipe/:recipeId', recipes.findOne);
+    app.get('/recipe/:recipeId', Auth.verifySource, recipes.findOne);
 
     // Update a Recipe with recipeId
     app.put('/recipe/:recipeId', Auth.verifyRecipeOwner, recipes.update);

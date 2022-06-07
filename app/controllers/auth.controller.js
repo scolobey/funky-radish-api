@@ -174,8 +174,39 @@ exports.verifyAdmin = (req, res, next) => {
   if (token) {
     TokenService.verifyToken(token)
       .then((decoded) => {
-        console.log(decoded)
         if (decoded.admin) {
+          req.decoded = decoded;
+          next();
+        } else {
+          res.json({ message: "You need admin privileges for that.", token: "" });
+        }
+      }).catch((error) => {
+          res.json({ message: "Invalid token.", token: "", error: error });
+      })
+  }
+  else {
+    return res.status(403).send({
+      success: false,
+      message: 'This action requires authentication.'
+    });
+  }
+};
+
+exports.verifySource = (req, res, next) => {
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+  console.log("verifying source... " + token);
+
+  const payload = {
+    admin: false,
+    user: 'guest'
+  }
+
+  if (token) {
+    TokenService.verifyToken(token)
+      .then((decoded) => {
+        // TODO - If you're logged in, use that token?
+        if (decoded.user == "guest") {
           req.decoded = decoded;
           next();
         }
@@ -192,6 +223,29 @@ exports.verifyAdmin = (req, res, next) => {
       message: 'This action requires authentication.'
     });
   }
+};
+
+exports.claimSpecialToken = (req, res, next) => {
+  const payload = {
+    admin: false,
+    user: 'guest'
+  }
+
+  TokenService.specialToken(payload)
+    .then((token) => {
+      res.json({
+        message: 'Enjoy your token, ya filthy animal!',
+        token: token,
+        error: ""
+      });
+  }).catch((error) => {
+      console.log("Error", error);
+      res.json({
+        message: "Token creation failed.",
+        token: "",
+        error: error.message || "no message"
+      });
+  })
 };
 
 // Check the token.

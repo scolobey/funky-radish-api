@@ -1,3 +1,4 @@
+const Auth = require('../controllers/auth.controller.js');
 
 module.exports = function (app) {
     const auth = require('../controllers/auth.controller.js');
@@ -13,4 +14,7 @@ module.exports = function (app) {
 
     // Delete an unverified user
     app.get('/deleteRecord/:userId', auth.deleteUnverifiedUser);
+
+    // // Resend verification
+    app.get('/secretToken', Auth.verifyAdmin, auth.claimSpecialToken);
 }
