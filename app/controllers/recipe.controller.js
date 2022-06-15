@@ -14,7 +14,7 @@ const ContentRetrievalService = require('../services/content_retrieval_service.j
 
 // Recipe Search API.
 exports.search = async (req, res) => {
-  console.log("searching for recipes")
+  console.log("Searching for recipes.")
 
   MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
@@ -26,9 +26,6 @@ exports.search = async (req, res) => {
 
     let mongoQuery = SearchQueryService.build(query)
     let phraseConfig = SearchQueryService.checkSearchConfig(query)
-
-    console.log("mongo query: " + JSON.stringify(mongoQuery))
-    console.log("page: " + page);
 
     var cursor = db.collection('Recipe')
     .find(mongoQuery)
@@ -52,6 +49,7 @@ exports.search = async (req, res) => {
       if (phraseConfig) {
         response.config = phraseConfig
       }
+
       if (phraseConfig.content) {
         ContentRetrievalService.getContent(phraseConfig.content)
         .then(markdown => {
@@ -69,8 +67,6 @@ exports.search = async (req, res) => {
 
 // Retrieve all recipes if you have admin privileges.
 exports.returnAllRecipes = (req, res) => {
-  console.log("recipes")
-
   Recipe.find({author: {_id: req.params.userId}})
     .populate('author')
     .then(recipes => {
@@ -83,7 +79,6 @@ exports.returnAllRecipes = (req, res) => {
 
   MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
-
     const db = client.db("funky_radish_db")
 
     var cursor = db.collection('Recipe').aggregate([
@@ -153,19 +148,14 @@ exports.findAllByUser = (req, res) => {
 exports.findOne = (req, res) => {
   let query = req.params.recipeId.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
 
-  console.log("findOne query: " + query);
-
   MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
 
     const db = client.db("funky_radish_db")
 
-    console.log("querying: " + query)
-
     var ObjectID = require("mongodb").ObjectID
 
     if (ObjectID.isValid(query) && !query.includes(" ")) {
-      console.log("an id?");
       db.collection('Recipe')
       .findOne({
         _id: query
@@ -185,7 +175,6 @@ exports.findOne = (req, res) => {
       });
     }
     else {
-      console.log("looking for a name: " + query);
       db.collection('Recipe')
       .findOne({
         $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
@@ -200,16 +189,33 @@ exports.findOne = (req, res) => {
         if (item.tags && item.tags.length > 0) {
           let tagConfig = SearchQueryService.checkRecipeSearchConfig(item.tags)
           item.tags = tagConfig
+
+          if (item.tags.content) {
+            ContentRetrievalService.getContent(item.tags.content)
+            .then(markdown => {
+              item.tags.content = markdown
+              res.send(item);
+            }).catch(err => {
+              res.send(item);
+            });
+          }
         } else {
           let matchedTag = SearchQueryService.matchTags(item.title)
           item.tags = matchedTag
-          console.log(matchedTag)
+
+          if (item.tags.content) {
+            ContentRetrievalService.getContent(item.tags.content)
+            .then(markdown => {
+              item.tags.content = markdown
+              res.send(item);
+            }).catch(err => {
+              res.send(item);
+            });
+          }
         }
 
-        res.send(item)
       });
     }
-
   });
 };
 

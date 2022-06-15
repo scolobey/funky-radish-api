@@ -11,16 +11,16 @@ It's best to use a scale. If you bake regularly, a scale is invaluable and will 
 
 The other thing that you can't really argue with is ingredient quality. A better ingredient will generally yield a better cookie. In the specific case of Chocolate Chip Cookies, I would focus mostly on the chocolate chips and the vanilla. But the other ingredients can have an effect.
 
-#Chips
+# Chips
 I mean, the chips are in the name. They're important. And because they aren't totally part of the structure of the cookie, you can swap out wildly different chips without worrying about weird results. A couple of things to note. Honestly, Tollhouse chocolate chips are not good. Maybe they were good at one point. And if you like them, go for it, but it's a low quality chip. I personally like to get a good bar of dark chocolate and dice it up. If you do this, I recommend sifting the chips after chopping to try and get rid of some of the smaller shards. Don't throw those shards away obviously, but you may want to leave them out of your cookies for aesthetic reasons. In terms of chip brands, you should have good results with Ghirardelli. They're widely available across the US in all kinds of grocery stores and I know some bakers who vouch for them, including myself. If you can find Valrhona chocolate, yes, go for it, it is definitely worth it, but maybe a little expensive and hard to find for your typical Chocolate Chip Cookie.
 
-#Vanilla
+# Vanilla
 There are recipes out there that skip the vanilla. I think this is ridiculous. In my opinion, the vanilla is as essential to the Chocolate Chip Cookie as the chips themselves. And I like a lot of vanilla too. Now, there are a few different kinds of vanilla. You tend to get what you pay for, so please skip the imitation stuff. If you want to go the extra mile, it is worth it to use a vanilla bean as opposed to extract. It's a little pricier, but worth it. You can basically just replace a Tbsp of extract in a recipe with the contents of a vanilla bean. Slice down the bean lengthwise, pin the bean to a dull knife with your thumb, with the inside facing the blade. Pull the bean through, scraping that beautiful paste onto the knife blade. Repeat with the other half and just mix that paste into your recipe when you might have otherwise added the extract.
 
-#Sugar
+# Sugar
 Classic C&H is honestly the best place to start. I understand the desire to try and get a higher quality sugar in your cookies. However, most recipes are going to be built around the most widely available brands. And in the case of sugar, there is a difference. My Mom has used C&H dark brown sugar in her cookies for decades. My grocery store doesn't carry C&H, so I end up using fancier organic brown sugar. The texture is just different, and therefore, the cookies are different. I think it would be worthwhile to build a cookie around a higher quality sugar specifically, but you should assume that most recipes online use standard brands, so start there if you want consistent results.
 
-#Flour
+# Flour
 Flour is fairly consistent in terms of brand. Higher quality isn't going to mean that your recipe is going to get thrown off too much. But we can get into the debate about flour types. I would recommend starting with 100% AP Flour to keep things simple. But you will also see recipes call for Pastry, Cake or Bread flours. Bread flour has a higher protein content than AP and typically appears in recipes that are on the chewy side. Cake and Pastry flours contain less protein than AP and are more refined, Pastry being the most refined. This can yield a lighter, cakier cookie. Again, my advice is to start by nailing a good, standard, all-around Chocolate Cookie with basic ingredients. If you want to dig deeper and search for your heart of hearts cookie recipe, you can adjust from there. It is often said that, if you get a recipe right on the first try, it was an accident.
 
 ## Variations

@@ -27,12 +27,9 @@ function analyzeQueryStructure(phrases) {
       analysisArray.concat(newPhrases)
     }
   });
-
-  console.log("analysis: " + JSON.stringify(analysisArray))
 }
 
 function compressQuery(queryList) {
-  console.log("list: " + JSON.stringify(queryList))
   let mainQuery = {}
   let baseQuery = [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ]
 
@@ -43,11 +40,7 @@ function compressQuery(queryList) {
 }
 
 function switchQueryType(phrase, phraseConfig) {
-
-  console.log("phrase: " + phrase);
   phrase = phrase
-  console.log("phraseConfig: " + JSON.stringify(phraseConfig));
-  console.log("code: " + phraseConfig.code);
 
   // 1 = title
   switch (phraseConfig.code) {
@@ -101,8 +94,6 @@ function switchQueryType(phrase, phraseConfig) {
 function generateMongoQuery(expandedQuery) {
 
   let mappedExpansion = expandedQuery.query.map(phrase => {
-
-    console.log("phrase: " + JSON.stringify(phrase))
 
     if (phrase.$or) {
       return phrase
@@ -190,42 +181,23 @@ function expandPhrase(phrase) {
   }
 
   let splitQuery = phrase.split(" ")
-  console.log("expanding: " + splitQuery)
-
   let length = splitQuery.length
   let stageLength = length
 
-  console.log("entering | length: " + length + ", stage length: " + stageLength )
-
   while (stageLength > 0) {
     let start = 0
-    console.log("decrementing stage size | length: " + length + ", stage length: " + stageLength + ", start: " + start)
-    console.log("---------------------------------------------------")
 
     while (stageLength > 0 && start + stageLength <= length)  {
-
-      console.log("iterating phrases of that stage size | length: " + length + ", stage length: " + stageLength + ", start: " + start)
-
       let currentPhrase = splitQuery.slice(start, start + stageLength).join(' ')
-      console.log("checking: " + currentPhrase)
-
       let pluralMatchExpansion = expandByMatchAndPluralization(currentPhrase)
-      console.log("expansion: " + JSON.stringify(pluralMatchExpansion))
-
-      // expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
       if (pluralMatchExpansion.matched) {
         // ([1,2,3],*[2,3,4]*,[3,4,5])([1]),([5])
-
         if (start > 0 && stageLength > 1) {
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
           let startPhrase = splitQuery.slice(0, start).join(' ')
           let finishPhrase = splitQuery.slice(start + stageLength, length).join(' ')
-
-          console.log("************ split queries **************")
-          console.log("start: " + JSON.stringify(startPhrase))
-          console.log("finish: " + JSON.stringify(finishPhrase))
 
           let startExpansion = expandPhrase(startPhrase)
           expandedPhrase = expandedPhrase.concat(startExpansion)
@@ -235,13 +207,9 @@ function expandPhrase(phrase) {
             expandedPhrase = expandedPhrase.concat(finishExpansion)
           }
 
-          console.log("expandedExpansion: " + JSON.stringify(startExpansion))
-
           stageLength = 0
 
         } else {
-          console.log("adding to expansion: start is 0")
-
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
           splitQuery = splitQuery.slice(stageLength-1, length-1)
@@ -249,14 +217,10 @@ function expandPhrase(phrase) {
           start = 0
           length = splitQuery.length
           stageLength = length
-
         }
 
       } else {
-
         if (stageLength === 1) {
-          console.log("not matched: but just 1 word")
-
           let pluralQuery = {
             $or: pluralMatchExpansion.expansion.map(phrase => {
               return {title: {$regex: phrase, $options: "i"}}
@@ -268,17 +232,10 @@ function expandPhrase(phrase) {
 
         // what do you add to the phrase expansion though?
         start++
-
       }
-
     }
-
     stageLength--
   }
-
-  // let pluralExpandedQuery = expandByMatchAndPluralization(expandedPhrase)
-
-  console.log("final expansion: " + JSON.stringify(expandedPhrase))
 
   return expandedPhrase
 }
@@ -443,22 +400,17 @@ exports.getDescription = (query) => {
 
 exports.checkSearchConfig = (query) => {
   let pluralities = expandByPluralization(query)
-  console.log("pluralities: " + pluralities);
   let phraseConfig = findConfig(pluralities)
-  console.log("config: " + JSON.stringify(phraseConfig));
   return phraseConfig
 }
 
 exports.checkRecipeSearchConfig = (tags) => {
   var config = {}
-
   //TODO: This can certainly be more efficient.
   for (int in tags) {
-    console.log("checking: " + tags[int]);
     var temporaryConfig = this.checkSearchConfig(tags[int])
 
     delete temporaryConfig.description
-    delete temporaryConfig.content
 
     if (!config.parents && temporaryConfig.parents) {
       temporaryConfig.parents.push(tags[int])
@@ -490,11 +442,9 @@ exports.matchTags = (title) => {
 
       let currentPhrase = splitTitle.slice(start, start + stageLength).join(' ')
       let pluralMatchExpansion = expandByMatchAndPluralization(currentPhrase)
-      console.log("expansion: " + JSON.stringify(pluralMatchExpansion))
 
       if (pluralMatchExpansion.matched) {
         let returnedTitleConfig = this.checkRecipeSearchConfig(expandByPluralization(Object.keys(pluralMatchExpansion.expansion[0])[0]))
-        console.log("matched: " + Object.keys(pluralMatchExpansion.expansion[0])[0])
         return returnedTitleConfig
       } else {
         start++
