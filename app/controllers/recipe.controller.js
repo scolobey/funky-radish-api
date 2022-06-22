@@ -199,6 +199,9 @@ exports.findOne = (req, res) => {
               res.send(item);
             });
           }
+          else {
+            return res.status(500).send({ message: "Tags, but no content" });
+          }
         } else {
           let matchedTag = SearchQueryService.matchTags(item.title)
           item.tags = matchedTag
@@ -211,6 +214,9 @@ exports.findOne = (req, res) => {
             }).catch(err => {
               res.send(item);
             });
+          }
+          else {
+            res.send(item);
           }
         }
 

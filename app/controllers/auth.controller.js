@@ -194,9 +194,7 @@ exports.verifyAdmin = (req, res, next) => {
 
 exports.verifySource = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
-  console.log("verifying source... " + token);
-
+  
   const payload = {
     admin: false,
     user: 'guest'

@@ -146,7 +146,6 @@ function expandByMatchAndPluralization(phrase) {
       pluralExpansion.push(singular)
     }
   } else {
-    console.log("not plural");
     let plural = pluralize.plural(phrase)
     if (searchConfig[phrase]) {
       phraseObj[phrase] = searchConfig[phrase]
@@ -163,8 +162,6 @@ function expandByMatchAndPluralization(phrase) {
   }
 
   let paredPluralExpansion = removeDuplicates(pluralExpansion)
-
-  console.log("exp: " + JSON.stringify(paredPluralExpansion));
 
   let returnExpansion = {
     expansion: paredPluralExpansion,
