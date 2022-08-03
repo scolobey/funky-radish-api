@@ -148,6 +148,8 @@ exports.findAllByUser = (req, res) => {
 exports.findOne = (req, res) => {
   let query = req.params.recipeId.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
 
+  console.log("query: " + query);
+
   MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
 
@@ -200,7 +202,7 @@ exports.findOne = (req, res) => {
             });
           }
           else {
-            return res.status(500).send({ message: "Tags, but no content" });
+            res.send(item);
           }
         } else {
           let matchedTag = SearchQueryService.matchTags(item.title)
