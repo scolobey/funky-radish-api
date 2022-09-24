@@ -158,6 +158,8 @@ exports.findOne = (req, res) => {
     var ObjectID = require("mongodb").ObjectID
 
     if (ObjectID.isValid(query) && !query.includes(" ")) {
+      let currentTime = new Date()
+
       db.collection('Recipe')
       .findOne({
         _id: query
@@ -173,8 +175,15 @@ exports.findOne = (req, res) => {
           item.tags = tagConfig
         }
 
+        db.collection('Recipe').updateOne({
+          _id: query
+        }, {
+          $set: {lastUpdated: currentTime}
+        })
+
         res.send(item)
       });
+      
     }
     else {
       db.collection('Recipe')
