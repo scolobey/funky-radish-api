@@ -149,6 +149,8 @@ exports.findOne = (req, res) => {
   let query = req.params.recipeId.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
 
   console.log("query: " + query);
+  console.log("req decode: " + Object.keys(req.decoded));
+  console.log("user: " + req.decoded.userID);
 
   MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
     assert.equal(null, err);
@@ -175,15 +177,17 @@ exports.findOne = (req, res) => {
           item.tags = tagConfig
         }
 
-        db.collection('Recipe').updateOne({
-          _id: query
-        }, {
-          $set: {lastUpdated: currentTime}
-        })
+        if (req.decoded.userID && req.decoded.userID == item.author) {
+          db.collection('Recipe').updateOne({
+            _id: query
+          }, {
+            $set: {lastUpdated: currentTime}
+          })
+        }
 
         res.send(item)
       });
-      
+
     }
     else {
       db.collection('Recipe')

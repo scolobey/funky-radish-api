@@ -194,7 +194,8 @@ exports.verifyAdmin = (req, res, next) => {
 
 exports.verifySource = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
-  
+  var userID = req.body.user || req.query.user || req.headers['user'];
+
   const payload = {
     admin: false,
     user: 'guest'
@@ -203,13 +204,17 @@ exports.verifySource = (req, res, next) => {
   if (token) {
     TokenService.verifyToken(token)
       .then((decoded) => {
+        //check if the user id has been provided.
+        if (userID) {
+          decoded.userID = userID
+        }
         // TODO - If you're logged in, use that token?
         if (decoded.user == "guest") {
           req.decoded = decoded;
           next();
         }
         else {
-          res.json({ message: "You need admin privileges for that.", token: "" });
+          res.json({ message: "You need a token for that.", token: "" });
         }
       }).catch((error) => {
           res.json({ message: "Invalid token.", token: "", error: error });
