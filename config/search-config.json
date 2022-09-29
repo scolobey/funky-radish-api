@@ -6,7 +6,8 @@
       "tiki cocktails",
       "classic cocktails",
       "day drinking",
-      "virgin cocktails"
+      "virgin cocktails",
+      "shots"
     ],
     "parents": [
       "home"
@@ -45,6 +46,19 @@
       "tiki cocktails"
     ],
     "content": "singapore_sling_blog_post.md"
+  },
+  "shots": {
+    "code": 2,
+    "description": "A cocktail is an alcoholic mixed drink. The origins of the word are often debated. The term in its modern usage appears to have originated in the United States  in the early 1800's.",
+    "children": [
+      "tequilla shots",
+      "vodka shots",
+      "jello shots"
+    ],
+    "parents": [
+      "home",
+      "cocktails"
+    ]
   },
   "classic cocktail": {
     "code": 2,
@@ -149,6 +163,16 @@
     "code": 4,
     "count": 270,
     "description": "Romaine or cos lettuce is a variety of lettuce that grows in a tall head of sturdy dark green leaves with firm ribs down their centers. Unlike most lettuces, it is tolerant of heat. In North America, romaine is sold as whole heads or as “hearts” that have had the outer leaves removed and are often packaged together."
+  },
+  "vodka": {
+    "code": 4,
+    "description": "A clear colored spirit, commonly distilled from potatoes."
+  },
+  "gin": {
+    "code": 4
+  },
+  "whiskey": {
+    "code": 4
   },
   "black olives": {
     "code": 4,
