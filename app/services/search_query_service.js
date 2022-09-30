@@ -176,6 +176,7 @@ function expandPhrase(phrase) {
 
   let expandedPhrase = []
   if (!phrase || phrase.length === 0) {
+    console.log("nothing to expand");
     return expandedPhrase
   }
 
@@ -187,9 +188,7 @@ function expandPhrase(phrase) {
   while (stageLength > 0) {
     let start = 0
 
-    console.log("grouping [" + start + ", " + stageLength + "]");
-
-    while (stageLength > 0 && start + stageLength <= length)  {
+    while (stageLength > 0 && start + stageLength <= length && stageLength != 0)  {
       let currentPhrase = splitQuery.slice(start, start + stageLength).join(' ')
       console.log("examining: " + currentPhrase);
 
@@ -199,7 +198,7 @@ function expandPhrase(phrase) {
       if (pluralMatchExpansion.matched) {
 
         if (start > 0 && stageLength > 1) {
-
+          console.log("start more than 0 and stage more than 1");
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
           let startPhrase = splitQuery.slice(0, start).join(' ')
@@ -214,13 +213,15 @@ function expandPhrase(phrase) {
           }
 
           stageLength = 0
-        } else {
+        }  else {
           // add the phrase to the expansion
           // remove the phrase from the query
           // (start over) set the start to the beginning and reset the length
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
-          splitQuery = splitQuery.splice(start+1, stageLength)
+          // what if we want the main phrase expanded?
+          splitQuery = splitQuery.splice(start+1, stageLength+1)
+          console.log("out: " + splitQuery);
 
           start = 0
           length = splitQuery.length
@@ -242,6 +243,7 @@ function expandPhrase(phrase) {
         start++
       }
     }
+
     stageLength--
   }
 

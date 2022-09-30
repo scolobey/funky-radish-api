@@ -60,6 +60,14 @@
       "cocktails"
     ]
   },
+  "tequila shots": {
+    "children": [],
+    "parents": [
+      "home",
+      "cocktails",
+      "shots"
+    ]
+  },
   "classic cocktail": {
     "code": 2,
     "description": "Classic cocktails typically refers to cocktails that are very widely recognized and have a history of popularity. Regularly included in this category: the Old Fashioned, the Manhattan, Martinis, Margaritas, etc.",
