@@ -4,8 +4,6 @@ const searchConfig = require('../../config/search-config.json')
 // query structures and process
 // https://docs.google.com/document/d/1_pveDDTd-s2K1POHEsHv09I-D0BL2s_LWXSRw8QSORQ/edit
 
-// function orderByLength()
-
 function processPhrase(phrase) {
   let analysisArray = []
   // remove last element. remove first element.
@@ -65,7 +63,7 @@ function switchQueryType(phrase, phraseConfig) {
     // 3 = title + category TODO
     case 3: {
       let query = {
-          $or: phrase
+          $or: [{title: { $regex: "(^| +|\\()" + phrase + "( +|$|\\))", $options: "i" }}, {tags: phrase.trim()}]
       }
 
       return query
@@ -198,7 +196,6 @@ function expandPhrase(phrase) {
       if (pluralMatchExpansion.matched) {
 
         if (start > 0 && stageLength > 1) {
-          console.log("start more than 0 and stage more than 1");
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
           let startPhrase = splitQuery.slice(0, start).join(' ')
@@ -219,9 +216,7 @@ function expandPhrase(phrase) {
           // (start over) set the start to the beginning and reset the length
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
-          // what if we want the main phrase expanded?
-          splitQuery = splitQuery.splice(start+1, stageLength+1)
-          console.log("out: " + splitQuery);
+          splitQuery.splice(start, stageLength)
 
           start = 0
           length = splitQuery.length

@@ -61,6 +61,7 @@
     ]
   },
   "tequila shots": {
+    "code": 3,
     "children": [],
     "parents": [
       "home",
