@@ -146,7 +146,7 @@ exports.findAllByUser = (req, res) => {
 
 // Find a single recipe with a recipeId
 exports.findOne = (req, res) => {
-  let query = req.params.recipeId.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(" ", "(-|\s)")
+  let query = req.params.recipeId.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/ /g, "(-|\\s)")
 
   console.log("query: " + query);
   console.log("req decode: " + Object.keys(req.decoded));
