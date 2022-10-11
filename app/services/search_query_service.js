@@ -94,94 +94,66 @@ function generateMongoQuery(expandedQuery) {
   let mappedExpansion = expandedQuery.query.map(phrase => {
 
     if (phrase.$or) {
+      // this checks for those singled out words as added to the expandedPhrase in expandPhrase
       return phrase
     } else {
+      // otherwise we handle the phrase structure.
       let phraseString = Object.keys(phrase)[0]
       let phraseDictionary = phrase[Object.keys(phrase)[0]]
       return switchQueryType(phraseString, phraseDictionary)
     }
-
-    // if (typeof phrase === 'object' && phrase[Object.keys(phrase)[0]]) {
-    //   let phraseString = Object.keys(phrase)[0]
-    //   let phraseDictionary = phrase[Object.keys(phrase)[0]]
-    //   return switchQueryType(phraseString, phraseDictionary, ["butter"])
-    // } else {
-    //   return query
-    // }
 
   })
 
   return mappedExpansion
 }
 
-function removeDuplicates(phraseSet) {
-  let uniquePhraseSet = phraseSet.filter(function(item, pos) {
-    return phraseSet.indexOf(item) == pos;
-  })
-
-  return uniquePhraseSet
-}
-
-function regexExpansion(set) {
-  console.log("set: " + JSON.stringify(set));
-
-  // return set.map(phrase => {
-  //   return phrase.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/ /g, "(-|\\s)")
-  // })
-}
-
 function expandByMatchAndPluralization(phrase) {
-  var pluralExpansion = []
-  let phraseObj = {}
-  let matched = false
+  let pluralArray = []
+  pluralArray.push(phrase)
 
+  var pluralExpansion = []
+
+  // Find the plural or singular respectively.
   if (pluralize.isPlural(phrase)) {
     let singular = pluralize.singular(phrase)
-
-    if (searchConfig[singular]) {
-      phraseObj[singular] = searchConfig[singular]
-      pluralExpansion.push(phraseObj)
-      matched = true
-    } else if (searchConfig[phrase]) {
-      phraseObj[phrase] = searchConfig[phrase]
-      pluralExpansion.push(phraseObj)
-      matched = true
-    } else {
-      console.log("no match: " + phrase + " : " + singular);
-      pluralExpansion.push(phrase)
-      pluralExpansion.push(singular)
+    if (singular != phrase) {
+        pluralArray.push(singular)
     }
   } else {
     let plural = pluralize.plural(phrase)
-    if (searchConfig[phrase]) {
-      phraseObj[phrase] = searchConfig[phrase]
-      pluralExpansion.push(phraseObj)
-      matched = true
-    } else if (searchConfig[plural]) {
-      phraseObj[plural] = searchConfig[plural]
-      pluralExpansion.push(phraseObj)
-      matched = true
-    } else {
-      pluralExpansion.push(phrase)
-      pluralExpansion.push(pluralize.plural(phrase))
+    if (plural != phrase) {
+        pluralArray.push(plural)
     }
   }
 
-  let paredPluralExpansion = removeDuplicates(pluralExpansion)
-  let paredRegexExpansion = regexExpansion(paredPluralExpansion)
-
-  let returnExpansion = {
-    expansion: paredPluralExpansion,
-    matched: matched
+  // Check for matching of either singular or polural
+  if (searchConfig[pluralArray[0]]) {
+    let phraseObject = {}
+    phraseObject[pluralArray[0]] = searchConfig[pluralArray[0]]
+    return { expansion: [phraseObject], matched: true}
+  } else if (searchConfig[pluralArray[1]]) {
+    let phraseObject = {}
+    phraseObject[pluralArray[1]] = searchConfig[pluralArray[1]]
+    return { expansion: [phraseObject], matched: true}
+  } else {
+    return { expansion: pluralArray, matched: false}
   }
+}
 
-  return returnExpansion
+function expandByMatch(phrase) {
+  if (searchConfig[phrase]) {
+
+  } else {
+
+  }
 }
 
 function expandPhrase(phrase) {
   console.log("expanding: " + phrase);
 
   let expandedPhrase = []
+
   if (!phrase || phrase.length === 0) {
     console.log("nothing to expand");
     return expandedPhrase
@@ -191,22 +163,32 @@ function expandPhrase(phrase) {
   let length = splitQuery.length
   let stageLength = length
 
+  // The following while statement should work like this...
   // ([1,2,3],*[2,3,4]*,[3,4,5])([1]),([5])
+
+  // as long as the stageLength is greater than 0
+  // keep goin.
   while (stageLength > 0) {
     let start = 0
 
+    // as long as the stageLength is greater than 0
+    // and the specified segment doesn't extend beyond the array
+    // we keep goin.
     while (stageLength > 0 && start + stageLength <= length && stageLength != 0)  {
-      let currentPhrase = splitQuery.slice(start, start + stageLength).join(' ')
-      console.log("examining: " + currentPhrase);
 
+      let currentPhrase = splitQuery.slice(start, start + stageLength).join(' ')
       let pluralMatchExpansion = expandByMatchAndPluralization(currentPhrase)
 
-      //check if the phrase or its plural are matched.
+      //check if the phrase was matched.
       if (pluralMatchExpansion.matched) {
-
         if (start > 0 && stageLength > 1) {
+          // if the subphrase was matched
+          // and it does not include the beginning of the parent phrase
+          // and the phrase is longer than 1 word
+          // add it's expansion to the expandedPhrase array.
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
 
+          // then expand the surrounding sub phrases.
           let startPhrase = splitQuery.slice(0, start).join(' ')
           let finishPhrase = splitQuery.slice(start + stageLength, length).join(' ')
 
@@ -218,9 +200,13 @@ function expandPhrase(phrase) {
             expandedPhrase = expandedPhrase.concat(finishExpansion)
           }
 
+          // This stage should be completed.
           stageLength = 0
         }  else {
-          // add the phrase to the expansion
+          // if the subphrase was matched
+          // but it either includes the beginning of the parent phrase
+          // or the phrase is only 1 word or less
+          // add it's expansion to the expandedPhrase array.
           // remove the phrase from the query
           // (start over) set the start to the beginning and reset the length
           expandedPhrase = expandedPhrase.concat(pluralMatchExpansion.expansion)
@@ -233,7 +219,11 @@ function expandPhrase(phrase) {
           stageLength = length
         }
       } else {
+
         if (stageLength === 1) {
+          // if the phrase was not matched
+          // and the phrase is only 1 word long.
+          // add a cue to search for that word and its plural in the title in the expandedPhrase
           let pluralQuery = {
             $or: pluralMatchExpansion.expansion.map(phrase => {
               return {title: {$regex: phrase, $options: "i"}}
@@ -243,11 +233,13 @@ function expandPhrase(phrase) {
           expandedPhrase = expandedPhrase.concat(pluralQuery)
         }
 
-        // what do you add to the phrase expansion though?
+        // if the phrase was not matched
+        // but it is loger than 1 word, move the start forward without adding to the expandedPhrase.
+
         start++
       }
-    }
 
+    }
     stageLength--
   }
 
@@ -305,12 +297,8 @@ function handleWithWithout(query) {
   return segmentedQuery
 }
 
-function removeJunkWords(query) {
-  return query.replace(/ and /g, ' ')
-}
-
-function cleanQuery(query) {
-  return query.replace(/-/g, ' ')
+function removeJunk(query) {
+  return query.replace(/ and /g, ' ').replace(/-/g, ' ')
 }
 
 function formatQuery(query) {
@@ -320,7 +308,7 @@ function formatQuery(query) {
       without: [],
   }
 
-  let cleanQuery = removeJunkWords(query)
+  let cleanQuery = removeJunk(query)
 
   if (cleanQuery.includes(" with")) {
     segmentedQuery = handleWithWithout(cleanQuery)
@@ -349,13 +337,10 @@ function formatQuery(query) {
 
 
 exports.build = (query) => {
-  // Remove some weird characters
-  let cleanedQuery = cleanQuery(query)
-
-  let structuredQuery = formatQuery(cleanedQuery)
+  let structuredQuery = formatQuery(query)
   let expandedQuery = expandQuery(structuredQuery)
 
-  console.log("query so far: " + JSON.stringify(expandedQuery))
+  console.log("query after expansion: " + JSON.stringify(expandedQuery))
 
   let mongoQuery = generateMongoQuery(expandedQuery)
 

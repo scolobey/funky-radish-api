@@ -25,7 +25,7 @@ exports.search = async (req, res) => {
     let page = req.params.page || 1
 
     let mongoQuery = SearchQueryService.build(query)
-    let phraseConfig = SearchQueryService.checkSearchConfig(query)
+    let phraseConfig = SearchQueryService.checkSearchConfig(query.replace(/-/g, ' '))
 
     var cursor = db.collection('Recipe')
     .find(mongoQuery)
