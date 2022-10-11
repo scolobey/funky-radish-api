@@ -123,9 +123,11 @@ function removeDuplicates(phraseSet) {
 }
 
 function regexExpansion(set) {
-  return set.map(phrase => {
-    return phrase.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/ /g, "(-|\\s)")
-  })
+  console.log("set: " + JSON.stringify(set));
+
+  // return set.map(phrase => {
+  //   return phrase.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/ /g, "(-|\\s)")
+  // })
 }
 
 function expandByMatchAndPluralization(phrase) {
@@ -169,7 +171,7 @@ function expandByMatchAndPluralization(phrase) {
   let paredRegexExpansion = regexExpansion(paredPluralExpansion)
 
   let returnExpansion = {
-    expansion: paredRegexExpansion,
+    expansion: paredPluralExpansion,
     matched: matched
   }
 
@@ -307,6 +309,10 @@ function removeJunkWords(query) {
   return query.replace(/ and /g, ' ')
 }
 
+function cleanQuery(query) {
+  return query.replace(/-/g, ' ')
+}
+
 function formatQuery(query) {
   let segmentedQuery = {
       query: [],
@@ -343,7 +349,10 @@ function formatQuery(query) {
 
 
 exports.build = (query) => {
-  let structuredQuery = formatQuery(query)
+  // Remove some weird characters
+  let cleanedQuery = cleanQuery(query)
+
+  let structuredQuery = formatQuery(cleanedQuery)
   let expandedQuery = expandQuery(structuredQuery)
 
   console.log("query so far: " + JSON.stringify(expandedQuery))
