@@ -122,6 +122,14 @@ function removeDuplicates(phraseSet) {
   return uniquePhraseSet
 }
 
+function regexExpansion(set) {
+  let regexExpandedSet = set.map(phrase => {
+    return phrase.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/ /g, "(-|\\s)")
+  })
+
+  return regexExpandedSet
+}
+
 function expandByMatchAndPluralization(phrase) {
   var pluralExpansion = []
   let phraseObj = {}
@@ -160,9 +168,12 @@ function expandByMatchAndPluralization(phrase) {
   }
 
   let paredPluralExpansion = removeDuplicates(pluralExpansion)
+  let regexPluralExpansion = regexExpansion(paredPluralExpansion)
+
+  console.log("expansion: " + regexExpansion(paredPluralExpansion));
 
   let returnExpansion = {
-    expansion: paredPluralExpansion,
+    expansion: regexPluralExpansion,
     matched: matched
   }
 
