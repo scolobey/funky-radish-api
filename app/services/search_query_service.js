@@ -38,7 +38,7 @@ function compressQuery(queryList) {
 }
 
 function switchQueryType(phrase, phraseConfig) {
-  phrase = phrase
+  phrase = phrase.replace(/ /g, "(-|\\s)")
 
   // 1 = title
   switch (phraseConfig.code) {
@@ -90,19 +90,16 @@ function switchQueryType(phrase, phraseConfig) {
 }
 
 function generateMongoQuery(expandedQuery) {
-
   let mappedExpansion = expandedQuery.query.map(phrase => {
 
+    // Check for singled out words as added to the expandedPhrase in expandPhrase
     if (phrase.$or) {
-      // this checks for those singled out words as added to the expandedPhrase in expandPhrase
       return phrase
     } else {
-      // otherwise we handle the phrase structure.
       let phraseString = Object.keys(phrase)[0]
       let phraseDictionary = phrase[Object.keys(phrase)[0]]
       return switchQueryType(phraseString, phraseDictionary)
     }
-
   })
 
   return mappedExpansion
@@ -226,7 +223,7 @@ function expandPhrase(phrase) {
           // add a cue to search for that word and its plural in the title in the expandedPhrase
           let pluralQuery = {
             $or: pluralMatchExpansion.expansion.map(phrase => {
-              return {title: {$regex: phrase, $options: "i"}}
+              return {title: {$regex: phrase.replace(/ /g, "(-|\\s)"), $options: "i"}}
             })
           }
 
@@ -343,7 +340,6 @@ exports.build = (query) => {
   console.log("query after expansion: " + JSON.stringify(expandedQuery))
 
   let mongoQuery = generateMongoQuery(expandedQuery)
-
   let compressedQuery = compressQuery(mongoQuery)
 
   console.log("returning query: " + JSON.stringify(compressedQuery))
