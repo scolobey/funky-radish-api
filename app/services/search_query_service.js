@@ -38,6 +38,7 @@ function compressQuery(queryList) {
 }
 
 function switchQueryType(phrase, phraseConfig) {
+  let tagPhrase = phrase.trim()
   phrase = phrase.replace(/ /g, "(-|\\s)")
 
   // 1 = title
@@ -54,7 +55,7 @@ function switchQueryType(phrase, phraseConfig) {
     case 2: {
       // Add a search clause to search for tagged recipes.
       let query = {
-          tags: phrase.trim()
+          tags: tagPhrase
       }
 
       return query
@@ -63,7 +64,7 @@ function switchQueryType(phrase, phraseConfig) {
     // 3 = title + category TODO
     case 3: {
       let query = {
-          $or: [{title: { $regex: "(^| +|\\()" + phrase + "( +|$|\\))", $options: "i" }}, {tags: phrase.trim()}]
+          $or: [{title: { $regex: "(^| +|\\()" + phrase + "( +|$|\\))", $options: "i" }}, {tags: tagPhrase}]
       }
 
       return query
