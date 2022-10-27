@@ -170,6 +170,7 @@ exports.verifyToken = (req, res, next) => {
 
 exports.verifyAdmin = (req, res, next) => {
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  console.log("verifying admin");
 
   if (token) {
     TokenService.verifyToken(token)

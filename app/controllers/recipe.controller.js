@@ -131,6 +131,56 @@ exports.findAll = (req, res) => {
   });
 }
 
+// Retrieve recipes owned by user specified in token.
+exports.findDuplicates = (req, res) => {
+
+  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+    assert.equal(null, err);
+
+    const db = client.db("funky_radish_db")
+
+    var cursor = db.collection('Recipe')
+    .aggregate([
+      { $sortByCount: '$title' }
+    ])
+    .limit(30)
+    .toArray(function(err, docs) {
+      assert.equal(err, null);
+
+      let response = {
+        recipes: docs
+      }
+
+      res.send(response);
+    })
+  });
+
+}
+
+exports.perfectSearch = (req, res) => {
+  let query = req.params.query
+
+  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
+    assert.equal(null, err);
+
+    const db = client.db("funky_radish_db")
+
+    var cursor = db.collection('Recipe')
+    .find({title: query})
+    .limit(30)
+    .toArray(function(err, docs) {
+      assert.equal(err, null);
+
+      let response = {
+        recipes: docs
+      }
+
+      res.send(response);
+    })
+  });
+
+}
+
 // Retrieve and return all recipes corresponding to a specific user from the database.
 exports.findAllByUser = (req, res) => {
   Recipe.find({author: {_id: req.params.userId}})

@@ -7,6 +7,12 @@ module.exports = function (app) {
     app.get('/recipes/:query/:page', Auth.verifySource, recipes.search);
     app.get('/recipes/:query', Auth.verifySource, recipes.search);
 
+    // retrieve recipes with duplicate titles
+    app.get('/duplicates', Auth.verifyAdmin, recipes.findDuplicates);
+
+    // perfect match search
+    app.get('/perfect/:query', Auth.verifySource, recipes.perfectSearch);
+
     // Retrieve all Recipes belonging to anyone
     app.get('/admin/recipes', recipes.returnAllRecipes);
 
