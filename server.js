@@ -3,7 +3,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const config = require('config');
 const mongoose = require('mongoose');
-const PORT = process.env.PORT || 8080
+const MongoClient = require('mongodb').MongoClient;
+const PORT = process.env.PORT || 8080;
 const DBHost = process.env.DBHost || config.get('DBHost');
 
 const SchedulerService = require('./app/services/scheduler_service.js');
@@ -55,7 +56,15 @@ require('./app/routes/newsletter.routes.js')(app);
 // Launch scheduled launchScheduledTasks
 SchedulerService.launchScheduledTasks()
 
-// listen for requests
-app.listen(PORT, () =>
-  console.log(`Listening on ${ PORT }`)
-);
+MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
+  if (err) {
+    logger.warn(`Failed to connect to the database. ${err.stack}`);
+  }
+
+  app.locals.db = client.db("funky_radish_db");
+
+  // listen for requests
+  app.listen(PORT, () =>
+    console.log(`Listening on ${ PORT }`)
+  );
+});

@@ -2,10 +2,8 @@ const Recipe = require('../models/recipe.model.js');
 const User = require('../models/user.model.js');
 const EmailService = require('../services/email_service.js');
 
-const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const config = require('config');
-const DBHost = process.env.DBHost || config.get('DBHost');
 
 const TokenService = require('../services/token_service.js');
 const SpoonacularService = require('../services/spoonacular_service.js');
@@ -16,53 +14,50 @@ const ContentRetrievalService = require('../services/content_retrieval_service.j
 exports.search = async (req, res) => {
   console.log("Searching for recipes.")
 
-  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
-    assert.equal(null, err);
+  const db = req.app.locals.db
 
-    const db = client.db("funky_radish_db")
+  let query = req.params.query.replace("(", "").replace(")", "")
+  let page = req.params.page || 1
 
-    let query = req.params.query.replace("(", "").replace(")", "")
-    let page = req.params.page || 1
+  let mongoQuery = SearchQueryService.build(query)
+  let phraseConfig = SearchQueryService.checkSearchConfig(query.replace(/-/g, ' '))
 
-    let mongoQuery = SearchQueryService.build(query)
-    let phraseConfig = SearchQueryService.checkSearchConfig(query.replace(/-/g, ' '))
+  var cursor = db.collection('Recipe')
+  .find(mongoQuery)
+  .skip((page-1)*30)
+  .limit(30)
+  .toArray(function(err, docs) {
+    assert.equal(err, null);
 
-    var cursor = db.collection('Recipe')
-    .find(mongoQuery)
-    .skip((page-1)*30)
-    .limit(30)
-    .toArray(function(err, docs) {
-      assert.equal(err, null);
+    docs.forEach((item, i) => {
+      item.directions = item.direction_list
+      item.ingredients = item.ingredient_list
 
-      docs.forEach((item, i) => {
-        item.directions = item.direction_list
-        item.ingredients = item.ingredient_list
+      delete item.direction_list
+      delete item.ingredient_list
+    });
 
-        delete item.direction_list
-        delete item.ingredient_list
-      });
+    let response = {
+      recipes: docs
+    }
 
-      let response = {
-        recipes: docs
-      }
+    if (phraseConfig) {
+      response.config = phraseConfig
+    }
 
-      if (phraseConfig) {
-        response.config = phraseConfig
-      }
-
-      if (phraseConfig.content) {
-        ContentRetrievalService.getContent(phraseConfig.content)
-        .then(markdown => {
-          response.config.content = markdown
-          res.send(response);
-        }).catch(err => {
-          res.send(response);
-        });
-      } else {
+    if (phraseConfig.content) {
+      ContentRetrievalService.getContent(phraseConfig.content)
+      .then(markdown => {
+        response.config.content = markdown
         res.send(response);
-      }
-    })
-  });
+      }).catch(err => {
+        res.send(response);
+      });
+    } else {
+      res.send(response);
+    }
+  })
+
 }
 
 // Retrieve all recipes if you have admin privileges.
@@ -77,46 +72,44 @@ exports.returnAllRecipes = (req, res) => {
       });
     });
 
-  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
-    assert.equal(null, err);
-    const db = client.db("funky_radish_db")
+  const db = req.app.locals.db
 
-    var cursor = db.collection('Recipe').aggregate([
-        {
-           $lookup: {
-             from: "Ingredient",
-             localField: "ingredients",
-             foreignField: "_id",
-             as: "ingredient_list"
-           }
-        },
-        {
-           $lookup: {
-             from: "Direction",
-             localField: "directions",
-             foreignField: "_id",
-             as: "direction_list"
-           }
-        },
-       {
-          $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$ingredient_list", 0 ] }, "$$ROOT" ] } }
-       },
-       { $project: { fromItems: 0 } }
-    ])
-    .toArray(function(err, docs) {
-      assert.equal(err, null);
+  var cursor = db.collection('Recipe').aggregate([
+      {
+         $lookup: {
+           from: "Ingredient",
+           localField: "ingredients",
+           foreignField: "_id",
+           as: "ingredient_list"
+         }
+      },
+      {
+         $lookup: {
+           from: "Direction",
+           localField: "directions",
+           foreignField: "_id",
+           as: "direction_list"
+         }
+      },
+     {
+        $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$ingredient_list", 0 ] }, "$$ROOT" ] } }
+     },
+     { $project: { fromItems: 0 } }
+  ])
+  .toArray(function(err, docs) {
+    assert.equal(err, null);
 
-      docs.forEach((item, i) => {
-        item.directions = item.direction_list
-        item.ingredients = item.ingredient_list
+    docs.forEach((item, i) => {
+      item.directions = item.direction_list
+      item.ingredients = item.ingredient_list
 
-        delete item.direction_list
-        delete item.ingredient_list
-      });
+      delete item.direction_list
+      delete item.ingredient_list
+    });
 
-      res.send(docs);
-    })
-  });
+    res.send(docs);
+  })
+
 }
 
 // Retrieve recipes owned by user specified in token.
@@ -134,38 +127,33 @@ exports.findAll = (req, res) => {
 // Retrieve recipes owned by user specified in token.
 exports.findDuplicates = (req, res) => {
 
-  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
-    assert.equal(null, err);
+  const db = req.app.locals.db
 
-    const db = client.db("funky_radish_db")
+  var cursor = db.collection('Recipe')
+  .aggregate([
+    {"$group" : { "_id": "$title", "count": { "$sum": 1 } } },
+    {"$match": {"_id" :{ "$ne" : null } , "count" : {"$gt": 1} } },
+    {"$project": {"title" : "$_id", "_id" : 0} }
+  ])
+  .toArray(function(err, docs) {
+    assert.equal(err, null);
 
-    var cursor = db.collection('Recipe')
-    .aggregate([
-      { $sortByCount: '$title' }
-    ])
-    .limit(30)
-    .toArray(function(err, docs) {
-      assert.equal(err, null);
+    console.log("resp length: " + docs.length);
 
-      let response = {
-        recipes: docs
-      }
+    let response = {
+      recipes: docs
+    }
 
-      res.send(response);
-    })
-  });
+    res.send(response);
+  })
 
 }
 
 exports.perfectSearch = (req, res) => {
   let query = req.params.query
+  const db = req.app.locals.db
 
-  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
-    assert.equal(null, err);
-
-    const db = client.db("funky_radish_db")
-
-    var cursor = db.collection('Recipe')
+  var cursor = db.collection('Recipe')
     .find({title: query})
     .limit(30)
     .toArray(function(err, docs) {
@@ -177,7 +165,6 @@ exports.perfectSearch = (req, res) => {
 
       res.send(response);
     })
-  });
 
 }
 
@@ -199,95 +186,89 @@ exports.findOne = (req, res) => {
   let query = req.params.recipeId.replace(/-/g, ' ').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/ /g, "(-|\\s)")
 
   console.log("query: " + query);
-  console.log("req decode: " + Object.keys(req.decoded));
-  console.log("user: " + req.decoded.userID);
 
-  MongoClient.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true }, function(err, client) {
-    assert.equal(null, err);
+  const db = req.app.locals.db
 
-    const db = client.db("funky_radish_db")
+  var ObjectID = require("mongodb").ObjectID
 
-    var ObjectID = require("mongodb").ObjectID
+  if (ObjectID.isValid(query) && !query.includes(" ")) {
+    let currentTime = new Date()
 
-    if (ObjectID.isValid(query) && !query.includes(" ")) {
-      let currentTime = new Date()
+    db.collection('Recipe')
+    .findOne({
+      _id: query
+    }, function(err, item) {
+      assert.equal(null, err);
 
-      db.collection('Recipe')
-      .findOne({
-        _id: query
-      }, function(err, item) {
-        assert.equal(null, err);
+      if (item == null) {
+        return res.status(500).send({ message: "No recipe matches that title." });
+      }
 
-        if (item == null) {
-          return res.status(500).send({ message: "No recipe matches that title." });
-        }
+      if (item.tags && item.tags.length > 0) {
+        let tagConfig = SearchQueryService.checkRecipeSearchConfig(item.tags)
+        item.tags = tagConfig
+      }
 
-        if (item.tags && item.tags.length > 0) {
-          let tagConfig = SearchQueryService.checkRecipeSearchConfig(item.tags)
-          item.tags = tagConfig
-        }
+      if (req.decoded.userID && req.decoded.userID == item.author) {
+        db.collection('Recipe').updateOne({
+          _id: query
+        }, {
+          $set: {lastUpdated: currentTime}
+        })
+      }
 
-        if (req.decoded.userID && req.decoded.userID == item.author) {
-          db.collection('Recipe').updateOne({
-            _id: query
-          }, {
-            $set: {lastUpdated: currentTime}
-          })
-        }
+      res.send(item)
+    });
 
-        res.send(item)
-      });
+  }
+  else {
+    db.collection('Recipe')
+    .findOne({
+      $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
+      title : { '$regex' : query, '$options' : 'iu' }
+    }, function(err, item) {
+      assert.equal(null, err);
 
-    }
-    else {
-      db.collection('Recipe')
-      .findOne({
-        $or: [ { author: "61e1e4cafbb17b00164fc738" }, { author: "61b690c3f1273900d0fb6ca4" }, { author: "6219a8c99d61adca80c6d027" } ],
-        title : { '$regex' : query, '$options' : 'iu' }
-      }, function(err, item) {
-        assert.equal(null, err);
+      if (item == null) {
+        return res.status(500).send({ message: "No recipe matches that title." });
+      }
 
-        if (item == null) {
-          return res.status(500).send({ message: "No recipe matches that title." });
-        }
+      if (item.tags && item.tags.length > 0) {
+        let tagConfig = SearchQueryService.checkRecipeSearchConfig(item.tags)
+        item.tags = tagConfig
 
-        if (item.tags && item.tags.length > 0) {
-          let tagConfig = SearchQueryService.checkRecipeSearchConfig(item.tags)
-          item.tags = tagConfig
-
-          if (item.tags.content) {
-            ContentRetrievalService.getContent(item.tags.content)
-            .then(markdown => {
-              item.tags.content = markdown
-              res.send(item);
-            }).catch(err => {
-              res.send(item);
-            });
-          }
-          else {
+        if (item.tags.content) {
+          ContentRetrievalService.getContent(item.tags.content)
+          .then(markdown => {
+            item.tags.content = markdown
             res.send(item);
-          }
-        } else {
-          let matchedTag = SearchQueryService.matchTags(item.title)
-          item.tags = matchedTag
-
-          if (item.tags.content) {
-            ContentRetrievalService.getContent(item.tags.content)
-            .then(markdown => {
-              item.tags.content = markdown
-              res.send(item);
-            }).catch(err => {
-              res.send(item);
-            });
-          }
-          else {
+          }).catch(err => {
             res.send(item);
-          }
+          });
         }
+        else {
+          res.send(item);
+        }
+      } else {
+        let matchedTag = SearchQueryService.matchTags(item.title)
+        item.tags = matchedTag
 
-      });
-    }
-  });
+        if (item.tags.content) {
+          ContentRetrievalService.getContent(item.tags.content)
+          .then(markdown => {
+            item.tags.content = markdown
+            res.send(item);
+          }).catch(err => {
+            res.send(item);
+          });
+        }
+        else {
+          res.send(item);
+        }
+      }
+
+    });
+  }
 };
 
 // Find a single recipe with a recipeId
