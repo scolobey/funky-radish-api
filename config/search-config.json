@@ -100,7 +100,7 @@
     "parents": [
       "home",
       "cocktails",
-      "classic coktails"
+      "classic cocktails"
     ]
   },
   "old fashioned": {
@@ -108,7 +108,7 @@
     "parents": [
       "home",
       "cocktails",
-      "classic coktails"
+      "classic cocktails"
     ]
   },
   "margarita": {
@@ -116,7 +116,7 @@
     "parents": [
       "home",
       "cocktails",
-      "classic coktails"
+      "classic cocktails"
     ]
   },
   "tom collins": {
@@ -124,7 +124,7 @@
     "parents": [
       "home",
       "cocktails",
-      "classic coktails"
+      "classic cocktails"
     ]
   },
   "bloody mary": {
@@ -300,6 +300,18 @@
   "grilled chicken breasts": {
     "code": 4,
     "count": 5
+  },
+  "urheri": {
+    "code": 4,
+    "description": "Urheri (a.k.a. Grains of Selim) is a spice used in many African cuisines. the spice is derived from the seed pod of an African shrub.",
+    "children": [],
+    "parents": [
+      "home"
+    ]
+  },
+  "grains of selim": {
+    "code": 4,
+    "description": "Urheri (a.k.a. Grains of Selim) is a spice used in many African cuisines. the spice is derived from the seed pod of an African shrub."
   },
   "garlic powder": {
     "code": 4,
