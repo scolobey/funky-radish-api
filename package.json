@@ -21,7 +21,7 @@
     "bcrypt": "^=5.0.0",
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.10",
-    "config": "^1.30.0",
+    "config": "^3.3.8",
     "cors": "^2.8.5",
     "express": "^4.16.3",
     "googleapis": "^39.2.0",
