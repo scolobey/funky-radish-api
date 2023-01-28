@@ -60,6 +60,36 @@ exports.search = async (req, res) => {
 
 }
 
+// Return Recently edited recipes.
+exports.recentRecipes = async (req, res) => {
+  console.log("grabbing recent recipes.")
+
+  const db = req.app.locals.db
+
+  var cursor = db.collection('Recipe')
+  .find({lastUpdated: {$exists: true}})
+  .limit(10)
+  .sort({lastUpdated: -1})
+  .toArray(function(err, docs) {
+    assert.equal(err, null);
+
+    docs.forEach((item, i) => {
+      item.directions = item.direction_list
+      item.ingredients = item.ingredient_list
+
+      delete item.direction_list
+      delete item.ingredient_list
+    });
+
+    let response = {
+      recipes: docs
+    }
+
+    res.send(response);
+  })
+
+}
+
 // Retrieve all recipes if you have admin privileges.
 exports.returnAllRecipes = (req, res) => {
   Recipe.find({author: {_id: req.params.userId}})
