@@ -7,7 +7,7 @@ module.exports = function (app) {
     app.get('/recipes/:query/:page', Auth.verifySource, recipes.search);
     app.get('/recipes/:query', Auth.verifySource, recipes.search);
 
-    app.get('/recentRecipes', Auth.verifySource, recipes.recentRecipes);
+    app.get('/recentRecipes', recipes.recentRecipes);
 
     // retrieve recipes with duplicate titles
     app.get('/duplicates', Auth.verifyAdmin, recipes.findDuplicates);
