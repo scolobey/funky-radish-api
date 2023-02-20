@@ -49,7 +49,9 @@ mongoose.connect(DBHost, { useNewUrlParser: true, useUnifiedTopology: true })
 // Define routes
 require('./app/routes/authenticate.routes.js')(app);
 require('./app/routes/user.routes.js')(app);
+require('./app/routes/admin.routes.js')(app);
 require('./app/routes/recipe.routes.js')(app);
+require('./app/routes/ingredient.routes.js')(app);
 require('./app/routes/collector.routes.js')(app);
 require('./app/routes/newsletter.routes.js')(app);
 

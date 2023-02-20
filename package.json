@@ -18,6 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "@sendgrid/mail": "^7.4.0",
+    "@supabase/supabase-js": "^2.8.0",
     "bcrypt": "^=5.0.0",
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.10",
@@ -32,6 +33,7 @@
     "node-fetch": "^2.6.1",
     "node-forge": "^0.10.0",
     "pluralize": "git+https://github.com/plurals/pluralize.git",
+    "recipe-ingredient-parser-v3": "^1.2.20",
     "socket.io-client": "^4.4.1",
     "toad-scheduler": "^1.6.0",
     "twit": "^2.2.11",

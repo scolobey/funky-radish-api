@@ -31,4 +31,5 @@ exports.launchScheduledTasks = () => {
   // scheduler.addSimpleIntervalJob(twitterStreamJob)
 }
 
-TwitterService.initializeTweetStream()
+// Disabled now that the API is paid. Never got any attention anyway.
+// TwitterService.initializeTweetStream()
