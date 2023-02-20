@@ -31,7 +31,7 @@
     "mongoose": "^=5.7.5",
     "mongoose-unique-validator": "^2.0.3",
     "node-fetch": "^2.6.1",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.3.0",
     "pluralize": "git+https://github.com/plurals/pluralize.git",
     "recipe-ingredient-parser-v3": "^1.2.20",
     "socket.io-client": "^4.4.1",
