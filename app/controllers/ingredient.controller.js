@@ -16,15 +16,11 @@ exports.search = async (req, res) => {
   let query = req.params.query
   let data = await getIngredients(query)
 
-  console.log(data[0].recipes.length);
-
   // collect the recipes.
   let recipeReturn = getRecipes(database, data[0].recipes)
 
   recipeReturn.toArray(function(err, docs) {
     assert.equal(err, null);
-
-    console.log("recipes collected")
 
     let ingredientFrequency = {}
 
@@ -76,9 +72,6 @@ exports.search = async (req, res) => {
 
     data[0].recipes = docs
     data[0].ingredientFrequency = ingFreqList.sort(function(a, b){return a[1] - b[1]});
-
-    console.log(data);
-
     res.send(JSON.stringify(data))
   })
 
