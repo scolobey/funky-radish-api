@@ -29,10 +29,10 @@ exports.search = async (req, res) => {
       if (item.ing.length > 0) {
         item.ing.forEach((ing, i) => {
 
-          console.log(ing);
           let cleanedIngredient = ing
-            .replace(/\s+/g, ' ')
             .replace('.', '')
+            .replace('-', ' ')
+            .replace(/\s+/g, ' ')
             .replace(/([0-9]+)g/, "$1 grams")
             .replace(' parts ', ' ')
             .replace(' part ', ' ')
@@ -51,13 +51,19 @@ exports.search = async (req, res) => {
             .trim()
             .toLowerCase()
 
-          let parsedIng = parse(cleanedIngredient, "eng")
+          try {
+            let parsedIng = parse(cleanedIngredient, "eng")
 
-          if ( ingredientFrequency[parsedIng.ingredient] ) {
-            ingredientFrequency[parsedIng.ingredient] = ingredientFrequency[parsedIng.ingredient] + 1
-          } else {
-            ingredientFrequency[parsedIng.ingredient] = 1
+            if ( ingredientFrequency[parsedIng.ingredient] ) {
+              ingredientFrequency[parsedIng.ingredient] = ingredientFrequency[parsedIng.ingredient] + 1
+            } else {
+              ingredientFrequency[parsedIng.ingredient] = 1
+            }
           }
+          catch(err) {
+            console.log("stupid ingredientparser can't handle: " + cleanedIngredient);
+          }
+
         })
       }
     });

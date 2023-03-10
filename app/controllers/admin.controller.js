@@ -55,9 +55,11 @@ exports.scanIngredients = async (req, res) => {
       // TODO: Fix this stupid package
       // WARNING: If you change this, you have to change the frontend as well.
       // Look at components/Recipe.js
+      // And you should also change the parser in the ingredient-based search @ ingredient.controller.js exports.search
       let cleanedIngredient = ingredient
-        .replace(/\s+/g, ' ')
         .replace('.', '')
+        .replace('-', ' ')
+        .replace(/\s+/g, ' ')
         .replace(/([0-9]+)g/, "$1 grams")
         .replace(' parts ', ' ')
         .replace(' part ', ' ')
