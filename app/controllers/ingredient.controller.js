@@ -26,6 +26,8 @@ exports.search = async (req, res) => {
 
     docs.forEach((item, i) => {
 
+      console.log(item);
+
       if (item.ing.length > 0) {
         item.ing.forEach((ing, i) => {
           let cleanedIngredient = ing
