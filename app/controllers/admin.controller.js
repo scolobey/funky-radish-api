@@ -11,24 +11,50 @@ const supabaseKey = process.env.SUPABASE_KEY || config.get('SUPABASE_KEY')
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+let ingredients = {}
+
+// Add values to Ingredients.
+exports.scanIngredients = async (req, res) => {
+  console.log("getting ingredients.")
+  // get ingredients ordered by count of recipes.
+  // that do not have a description.
+
+  // Add a description from the OpenAi API.
+  // design prompts for each key
+  let descr = {
+    description: "",
+    nutrition: "",
+    history: "",
+    production: "",
+    image: "",
+    types: "",
+    brands: "",
+    faq: [{q: "", a: ""}]
+  }
+
+  res.json({
+    message: 'All done!',
+    data: {}
+  });
+}
+
 // Scan ingredients. Collect statistics.
 exports.scanIngredients = async (req, res) => {
   console.log("scanning ingredients.")
 
-  // Create a recipe container
-  let ingredients = {}
-
   //first get the recipes.
   const db = req.app.locals.db
-
   var cursor = db.collection('Recipe')
   .find()
 
   cursor.on('data', function (data) {
     console.log(Object.keys(ingredients).length);
 
+    // Iterate ingredients in the recipe.
     data.ing.forEach((ingredient, i) => {
       // TODO: Fix this stupid package
+      // WARNING: If you change this, you have to change the frontend as well.
+      // Look at components/Recipe.js
       let cleanedIngredient = ingredient
         .replace(/\s+/g, ' ')
         .replace('.', '')
@@ -58,11 +84,13 @@ exports.scanIngredients = async (req, res) => {
           if (ingredients.hasOwnProperty(parsedIng.ingredient)) {
             if ( !ingredients[parsedIng.ingredient].recipes.includes(data._id)) {
               ingredients[parsedIng.ingredient].recipes.push(data._id)
+              ingredients[parsedIng.ingredient].recipesCount ++
             }
           } else {
             ingredients[parsedIng.ingredient] = {
               name: parsedIng.ingredient,
               recipes: [data._id],
+              recipesCount: 1,
               units: [parsedIng.unit]
             }
           }
@@ -76,39 +104,50 @@ exports.scanIngredients = async (req, res) => {
   });
 
   cursor.on('end', function () {
+    console.log('Done');
+
+    saveFile()
+
     let ingArray = Object.values(ingredients)
-    console.log("adding ingredients: " + ingArray.length);
 
-    let dataSummary = JSON.stringify(ingArray);
+    // addIngredients(ingArray)
 
-    fs.writeFile('ingFile.json', dataSummary, 'utf8', function(err) {
-      if (err) throw err;
-      console.log('complete');
-    });
-
-    console.log('List: ', dataSummary);
-
-    addIngredients(ingArray)
-
-    res.send(ingArray.length);
   });
 
-  //       // Run other metrics.
-  //       // % of recipes including this ingredient.
-  //       // array of units
-  //       // similar ingredients
-  //
-
-  //       console.log("inserting ing: " + ingArray.length);
-
-
+  res.json({
+    message: 'All done!',
+    data: {}
+  });
 }
 
-const addIngredients = async (ingList) => {
+const saveFile = async () => {
+  let ingArray = Object.values(ingredients)
+  let dataSummary = JSON.stringify(ingArray)
+  console.log("saving: " + dataSummary)
 
+  fs.writeFile('ingFile.json', dataSummary, 'utf8', function(err) {
+    if (err) throw err;
+    console.log('complete');
+  });
+};
+
+const addIngredients = async (ingList) => {
   const { error } = await supabase
     .from('ingredients')
-    .insert(ingList)
+    .insert(ingList, { upsert: true })
 
   console.log(error);
 };
+
+// const getIngredients = async (ingList) => {
+//   const { error } = await supabase
+//     .from('ingredients')
+//     .insert(ingList, { upsert: true })
+//
+//     let { data: ingredients, error } = await supabase
+//   .from('ingredients')
+//   .select('*')
+//   .range(0, 9)
+//
+//   console.log(error);
+// };

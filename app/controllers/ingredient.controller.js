@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const config = require('config');
-
 const assert = require('assert');
+const { parse } = require('recipe-ingredient-parser-v3');
 
 const supabaseUrl = process.env.SUPABASE_URI || config.get('SUPABASE_URI')
 const supabaseKey = process.env.SUPABASE_KEY || config.get('SUPABASE_KEY')
@@ -10,7 +10,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Scan ingredients. Collect statistics.
 exports.search = async (req, res) => {
-  console.log("getting ingredient: " + req.params.query);
 
   const database = req.app.locals.db
 
@@ -27,17 +26,58 @@ exports.search = async (req, res) => {
 
     console.log("recipes collected")
 
-    docs.forEach((item, i) => {
-      item.directions = item.direction_list
-      item.ingredients = item.ingredient_list
+    let ingredientFrequency = {}
 
-      delete item.direction_list
-      delete item.ingredient_list
+    docs.forEach((item, i) => {
+
+      if (item.ing.length > 0) {
+        item.ing.forEach((ing, i) => {
+          let cleanedIngredient = ing
+            .replace(/\s+/g, ' ')
+            .replace('.', '')
+            .replace(/([0-9]+)g/, "$1 grams")
+            .replace(' parts ', ' ')
+            .replace(' part ', ' ')
+            .replace(/([a-zA-Z]+)\./, "$1 ")
+            .replace(' oz ', ' ounce ')
+            .replace(', as needed', '')
+            .replace(', optional', '')
+            .replace(' as needed', '')
+            .replace(' medium ', ' ')
+            .replace(' large ', ' ')
+            .replace(' small ', ' ')
+            .replace(' fresh ', ' ')
+            .replace(' pure ', ' ')
+            .replace('"', ' inches')
+            .replace(/ *\([\s\S]*?\)/g, '')
+            .trim()
+            .toLowerCase()
+
+          let parsedIng = parse(cleanedIngredient, "eng")
+
+          if ( ingredientFrequency[parsedIng.ingredient] ) {
+            ingredientFrequency[parsedIng.ingredient] = ingredientFrequency[parsedIng.ingredient] + 1
+          } else {
+            ingredientFrequency[parsedIng.ingredient] = 1
+          }
+        })
+      }
     });
 
-    console.log("got back the recipe list: ");
+    let keys = Object.keys(ingredientFrequency)
+    let ingFreqList = []
+
+    keys.forEach((item, i) => {
+      let count = ingredientFrequency[item]
+      if (count > 1) {
+        ingFreqList.push([item, count])
+      }
+    })
 
     data[0].recipes = docs
+    data[0].ingredientFrequency = ingFreqList.sort(function(a, b){return a[1] - b[1]});
+
+    console.log(data);
 
     res.send(JSON.stringify(data))
   })
