@@ -26,10 +26,10 @@ exports.search = async (req, res) => {
 
     docs.forEach((item, i) => {
 
-      console.log(item);
-
       if (item.ing.length > 0) {
         item.ing.forEach((ing, i) => {
+
+          console.log(ing);
           let cleanedIngredient = ing
             .replace(/\s+/g, ' ')
             .replace('.', '')
